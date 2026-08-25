@@ -1,7 +1,11 @@
-# 🤖 Alpaca AI Options Agent — hackathon build
+# 🛡️ Risk Gate — Honest Options AI
+
+**Team:** Risk Gate · **Tagline:** Honest options AI
 
 An autonomous options-trading agent for the Alpaca AI Trading Agents Hackathon
-(Aug 28 – Sep 4). **Paper account only. Never real money.**
+(Aug 28 – Sep 4, 2026). Its edge isn't a magic signal — it's **discipline and risk
+gates**, with every decision explainable and honestly validated. **Paper account
+only. Never real money.**
 
 Start here → **PLAN.md** (the week plan) and **TRACKER.md** (the checklist).
 Write-up goes in **WRITEUP.md** — filled in LAST.

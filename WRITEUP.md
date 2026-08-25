@@ -1,4 +1,4 @@
-# One-Page Write-Up — [Agent name]  *(FILL THIS LAST)*
+# One-Page Write-Up — Risk Gate (Honest Options AI)  *(FILL THIS LAST)*
 
 > Skeleton only. Complete it on Day 7 once you have real paper results.
 > Keep it to ONE page. The email asks specifically for: AI logic · risk gates ·
