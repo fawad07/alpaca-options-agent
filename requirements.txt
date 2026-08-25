@@ -1,0 +1,8 @@
+# Core (dry-run works with just these three)
+pandas
+numpy
+requests
+# Loads your Alpaca keys from .env
+python-dotenv
+# Needed only for LIVE_PAPER mode (placing real paper orders on Alpaca)
+alpaca-py
