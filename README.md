@@ -10,26 +10,37 @@ only. Never real money.**
 Start here → **PLAN.md** (the week plan) and **TRACKER.md** (the checklist).
 Write-up goes in **WRITEUP.md** — filled in LAST.
 
-## Run the dry-run (works right now, no Alpaca account needed)
+## Setup (once)
 ```
 cd ~/Desktop/alpaca-options-agent
-pip3 install pandas numpy requests
-python3 agent.py
+python3.11 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+cp .env.example .env          # then paste your PAPER keys into .env
 ```
-It fetches real prices, computes signals, and prints the exact option trades it
-*would* place — with every risk gate applied. Places nothing.
+> Uses a Python 3.11 virtualenv (the MCP tooling needs 3.10+). Run everything
+> with `.venv/bin/python …`.
 
-Honesty check on the signal:
+## Dry-run (no orders — prints what it WOULD do)
 ```
-python3 backtest_signal.py
+.venv/bin/python agent.py
+```
+Applies every risk gate and prints the option trades it would place. Places nothing.
+
+## Verify the plumbing
+```
+.venv/bin/python test_connection.py    # account balance via Alpaca API
+.venv/bin/python mcp_test.py           # connect to Alpaca MCP server, list tools
+.venv/bin/python test_select.py        # pick + price an ATM option per symbol via MCP
+.venv/bin/python backtest_signal.py    # out-of-sample honesty check on the signal
 ```
 
-## Go live on your Alpaca PAPER account (later, after setup)
-1. `pip3 install -r requirements.txt`
-2. `cp .env.example .env` and paste your **paper** API keys
-3. Set `AGENT_MODE=LIVE_PAPER` in `.env`
-4. Fill the `# TODO(alpaca)` hooks in `agent.py` (Day 1–2 of the plan)
-5. `python3 agent.py --loop 900`  (runs every 15 min)
+## Go live on the PAPER account (during US market hours)
+1. In `.env` set `AGENT_MODE=LIVE_PAPER`
+2. `.venv/bin/python agent.py`            (one pass — places/manages via MCP)
+   or `.venv/bin/python agent.py --loop 900`   (every 15 min)
+
+**Architecture:** `agent.py` (signal + risk gates) → `mcp_client.py` → Alpaca **MCP server**
+→ Alpaca paper account. Options only, defined-risk (long calls/puts), paper money only.
 
 ## Files
 | File | Role | Reused from |

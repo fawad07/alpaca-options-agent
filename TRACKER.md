@@ -30,11 +30,10 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 - [x] Out-of-sample honesty check (`backtest_signal.py`)
 - [x] Decided **MCP** — official `alpaca-mcp-server` (72 tools); connection verified via `mcp_test.py` ✅
 - [x] Fresh dedicated account confirmed (created 2026-08-25) ✅
-- [ ] Wire agent to MCP: account/equity, positions
-- [ ] (verified reachable via MCP: get_account_info, option chain, place_option_order)
-- [ ] Wire option chain selection (ATM, DTE 14–60, liquid)
-- [ ] Wire order placement (buy-to-open) + exits (TP +50% / SL −50% / near-expiry)
-- [ ] Test paper stock order fills, then paper option order fills
+- [x] Wire agent to MCP: account/equity, positions ✅
+- [x] Wire option chain selection (ATM, ~30 DTE) — verified via `test_select.py` ✅
+- [x] Wire order placement (buy-to-open) + exits (TP +50% / SL −50%) ✅ (code-complete)
+- [ ] **Place first real paper option order** (must be during US market hours, 9:30–16:00 ET)
 - [ ] Autonomous schedule during market hours (`--loop` / cron)
 - [ ] Flip `AGENT_MODE=LIVE_PAPER` on the **submission** account; run the week
 
