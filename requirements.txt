@@ -6,3 +6,6 @@ requests
 python-dotenv
 # Needed only for LIVE_PAPER mode (placing real paper orders on Alpaca)
 alpaca-py
+# MCP integration (client SDK + Alpaca's official MCP server). Needs Python 3.10+
+mcp
+alpaca-mcp-server

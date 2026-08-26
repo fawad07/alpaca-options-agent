@@ -17,17 +17,21 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 - [ ] Dev paper account (any) for building — you already have one ✅
 - [ ] **NEW, dedicated** paper account created **just for the final submission**
       (reused/existing accounts are NOT eligible for judging)
-- [ ] Submission account balance set to **$100,000**
-- [ ] Paper API keys for the submission account → pasted into `.env`
-- [ ] Recorded the **Alpaca paper account ID** (required in the submission)
+- [x] Submission account balance set to **$100,000** ✅
+- [x] Paper API keys pasted into `.env` (git-ignored) ✅
+- [x] Options trading enabled (Level 3) ✅
+- [x] Recorded the **Alpaca paper account ID**: `PA327FXF8G6D` (submit this)
+- [x] Connection verified with `test_connection.py` ✅
 
 ## 🧱 Build
 - [x] Project scaffold + dry-run agent runs on real data
 - [x] Signal engine (`signals.py`) — bull→call / bear→put
 - [x] Risk gates (`risk.py`) — 2%/trade, ≤5 open, 5% daily-loss halt, long-only, DTE 14–60
 - [x] Out-of-sample honesty check (`backtest_signal.py`)
-- [ ] Decide **MCP vs CLI** (leaning MCP — it's the hackathon's core theme)
-- [ ] Wire Alpaca: account/equity, positions  *(agent.py TODOs)*
+- [x] Decided **MCP** — official `alpaca-mcp-server` (72 tools); connection verified via `mcp_test.py` ✅
+- [x] Fresh dedicated account confirmed (created 2026-08-25) ✅
+- [ ] Wire agent to MCP: account/equity, positions
+- [ ] (verified reachable via MCP: get_account_info, option chain, place_option_order)
 - [ ] Wire option chain selection (ATM, DTE 14–60, liquid)
 - [ ] Wire order placement (buy-to-open) + exits (TP +50% / SL −50% / near-expiry)
 - [ ] Test paper stock order fills, then paper option order fills
