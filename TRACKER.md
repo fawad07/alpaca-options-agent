@@ -34,14 +34,14 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 - [x] Wire option chain selection (ATM, ~30 DTE) — verified via `test_select.py` ✅
 - [x] Wire order placement (buy-to-open) + exits (TP +50% / SL −50%) ✅ (code-complete)
 - [ ] **Place first real paper option order** (must be during US market hours, 9:30–16:00 ET)
-- [ ] Autonomous schedule during market hours (`--loop` / cron)
+- [x] Autonomous scheduler built (`run_agent.sh` + `market_open.py`, cron-ready) — start at market open
 - [ ] Flip `AGENT_MODE=LIVE_PAPER` on the **submission** account; run the week
 
 ## 📦 Deliverables (required for submission)
 - [x] **Public GitHub repo, MIT-licensed** — https://github.com/fawad07/alpaca-options-agent
 - [ ] Cover image
-- [ ] **Video presentation** (demo the agent in action)
-- [ ] **Slide presentation**
+- [ ] **Video presentation** — script ready (`VIDEO_SCRIPT.md`); record during a live run
+- [ ] **Slide presentation** — deck drafted (`SLIDES.md`); finalize with results
 - [ ] Demo app platform + application URL
 - [ ] **Alpaca paper account ID** (for P&L judging)
 - [ ] Project title, short + long description, tech/category tags
