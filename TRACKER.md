@@ -58,5 +58,6 @@ P&L · Technology Implementation · Creativity & Originality · Presentation & E
 → Our edge: creativity + presentation + engagement + a clean, honest, well-documented agent.
 
 ## 📝 Write-up — DO THIS LAST
-- [ ] One page: **AI logic · risk gates · Alpaca infrastructure** (`WRITEUP.md`)
-- [ ] Attach final P&L screenshot; submit before Sep 4 10:00 AM CDT
+- [x] Write-up pre-filled (`WRITEUP.md`) — only final P&L numbers + screenshot remain
+- [ ] Drop in final P&L numbers + screenshot; submit before Sep 4 10:00 AM CDT
+- [ ] (optional) Deploy dashboard to Render for a public demo URL — see `DEPLOY.md`
