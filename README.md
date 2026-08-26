@@ -34,6 +34,13 @@ Applies every risk gate and prints the option trades it would place. Places noth
 .venv/bin/python backtest_signal.py    # out-of-sample honesty check on the signal
 ```
 
+## Live status dashboard (also your demo URL)
+```
+.venv/bin/python dashboard.py     # → http://localhost:8095
+```
+Shows account equity + P&L, open option positions, recent orders, and the agent's
+decisions — all read through the Alpaca MCP server. Auto-refreshes. Read-only.
+
 ## Go live on the PAPER account (during US market hours)
 1. In `.env` set `AGENT_MODE=LIVE_PAPER`
 2. `.venv/bin/python agent.py`            (one pass — places/manages via MCP)

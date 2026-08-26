@@ -42,7 +42,7 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 - [ ] Cover image — draft ready (`cover.html` → open in browser, export/screenshot to PNG)
 - [ ] **Video presentation** — script ready (`VIDEO_SCRIPT.md`); record during a live run
 - [ ] **Slide presentation** — deck drafted (`SLIDES.md`); finalize with results
-- [ ] Demo app platform + application URL
+- [x] Demo app built — live dashboard (`dashboard.py` → localhost:8095); show in video, or deploy for a public URL
 - [ ] **Alpaca paper account ID** (for P&L judging)
 - [ ] Project title, short + long description, tech/category tags
 

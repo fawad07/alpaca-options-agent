@@ -9,3 +9,5 @@ alpaca-py
 # MCP integration (client SDK + Alpaca's official MCP server). Needs Python 3.10+
 mcp
 alpaca-mcp-server
+# Live status dashboard
+flask

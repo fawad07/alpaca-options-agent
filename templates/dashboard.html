@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risk Gate — Live Status</title>
+<style>
+  :root{--bg:#0b1018;--card:#141c28;--card2:#1b2533;--line:#26313f;--text:#e8eef6;
+        --muted:#8296ad;--green:#3fb950;--red:#f85149;--accent:#5fa8ff;--amber:#e0a13a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:24px}
+  .wrap{max-width:1000px;margin:0 auto}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+  header h1{font-size:22px} .shield{font-size:26px}
+  .pill{font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .pill.live{color:var(--green);border-color:#1f5130;background:rgba(63,185,80,.12)}
+  .pill.dry{color:var(--amber);border-color:#5a4620;background:rgba(224,161,58,.10)}
+  .pill.open{color:var(--green)} .pill.closed{color:var(--muted)}
+  .clock{margin-left:auto;color:var(--muted);font-size:13px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .card .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .card .v{font-size:24px;font-weight:700;margin-top:6px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px}
+  .panel h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:right;padding:9px 8px;border-bottom:1px solid var(--line);font-size:13px;font-variant-numeric:tabular-nums}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--muted);font-size:11px;text-transform:uppercase}
+  tr:last-child td{border-bottom:none}
+  .green{color:var(--green)} .red{color:var(--red)} .muted{color:var(--muted)}
+  .note{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.5}
+  .banner{background:rgba(224,161,58,.10);border:1px solid #5a4620;color:#e8d3a6;
+          border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="shield">🛡️</span>
+    <h1>Risk Gate — Live Status</h1>
+    <span class="pill" id="mode">—</span>
+    <span class="pill" id="market">—</span>
+    <span class="clock" id="clock">connecting…</span>
+  </header>
+
+  <div id="banner"></div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="panel">
+    <h2>Open option positions</h2>
+    <table><thead><tr><th>Contract</th><th>Type</th><th>Qty</th><th>Avg</th><th>Now</th><th>Value</th><th>P/L</th></tr></thead>
+      <tbody id="pos"></tbody></table>
+  </div>
+
+  <div class="panel">
+    <h2>Recent orders</h2>
+    <table><thead><tr><th>Time</th><th>Contract</th><th>Side</th><th>Qty</th><th>Status</th></tr></thead>
+      <tbody id="orders"></tbody></table>
+  </div>
+
+  <div class="panel">
+    <h2>Agent decisions (from log)</h2>
+    <table><thead><tr><th>Time</th><th>Symbol</th><th>Contract</th><th>Qty</th></tr></thead>
+      <tbody id="log"></tbody></table>
+  </div>
+
+  <div class="note">Read-only. Paper account only — no real money. Data via Alpaca MCP server.
+    Refreshes every 20s.</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>'$'+Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
+const cls=n=>n>=0?'green':'red', sg=n=>n>=0?'+':'';
+
+async function refresh(){
+  try{
+    const d=await(await fetch('/api/status')).json();
+    $('clock').textContent='updated '+d.updated;
+    const m=$('mode'); m.textContent=d.mode; m.className='pill '+(d.mode==='LIVE_PAPER'?'live':'dry');
+    const mk=$('market'); mk.textContent='Market '+d.market; mk.className='pill '+(d.market==='OPEN'?'open':'closed');
+
+    $('banner').innerHTML = !d.connected
+      ? `<div class="banner">Not connected to Alpaca yet — add your paper keys to <b>.env</b>. ${d.error?('('+d.error+')'):''}</div>`
+      : (d.mode!=='LIVE_PAPER' ? `<div class="banner">Currently in <b>DRY_RUN</b> — showing your account, but the agent is placing no trades. Set AGENT_MODE=LIVE_PAPER to trade (paper).</div>`:'');
+
+    const a=d.account;
+    $('cards').innerHTML = a ? `
+      <div class="card"><div class="k">Equity</div><div class="v">${money(a.equity)}</div></div>
+      <div class="card"><div class="k">P&L vs $100k</div><div class="v ${cls(a.pl)}">${sg(a.pl)}${money(a.pl)}<span style="font-size:14px"> (${sg(a.pl_pct)}${a.pl_pct.toFixed(2)}%)</span></div></div>
+      <div class="card"><div class="k">Cash</div><div class="v">${money(a.cash)}</div></div>
+      <div class="card"><div class="k">Options buying power</div><div class="v">${money(a.options_bp)}</div></div>`
+      : `<div class="card"><div class="k">Account</div><div class="v muted">—</div></div>`;
+
+    $('pos').innerHTML = (d.positions&&d.positions.length) ? d.positions.map(p=>`
+      <tr><td>${p.symbol}</td><td>${p.right}</td><td>${p.qty}</td><td>${money(p.avg)}</td>
+      <td>${money(p.price)}</td><td>${money(p.value)}</td>
+      <td class="${cls(p.pl)}">${sg(p.pl)}${money(p.pl)} (${sg(p.plpc)}${p.plpc.toFixed(0)}%)</td></tr>`).join('')
+      : '<tr><td class="muted" colspan="7">No open positions.</td></tr>';
+
+    $('orders').innerHTML=(d.orders&&d.orders.length)?d.orders.map(o=>`
+      <tr><td>${o.time||''}</td><td>${o.symbol||''}</td>
+      <td class="${o.side==='buy'?'green':'red'}">${(o.side||'').toUpperCase()}</td>
+      <td>${o.qty||''}</td><td>${o.status||''}</td></tr>`).join('')
+      : '<tr><td class="muted" colspan="5">No orders yet.</td></tr>';
+
+    $('log').innerHTML=(d.log&&d.log.length)?d.log.map(e=>`
+      <tr><td>${(e.ts||'').replace('T',' ')}</td><td>${e.symbol||''}</td>
+      <td>${e.contract||''}</td><td>${e.qty||''}</td></tr>`).join('')
+      : '<tr><td class="muted" colspan="4">No agent trades logged yet.</td></tr>';
+  }catch(e){ $('clock').textContent='offline — retrying'; }
+}
+refresh(); setInterval(refresh,20000);
+</script>
+</body>
+</html>
