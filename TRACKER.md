@@ -39,7 +39,7 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 
 ## 📦 Deliverables (required for submission)
 - [x] **Public GitHub repo, MIT-licensed** — https://github.com/fawad07/alpaca-options-agent
-- [ ] Cover image
+- [ ] Cover image — draft ready (`cover.html` → open in browser, export/screenshot to PNG)
 - [ ] **Video presentation** — script ready (`VIDEO_SCRIPT.md`); record during a live run
 - [ ] **Slide presentation** — deck drafted (`SLIDES.md`); finalize with results
 - [ ] Demo app platform + application URL
@@ -47,6 +47,7 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 - [ ] Project title, short + long description, tech/category tags
 
 ## 📣 Social engagement (Build in Public — up to 5 posts, tag @lablabai + @AlpacaHQ)
+> All 5 posts are drafted in `SOCIAL.md` — just add a screenshot and post.
 - [ ] Post 1 — the build begins / the honest angle
 - [ ] Post 2–4 — progress, a setback, a risk-gate save
 - [ ] Post 5 — final results
