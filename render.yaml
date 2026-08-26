@@ -1,0 +1,20 @@
+# Render Blueprint — deploys the Risk Gate live dashboard as a public web service.
+# In Render: New → Blueprint → pick this repo. Then set the two secret env vars.
+services:
+  - type: web
+    name: risk-gate-dashboard
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python dashboard.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: AGENT_MODE
+        value: LIVE_PAPER
+      - key: ALPACA_API_KEY      # set in the Render dashboard (secret)
+        sync: false
+      - key: ALPACA_SECRET_KEY   # set in the Render dashboard (secret)
+        sync: false
+      - key: DASH_TOKEN          # optional: set a word to require ?token=WORD
+        sync: false

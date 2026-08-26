@@ -8,15 +8,24 @@ Auto-refreshes. Read-only — it never places trades.
 Run:   .venv/bin/python dashboard.py    →   http://localhost:8095
 """
 from __future__ import annotations
-import asyncio, json, time, re
+import os, asyncio, json, time, re
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request, abort
 import config as C
 from mcp_client import mcp_session, account, option_positions, call
 
 app = Flask(__name__)
 _cache = {'t': 0.0, 'data': None}
+
+# Optional access gate: if DASH_TOKEN is set, every request needs ?token=…
+# (handy when the dashboard is deployed to a public URL). Leave unset = open.
+DASH_TOKEN = os.getenv('DASH_TOKEN', '')
+
+@app.before_request
+def _gate():
+    if DASH_TOKEN and request.args.get('token') != DASH_TOKEN:
+        abort(403)
 
 
 def market_status() -> str:
@@ -107,6 +116,7 @@ def api_status():
 
 
 if __name__ == '__main__':
-    print("\n  Risk Gate — live status dashboard")
-    print("  Open:  http://localhost:8095\n")
-    app.run(host='0.0.0.0', port=8095, debug=False, threaded=True)
+    port = int(os.getenv('PORT', 8095))   # Render/hosts provide $PORT
+    print(f"\n  Risk Gate — live status dashboard")
+    print(f"  Open:  http://localhost:{port}\n")
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
