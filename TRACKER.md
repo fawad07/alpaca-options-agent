@@ -6,8 +6,8 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 
 ## 📋 Rules / eligibility (must all be true)
 - [ ] 18+, not an Alpaca employee, not in a sanctioned country
-- [ ] Registered on **lablab.ai** for the hackathon
-- [ ] Joined the **lablab.ai Discord** (both are required)
+- [x] Registered on **lablab.ai** for the hackathon
+- [x] Joined the **lablab.ai Discord** (both are required)
 - [ ] Agent is **autonomous** via **Alpaca Trading API**
 - [ ] Uses **Alpaca MCP server OR CLI** (they emphasize **MCP**)
 - [ ] **All strategies incorporate options** ✅ (agent buys calls/puts)
@@ -35,7 +35,7 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 - [ ] Flip `AGENT_MODE=LIVE_PAPER` on the **submission** account; run the week
 
 ## 📦 Deliverables (required for submission)
-- [ ] **Public GitHub repo, MIT-licensed** (submissions must be MIT-compliant)
+- [x] **Public GitHub repo, MIT-licensed** — https://github.com/fawad07/alpaca-options-agent
 - [ ] Cover image
 - [ ] **Video presentation** (demo the agent in action)
 - [ ] **Slide presentation**
