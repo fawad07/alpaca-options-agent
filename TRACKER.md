@@ -34,7 +34,8 @@ Work top-to-bottom. **The write-up is intentionally the LAST item.**
 - [x] Wire option chain selection (ATM, ~30 DTE) — verified via `test_select.py` ✅
 - [x] Wire order placement (buy-to-open) + exits (TP +50% / SL −50%) ✅ (code-complete)
 - [ ] **Place first real paper option order** (must be during US market hours, 9:30–16:00 ET)
-- [x] Autonomous scheduler built (`run_agent.sh` + `market_open.py`, cron-ready) — start at market open
+- [x] **Autonomous cloud trading is LIVE** — GitHub Actions (`trade.yml`), secrets set, test run passed
+      (market-gated → no weekend trades). Trades itself every 15 min on weekday market hours. $0, no Mac needed.
 - [ ] Flip `AGENT_MODE=LIVE_PAPER` on the **submission** account; run the week
 
 ## 📦 Deliverables (required for submission)
