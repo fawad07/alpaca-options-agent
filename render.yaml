@@ -18,3 +18,23 @@ services:
         sync: false
       - key: DASH_TOKEN          # optional: set a word to require ?token=WORD
         sync: false
+
+  # Autonomous trader — runs the agent every 15 min during US market hours.
+  # NOTE: Render Cron Jobs are a PAID feature (small per-run cost). If you want
+  # $0, use the GitHub Actions workflow instead (.github/workflows/trade.yml) —
+  # free for public repos. Keep only one of the two enabled to avoid double trades.
+  - type: cron
+    name: risk-gate-agent
+    runtime: python
+    schedule: "*/15 13-20 * * 1-5"   # ~9:30–16:00 ET (UTC), Mon–Fri; agent self-gates
+    buildCommand: pip install -r requirements.txt
+    startCommand: python cron_once.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: AGENT_MODE
+        value: LIVE_PAPER
+      - key: ALPACA_API_KEY
+        sync: false
+      - key: ALPACA_SECRET_KEY
+        sync: false

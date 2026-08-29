@@ -1,0 +1,27 @@
+name: risk-gate-agent
+
+# FREE autonomous trader (public repos get unlimited GitHub Actions minutes).
+# Runs the agent every 15 min during US market hours; the agent self-gates so
+# off-hours/holiday runs place nothing. Add repo Secrets ALPACA_API_KEY and
+# ALPACA_SECRET_KEY (Settings → Secrets and variables → Actions).
+
+on:
+  schedule:
+    - cron: "*/15 13-20 * * 1-5"   # ~9:30–16:00 ET expressed in UTC, Mon–Fri
+  workflow_dispatch: {}            # lets you run it manually from the Actions tab
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Run one market-hours-gated agent pass
+        env:
+          AGENT_MODE: LIVE_PAPER
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+        run: python cron_once.py
