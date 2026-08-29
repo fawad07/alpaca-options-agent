@@ -11,10 +11,18 @@ from __future__ import annotations
 import asyncio, os, sys
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+import shutil
 import config as C
 
-# the MCP server console script that pip installed into this venv
-SERVER_CMD = os.path.join(os.path.dirname(sys.executable), 'alpaca-mcp-server')
+# Resolve the alpaca-mcp-server console script robustly (works with a local venv
+# AND on hosts like Render where it's on PATH rather than next to sys.executable).
+def _resolve_server_cmd() -> str:
+    local = os.path.join(os.path.dirname(sys.executable), 'alpaca-mcp-server')
+    if os.path.exists(local):
+        return local
+    return shutil.which('alpaca-mcp-server') or 'alpaca-mcp-server'
+
+SERVER_CMD = _resolve_server_cmd()
 
 def server_params() -> StdioServerParameters:
     env = {**os.environ,
