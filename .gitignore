@@ -14,3 +14,8 @@ logs/
 
 # OS
 .DS_Store
+
+# Node (deck generation only)
+node_modules/
+package.json
+package-lock.json
