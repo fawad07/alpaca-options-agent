@@ -19,3 +19,5 @@ logs/
 node_modules/
 package.json
 package-lock.json
+results.json
+results.txt
