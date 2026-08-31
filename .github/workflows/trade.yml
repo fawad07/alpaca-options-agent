@@ -7,7 +7,9 @@ name: risk-gate-agent
 
 on:
   schedule:
-    - cron: "*/15 13-20 * * 1-5"   # ~9:30–16:00 ET expressed in UTC, Mon–Fri
+    # Offset off the top-of-hour (:00/:15/:30/:45 are GitHub's most-congested,
+    # most-skipped minutes). ~9:30–16:00 ET expressed in UTC, Mon–Fri.
+    - cron: "7,22,37,52 13-20 * * 1-5"
   workflow_dispatch: {}            # lets you run it manually from the Actions tab
 
 jobs:
