@@ -5,9 +5,11 @@ requests
 # Loads your Alpaca keys from .env
 python-dotenv
 # Needed only for LIVE_PAPER mode (placing real paper orders on Alpaca)
-alpaca-py
+alpaca-py==0.44.0
 # MCP integration (client SDK + Alpaca's official MCP server). Needs Python 3.10+
-mcp
-alpaca-mcp-server
+# PINNED to the versions verified working locally — mcp 2.x has a breaking API
+# change that crashes the server subprocess in CI with "Connection closed".
+mcp==1.29.1
+alpaca-mcp-server==2.3.0
 # Live status dashboard
 flask
