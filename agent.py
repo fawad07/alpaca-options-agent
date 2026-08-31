@@ -58,10 +58,11 @@ def run_dry():
 
 
 # ────────────────────────── LIVE PAPER (via MCP) ───────────────
-async def run_live():
+async def run_live() -> dict:
     from mcp_client import (mcp_session, account, option_positions,
                             find_atm_contract, option_premium, buy_option, close_option)
     print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [LIVE_PAPER via MCP] ===")
+    placed, blocked, signals_n, exits_n = [], [], 0, 0
     async with mcp_session() as s:
         acct = await account(s)
         equity = float(acct.get('equity', C.ACCOUNT_START))
@@ -79,10 +80,10 @@ async def run_live():
                 plpc = 0.0
             if plpc >= C.TAKE_PROFIT_PCT:
                 print(f"  EXIT {sym}: {plpc:+.0%} — take-profit, closing")
-                await close_option(s, sym); rm.open_positions -= 1
+                await close_option(s, sym); rm.open_positions -= 1; exits_n += 1
             elif plpc <= -C.STOP_LOSS_PCT:
                 print(f"  EXIT {sym}: {plpc:+.0%} — stop-loss, closing")
-                await close_option(s, sym); rm.open_positions -= 1
+                await close_option(s, sym); rm.open_positions -= 1; exits_n += 1
 
         # 2) scan for new entries
         for symu in C.UNIVERSE:
@@ -92,35 +93,52 @@ async def run_live():
             sig = S.signal(df); price = float(df['close'].iloc[-1])
             if sig['direction'] == 'neutral' or sig['confidence'] < C.MIN_CONFIDENCE:
                 print(f"  {symu}: no trade — {sig['reason']}"); continue
+            signals_n += 1                      # an actionable signal fired
             ok, why = rm.can_open_new()
             if not ok:
-                print(f"  {symu}: BLOCKED — {why}"); continue
+                print(f"  {symu}: BLOCKED — {why}"); blocked.append(symu); continue
             right = 'call' if sig['direction'] == 'bull' else 'put'
             c = await find_atm_contract(s, symu, right, price, C.MIN_DTE, C.MAX_DTE)
             if not c:
-                print(f"  {symu}: no suitable contract"); continue
+                print(f"  {symu}: no suitable contract"); blocked.append(symu); continue
             ok, why = rm.contract_ok(_dte(c['expiration_date']), is_long=True)
             if not ok:
-                print(f"  {symu}: contract rejected — {why}"); continue
+                print(f"  {symu}: contract rejected — {why}"); blocked.append(symu); continue
             prem = await option_premium(s, c['symbol'])
             if not prem:
-                print(f"  {symu}: no premium quote"); continue
+                print(f"  {symu}: no premium quote"); blocked.append(symu); continue
             qty = rm.size_contracts(prem)
             if qty < 1:
-                print(f"  {symu}: 1 lot (${prem*100:,.0f}) exceeds risk cap"); continue
+                print(f"  {symu}: 1 lot (${prem*100:,.0f}) exceeds risk cap"); blocked.append(symu); continue
             print(f"  {symu}: {sig['direction'].upper()} — BUY {qty}x {c['symbol']} @ ~${prem:.2f}"
                   f"  ({sig['reason']})")
             res = await buy_option(s, c['symbol'], qty)
             log({'symbol': symu, 'contract': c['symbol'], 'qty': qty, 'premium': prem,
                  'signal': sig, 'order_result': str(res)[:400], 'mode': 'LIVE_PAPER'})
+            placed.append(f"{qty}x {symu} {right}")
             rm.open_positions += 1
 
+    # build the one-line journal summary of this pass
+    parts = []
+    if placed:
+        parts.append("BOUGHT " + "; ".join(placed))
+    if exits_n:
+        parts.append(f"closed {exits_n} position(s)")
+    if not placed:
+        if signals_n == 0:
+            parts.append(f"no signal — all {len(C.UNIVERSE)} symbols neutral/low-confidence")
+        else:
+            parts.append(f"{signals_n} signal(s) fired but none opened "
+                         f"(risk gate / no contract / over cap): {', '.join(blocked)}")
+    return {'equity': round(equity, 2), 'open_positions': rm.open_positions,
+            'new_trades': len(placed), 'exits': exits_n, 'summary': "; ".join(parts)}
 
-def run_once():
+
+def run_once() -> dict:
     if C.MODE == 'LIVE_PAPER':
-        asyncio.run(run_live())
-    else:
-        run_dry()
+        return asyncio.run(run_live())
+    run_dry()
+    return {'summary': 'dry run (no live account)'}
 
 
 if __name__ == '__main__':
