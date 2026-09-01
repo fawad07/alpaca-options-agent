@@ -11,13 +11,12 @@ results.json (and a plain results.txt you can copy from).
 from __future__ import annotations
 import asyncio, json, datetime as _dt
 import config
-from mcp_client import mcp_session, call, account, option_positions
+from mcp_client import mcp_session, call, account, option_positions, _rows
 
 
 async def _orders(session):
     """All orders, newest first — used for trade count + win/loss on closed options."""
-    data = await call(session, 'get_orders', {'status': 'all', 'limit': 500})
-    return data if isinstance(data, list) else (data or {}).get('orders', []) or []
+    return _rows(await call(session, 'get_orders', {'status': 'all', 'limit': 500}))
 
 
 async def _portfolio_history(session):

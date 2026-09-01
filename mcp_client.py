@@ -43,9 +43,18 @@ async def account(session) -> dict:
     return await call(session, 'get_account_info') or {}
 
 
+def _rows(data) -> list:
+    """Alpaca's MCP wraps list payloads as {"data": {"result": [...]}}; older
+    shapes used a bare list or a 'positions'/'orders' key. Handle them all."""
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        return data.get('result') or data.get('positions') or data.get('orders') or []
+    return []
+
+
 async def option_positions(session) -> list:
-    data = await call(session, 'get_all_positions')
-    rows = data if isinstance(data, list) else (data or {}).get('positions', []) or []
+    rows = _rows(await call(session, 'get_all_positions'))
     return [p for p in rows if 'option' in str(p.get('asset_class', '')).lower()]
 
 
