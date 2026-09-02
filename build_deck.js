@@ -68,8 +68,8 @@ steps.forEach((st,i)=>{ const x=x0+i*(bw+gap); const mcp=(i===3);
   s.addText(st[0],{x:x+0.1,y:y+0.35,w:bw-0.2,h:0.6,fontFace:SANS,fontSize:17,bold:true,color:mcp?AMBER:TEXT,align:"center",isTextBox:true,margin:0});
   s.addText(st[1],{x:x+0.1,y:y+0.95,w:bw-0.2,h:0.5,fontFace:MONO,fontSize:12,color:MUTED,align:"center",isTextBox:true,margin:0});
   if(i<4) s.addText("▸",{x:x+bw-0.02,y:y+0.55,w:0.4,h:0.5,fontSize:22,color:BLUE,align:"center",isTextBox:true,margin:0}); });
-s.addText("The signal decides direction. The risk gates decide if — and how big. Orders execute through Alpaca's MCP server.",
-  {x:0.9,y:5.3,w:11.5,h:0.7,fontFace:SANS,fontSize:16,color:MUTED,isTextBox:true,margin:0});
+s.addText("The signal decides direction; the risk gates decide if — and how big. Orders execute through Alpaca's MCP — autonomously each market-hours cycle, with every decision logged to a journal.",
+  {x:0.9,y:5.3,w:11.5,h:0.9,fontFace:SANS,fontSize:16,color:MUTED,isTextBox:true,margin:0});
 foot(s,4);
 
 // ── Slide 5 — AI logic ────────────────────────────────────────
@@ -101,7 +101,7 @@ gates.forEach((g,i)=>{ const col=i%3, row=Math.floor(i/3);
   const x=0.9+col*4.05, yy=1.9+row*2.05; card(s,x,yy,3.75,1.8,CARD);
   s.addText(g[0],{x:x+0.3,y:yy+0.3,w:3.2,h:0.8,fontFace:SANS,fontSize:30,bold:true,color:AMBER,isTextBox:true,margin:0});
   s.addText(g[1],{x:x+0.3,y:yy+1.15,w:3.2,h:0.5,fontFace:SANS,fontSize:15,color:MUTED,isTextBox:true,margin:0}); });
-s.addText("In testing, the gates correctly REFUSED SPY & QQQ trades that exceeded the 2% cap — protection working.",
+s.addText("Real evidence: at the 5-position cap the agent REFUSED further signals — and every block is logged in the decision journal.",
   {x:0.9,y:6.15,w:11.5,h:0.5,fontFace:SANS,fontSize:14,color:MUTED,italic:true,isTextBox:true,margin:0});
 foot(s,6);
 
