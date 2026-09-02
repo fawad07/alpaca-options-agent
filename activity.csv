@@ -11,3 +11,4 @@ timestamp_et,market,equity,open_positions,new_trades,exits,summary
 2026-09-01 15:02,open,99632.81,5,0,0,"5 signal(s) fired but none opened (risk gate / no contract / over cap): SPY, MSFT, NVDA, AMZN, TSLA"
 2026-09-01 15:59,open,99574.81,5,0,0,"5 signal(s) fired but none opened (risk gate / no contract / over cap): SPY, MSFT, NVDA, AMZN, TSLA"
 2026-09-01 18:33,closed,,,,,market closed — no action
+2026-09-02 12:42,open,100762.69,5,1,1,BOUGHT 1x SPY call; closed 1 position(s)
