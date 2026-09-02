@@ -13,7 +13,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from flask import Flask, jsonify, render_template, request, abort
 import config as C
-from mcp_client import mcp_session, account, option_positions, call
+from mcp_client import mcp_session, account, option_positions, call, _rows
 
 app = Flask(__name__)
 _cache = {'t': 0.0, 'data': None}
@@ -72,8 +72,7 @@ async def _fetch_live():
         acct = await account(s)
         pos = await option_positions(s)
         try:
-            od = await call(s, 'get_orders', {'status': 'all', 'limit': 15})
-            orders = od if isinstance(od, list) else (od or {}).get('orders', []) or []
+            orders = _rows(await call(s, 'get_orders', {'status': 'all', 'limit': 15}))
         except Exception:
             orders = []
         return acct, pos, orders
@@ -117,6 +116,9 @@ def api_status():
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8095))   # Render/hosts provide $PORT
+    # Local runs bind to localhost only (don't expose account data on the LAN).
+    # A host (Render) sets $PORT, so there we bind 0.0.0.0 so it's routable.
+    host = '0.0.0.0' if os.getenv('PORT') else '127.0.0.1'
     print(f"\n  Risk Gate — live status dashboard")
     print(f"  Open:  http://localhost:{port}\n")
-    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
+    app.run(host=host, port=port, debug=False, threaded=True)

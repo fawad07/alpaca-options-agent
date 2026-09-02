@@ -49,6 +49,22 @@ decisions — all read through the Alpaca MCP server. Auto-refreshes. Read-only.
 **Architecture:** `agent.py` (signal + risk gates) → `mcp_client.py` → Alpaca **MCP server**
 → Alpaca paper account. Options only, defined-risk (long calls/puts), paper money only.
 
+## Autonomous cloud trading + monitoring
+The agent trades itself in the cloud — **no computer needed** — via GitHub Actions
+(`.github/workflows/trade.yml`), which runs `cron_once.py` on a market-hours schedule.
+Every run writes to a **decision journal** (`journal.py` → `ACTIVITY.md` + `activity.csv`),
+committed back to the repo, so there's an honest, timestamped record of *every* decision —
+traded, no-signal, risk-gated, or market-closed.
+
+Helper scripts:
+```
+./check.sh        # one-shot status: recent cloud runs + journal + live P&L
+./trade-now.sh    # force one cloud trade pass now, and show what it did
+./autopilot.sh    # local hourly backstop: fire a pass every hour during market hours
+.venv/bin/python results.py   # slide-ready P&L numbers (writes results.txt/json)
+```
+See **MONITORING.md** for the daily routine and **ACTIVITY.md** for the live journal.
+
 ## Files
 | File | Role | Reused from |
 |---|---|---|
