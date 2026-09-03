@@ -17,17 +17,20 @@ The agent trades itself in the cloud (GitHub Actions, every 15 min, market hours
 ## ⭐ Thu Sep 3 — AFTER 4:00 PM ET (market close) — CAPTURE EVERYTHING
 This is THE moment. Full week of results is in, market is closed, numbers are final.
 
-- [ ] `cd ~/Desktop/alpaca-options-agent`
-- [ ] `.venv/bin/python results.py` → copy the printed numbers (also saved to `results.txt`)
+Final numbers (locked Sep 3 close): **+$1,823 (+1.82%) · 9 trades · 2 take-profits
+(+54% SPY, +74% NVDA) · 0 stops · 87 gate blocks · ~1% max drawdown · $101,823 equity.**
+
+- [x] `.venv/bin/python results.py` → numbers captured
+- [x] Numbers in **submission/presentation.pptx** slide 9
+- [x] Numbers in **submission/WRITEUP.md** Results section
+- [x] Numbers in **submission/LINKEDIN.md** Post 3
+- [x] Cover image exported → **submission/cover.png**
 - [ ] Log into **app.alpaca.markets/paper/dashboard/overview** — confirm account **...FXF8G6D**
-- [ ] **Screenshot the equity curve chart** (+ the total P&L next to it) → this is the money shot
+- [ ] **Screenshot the equity-curve chart** (+ total P&L) → drop onto slide 9 + attach to submission
 - [ ] (optional) Screenshot your own `dashboard.py` for the video
-- [ ] Paste numbers into **presentation.pptx slide 9** (replace the `[__]` placeholders)
-- [ ] Paste numbers into **WRITEUP.md** Results section
-- [ ] Drop the equity-curve image onto **slide 9**
-- [ ] Record the **video** (`VIDEO_SCRIPT.md`)
-- [ ] Export **cover.html** to a PNG
-- [ ] Post the **final social update** (post 5 in `SOCIAL.md`), tag @lablabai + @AlpacaHQ
+- [ ] Eyeball **submission/presentation.pptx** once (couldn't render it locally)
+- [ ] Record the **video** (`submission/VIDEO_SCRIPT.md`)
+- [ ] Post on **LinkedIn** (`submission/LINKEDIN.md`), tag Alpaca + lablab.ai; copy the post link(s)
 
 > Note: screenshots/numbers do NOT need the market open — the account keeps its
 > balance and chart 24/7. Thursday evening is the right time even though it's closed.

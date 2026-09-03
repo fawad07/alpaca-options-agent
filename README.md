@@ -7,8 +7,8 @@ An autonomous options-trading agent for the Alpaca AI Trading Agents Hackathon
 gates**, with every decision explainable and honestly validated. **Paper account
 only. Never real money.**
 
-Start here → **PLAN.md** (the week plan) and **TRACKER.md** (the checklist).
-Write-up goes in **WRITEUP.md** — filled in LAST.
+Start here → **docs/PLAN.md** (the week plan) and **docs/TRACKER.md** (the checklist).
+Write-up is in **submission/WRITEUP.md**. Docs live in **docs/**, deliverables in **submission/**.
 
 ## Setup (once)
 ```
@@ -63,7 +63,7 @@ Helper scripts:
 ./autopilot.sh    # local hourly backstop: fire a pass every hour during market hours
 .venv/bin/python results.py   # slide-ready P&L numbers (writes results.txt/json)
 ```
-See **MONITORING.md** for the daily routine and **ACTIVITY.md** for the live journal.
+See **docs/MONITORING.md** for the daily routine and **ACTIVITY.md** for the live journal.
 
 ## Files
 | File | Role | Reused from |
