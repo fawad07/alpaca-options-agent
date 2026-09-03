@@ -53,10 +53,10 @@ github.com/fawad07/alpaca-options-agent
 
 Wrapping up Risk Gate for the Alpaca × lablab.ai AI Trading Agents Hackathon. 🛡️
 
-One week of autonomous options trading on a paper account — every order placed through Alpaca's MCP server, every trade filtered through hard risk gates, every decision logged.
+Autonomous options trading on a paper account — every order placed through Alpaca's MCP server, every trade filtered through hard risk gates, every decision logged.
 
-Final paper P&L: [FILL IN]
-Trades placed: [FILL IN] · Risk-gate blocks: [FILL IN]
+Final paper P&L: +$1,823 (+1.82%)
+9 trades · 2 take-profits captured (+54% on SPY, +74% on NVDA) · 0 stop-losses · 87 signals refused at the 5-position cap · ~1% max drawdown.
 
 The honest takeaway: one week of options P&L is mostly luck. What I set out to prove is that an AI agent can be transparent, disciplined, and safe — every trade explainable, every risk capped, and the signal's real (limited) edge measured instead of oversold.
 

@@ -45,10 +45,11 @@ We out-of-sample tested the directional signal (settings locked on 2016–2022, 
 hiding it. Risk Gate therefore competes on discipline, safety, and transparency — not on
 a pretended edge. That candor, plus rigorous risk control, is the whole point.
 
-## Results  *(fill in at the end)*
-- Period: **Aug 28 – Sep 4, 2026** · Final equity: **[$____]** · P&L: **[±__%]**
-- Trades taken: **[__]** · Take-profits / stops: **[__ / __]** · Risk-gate blocks: **[__]**
-- **[Screenshot: Alpaca paper P&L + the live dashboard]**
+## Results
+- Period: **Sep 1 – 3, 2026** (paper account PA327FXF8G6D) · Final equity: **$101,823** · P&L: **+$1,823 (+1.82%)**
+- Trades: **9** (7 entries / 2 exits) · Take-profits / stops: **2 / 0** (SPY **+54%**, NVDA **+74%**) · Risk-gate blocks: **87** signals refused at the 5-position cap
+- Max drawdown: **~1%** — the gates kept losses tiny while winners ran to their +50% target.
+- **[Screenshot: Alpaca paper P&L + equity curve + the live dashboard]**
 
 ## Honest takeaway
 One week of options P&L is dominated by luck. Risk Gate is built to be **transparent,

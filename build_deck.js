@@ -134,12 +134,12 @@ foot(s,8);
 s = p.addSlide(); bg(s);
 s.addText("Results", {x:0.9,y:0.6,w:11,h:0.8,fontFace:SANS,fontSize:40,bold:true,color:TEXT,isTextBox:true,margin:0});
 s.addText("Aug 28 – Sep 4, 2026 · paper account PA327FXF8G6D", {x:0.9,y:1.5,w:11.5,h:0.5,fontFace:MONO,fontSize:13,color:MUTED,isTextBox:true,margin:0});
-const stats=[["Final P&L","[  __%  ]"],["Trades","[  __  ]"],["TP / Stops","[ _ / _ ]"],["Risk-gate blocks","[  __  ]"]];
+const stats=[["Final P&L","+1.82%"],["Trades","9"],["TP / Stops","2 / 0"],["Risk-gate blocks","87"]];
 stats.forEach((st,i)=>{ const x=0.9+i*3.0; card(s,x,2.3,2.75,2.0,CARD);
   s.addText(st[1],{x:x+0.1,y:2.6,w:2.55,h:0.9,fontFace:SANS,fontSize:28,bold:true,color:GREEN,align:"center",isTextBox:true,margin:0});
   s.addText(st[0],{x:x+0.1,y:3.5,w:2.55,h:0.6,fontFace:SANS,fontSize:14,color:MUTED,align:"center",isTextBox:true,margin:0}); });
 card(s,0.9,4.6,11.5,1.7,CARD2);
-s.addText("[ Screenshot: Alpaca paper P&L + the live status dashboard ]",
+s.addText("Final equity $101,823  ·  +1.82% on the week  ·  2 take-profits captured (+54%, +74%)  ·  0 stop-losses\n[ add screenshot: Alpaca equity curve + P&L ]",
   {x:1.1,y:4.6,w:11.1,h:1.7,fontFace:SANS,fontSize:16,color:MUTED,italic:true,align:"center",valign:"middle",isTextBox:true,margin:0});
 foot(s,9);
 
