@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap');
+:root{
+  --bg:#0B1018; --card:#141C28; --card2:#1B2533; --line:#2A3646;
+  --text:#E8EEF6; --muted:#8FA0B5; --blue:#5FA8FF; --green:#3FB950;
+  --red:#F85149; --amber:#E0A13A; --greenbg:#12251A; --amberbg:#271F12;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+@page{ size:13.333in 7.5in; margin:0; }
+html,body{background:var(--bg);}
+.slide{
+  position:relative; width:13.333in; height:7.5in; background:var(--bg);
+  color:var(--text); font-family:'Archivo',Arial,sans-serif;
+  padding:0.62in 0.9in; overflow:hidden; page-break-after:always;
+}
+.slide:last-child{page-break-after:auto;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+h1{font-size:96px;font-weight:900;letter-spacing:-.02em;line-height:.98;}
+h2{font-size:48px;font-weight:800;margin-bottom:6px;}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);font-weight:600;}
+.tag{font-size:38px;font-weight:800;color:var(--green);margin-top:4px;}
+.muted{color:var(--muted);}
+.blue{color:var(--blue);} .green{color:var(--green);} .red{color:var(--red);} .amber{color:var(--amber);}
+.sub{font-size:20px;color:var(--muted);margin-top:10px;font-family:'IBM Plex Mono',monospace;}
+.foot{position:absolute;left:0.9in;bottom:0.34in;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+.pageno{position:absolute;right:0.9in;bottom:0.34in;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;}
+.card2{background:var(--card2);border:1px solid var(--line);border-radius:12px;}
+.row{display:flex;gap:22px;}
+.big{font-size:26px;line-height:1.35;}
+</style></head>
+<body>
+
+<!-- 1 Title -->
+<div class="slide">
+  <div style="font-size:150px;line-height:1;position:absolute;right:1in;top:1.2in;opacity:.16;">🛡️</div>
+  <div style="position:absolute;top:2.6in;">
+    <div class="eyebrow">Alpaca × lablab.ai · AI Trading Agents Hackathon 2026</div>
+    <h1 style="margin:12px 0 4px;">Risk Gate</h1>
+    <div class="tag">Honest Options AI</div>
+    <div style="font-size:19px;color:var(--muted);max-width:9in;margin-top:20px;">An autonomous options agent that trades through Alpaca's MCP server — its edge is discipline and risk gates, not hype.</div>
+    <div class="mono" style="font-size:13px;color:var(--muted);margin-top:26px;">github.com/fawad07/alpaca-options-agent   ·   paper account only</div>
+  </div>
+</div>
+
+<!-- 2 Problem -->
+<div class="slide">
+  <h2>The problem</h2>
+  <div class="big" style="margin-top:34px;">Every "AI trading bot" promises easy money.</div>
+  <div class="big" style="margin-top:14px;">Almost all of them lose —</div>
+  <div class="big amber" style="font-weight:700;margin-top:14px;">because a backtest that dazzles you has usually just memorized the past.</div>
+  <div class="card" style="margin-top:44px;padding:26px 30px;">
+    <div style="font-size:18px;color:var(--muted);">So we built the opposite of a hype bot — one whose edge is risk control and honesty, not a secret signal.</div>
+  </div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">2</div>
+</div>
+
+<!-- 3 Thesis -->
+<div class="slide">
+  <h2>Our thesis</h2>
+  <div class="sub" style="font-family:'Archivo';font-size:20px;">The edge isn't a magic prediction. It's discipline.</div>
+  <div class="row" style="margin-top:34px;">
+    <div class="card" style="flex:1;padding:26px;height:3.3in;">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--card2);border:2px solid var(--blue);color:var(--blue);font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;" class="mono">1</div>
+      <div style="font-size:24px;font-weight:800;margin-top:22px;">Transparent</div>
+      <div style="font-size:15px;color:var(--muted);margin-top:12px;line-height:1.45;">Every trade is a simple, explainable rule — no black box.</div>
+    </div>
+    <div class="card" style="flex:1;padding:26px;height:3.3in;">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--card2);border:2px solid var(--blue);color:var(--blue);font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;" class="mono">2</div>
+      <div style="font-size:24px;font-weight:800;margin-top:22px;">Risk-gated</div>
+      <div style="font-size:15px;color:var(--muted);margin-top:12px;line-height:1.45;">Hard caps on size, exposure, and losses protect the account first.</div>
+    </div>
+    <div class="card" style="flex:1;padding:26px;height:3.3in;">
+      <div style="width:52px;height:52px;border-radius:50%;background:var(--card2);border:2px solid var(--blue);color:var(--blue);font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;" class="mono">3</div>
+      <div style="font-size:24px;font-weight:800;margin-top:22px;">Honest</div>
+      <div style="font-size:15px;color:var(--muted);margin-top:12px;line-height:1.45;">We validate out-of-sample and report what's real — no cherry-picking.</div>
+    </div>
+  </div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">3</div>
+</div>
+
+<!-- 4 How it works -->
+<div class="slide">
+  <h2>How it works</h2>
+  <div class="row" style="margin-top:70px;align-items:stretch;">
+    <div class="card" style="flex:1;padding:20px 10px;text-align:center;"><div style="font-size:18px;font-weight:800;">Price data</div><div class="mono" style="font-size:12px;color:var(--muted);margin-top:10px;">daily bars</div></div>
+    <div style="align-self:center;color:var(--blue);font-size:24px;">▸</div>
+    <div class="card" style="flex:1;padding:20px 10px;text-align:center;"><div style="font-size:18px;font-weight:800;">Signal</div><div class="mono" style="font-size:12px;color:var(--muted);margin-top:10px;">EMA · RSI</div></div>
+    <div style="align-self:center;color:var(--blue);font-size:24px;">▸</div>
+    <div class="card" style="flex:1;padding:20px 10px;text-align:center;"><div style="font-size:18px;font-weight:800;">Risk gates</div><div class="mono" style="font-size:12px;color:var(--muted);margin-top:10px;">size / block</div></div>
+    <div style="align-self:center;color:var(--blue);font-size:24px;">▸</div>
+    <div style="flex:1;padding:20px 10px;text-align:center;background:var(--amberbg);border:1px solid var(--amber);border-radius:12px;"><div style="font-size:18px;font-weight:800;color:var(--amber);">Alpaca MCP</div><div class="mono" style="font-size:12px;color:var(--muted);margin-top:10px;">place order</div></div>
+    <div style="align-self:center;color:var(--blue);font-size:24px;">▸</div>
+    <div class="card" style="flex:1;padding:20px 10px;text-align:center;"><div style="font-size:18px;font-weight:800;">Paper acct</div><div class="mono" style="font-size:12px;color:var(--muted);margin-top:10px;">$100k</div></div>
+  </div>
+  <div style="font-size:16px;color:var(--muted);margin-top:56px;max-width:11.2in;">The signal decides direction; the risk gates decide if — and how big. Orders execute through Alpaca's MCP server — autonomously each market-hours cycle, with every decision logged to a journal.</div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">4</div>
+</div>
+
+<!-- 5 AI logic -->
+<div class="slide">
+  <h2 style="font-size:40px;">The AI logic (transparent on purpose)</h2>
+  <div class="row" style="margin-top:34px;">
+    <div class="card" style="flex:1;padding:28px;height:4in;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);">Signal</div>
+      <ul style="margin-top:22px;font-size:17px;line-height:2;list-style:none;">
+        <li>• Trend: 20-day EMA vs 50-day EMA</li>
+        <li>• Filter: 14-day RSI (skip overbought/oversold)</li>
+        <li>• Confidence scales with trend strength</li>
+        <li>• Weak setups → no trade</li>
+      </ul>
+    </div>
+    <div class="card" style="flex:1;padding:28px;height:4in;">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);">Action</div>
+      <div style="font-size:22px;font-weight:800;color:var(--green);margin-top:26px;">Uptrend  →  BUY a CALL</div>
+      <div style="font-size:22px;font-weight:800;color:var(--red);margin-top:20px;">Downtrend  →  BUY a PUT</div>
+      <div style="font-size:22px;font-weight:800;color:var(--muted);margin-top:20px;">Otherwise  →  no trade</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:28px;">Always defined-risk: a bought call or put, ~30 days out, near the money.</div>
+    </div>
+  </div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">5</div>
+</div>
+
+<!-- 6 Risk gates -->
+<div class="slide">
+  <h2>Risk gates (the heart of it)</h2>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:34px;">
+    <div class="card" style="padding:22px;"><div style="font-size:32px;font-weight:800;color:var(--amber);">≤ 2%</div><div style="font-size:15px;color:var(--muted);margin-top:10px;">risked per trade</div></div>
+    <div class="card" style="padding:22px;"><div style="font-size:32px;font-weight:800;color:var(--amber);">≤ 5</div><div style="font-size:15px;color:var(--muted);margin-top:10px;">open positions</div></div>
+    <div class="card" style="padding:22px;"><div style="font-size:32px;font-weight:800;color:var(--amber);">5%</div><div style="font-size:15px;color:var(--muted);margin-top:10px;">daily-loss halt</div></div>
+    <div class="card" style="padding:22px;"><div style="font-size:32px;font-weight:800;color:var(--amber);">Long-only</div><div style="font-size:15px;color:var(--muted);margin-top:10px;">never sells naked</div></div>
+    <div class="card" style="padding:22px;"><div style="font-size:32px;font-weight:800;color:var(--amber);">14–60d</div><div style="font-size:15px;color:var(--muted);margin-top:10px;">expiry window</div></div>
+    <div class="card" style="padding:22px;"><div style="font-size:32px;font-weight:800;color:var(--amber);">+50 / −50%</div><div style="font-size:15px;color:var(--muted);margin-top:10px;">take-profit / stop</div></div>
+  </div>
+  <div style="font-size:14px;color:var(--muted);font-style:italic;margin-top:30px;">Real evidence: at the 5-position cap the agent REFUSED further signals — and every block is logged in the decision journal.</div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">6</div>
+</div>
+
+<!-- 7 MCP -->
+<div class="slide">
+  <h2>Built on MCP</h2>
+  <div style="font-size:18px;color:var(--muted);margin-top:10px;">The hackathon's core theme — the agent trades THROUGH Alpaca's official MCP server.</div>
+  <div class="row" style="margin-top:40px;align-items:center;">
+    <div style="text-align:center;width:2.6in;">
+      <div style="font-size:96px;font-weight:900;color:var(--blue);line-height:1;">72</div>
+      <div style="font-size:15px;color:var(--muted);margin-top:8px;">MCP tools available</div>
+    </div>
+    <div class="card" style="flex:1;padding:26px 30px;height:3.1in;">
+      <div style="font-size:16px;font-weight:800;">Tools the agent calls</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-top:20px;" class="mono">
+        <div class="green" style="font-size:15px;">• get_account_info</div>
+        <div class="green" style="font-size:15px;">• get_option_contracts</div>
+        <div class="green" style="font-size:15px;">• get_option_snapshot</div>
+        <div class="green" style="font-size:15px;">• place_option_order</div>
+        <div class="green" style="font-size:15px;">• get_all_positions</div>
+        <div class="green" style="font-size:15px;">• close_position</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">7</div>
+</div>
+
+<!-- 8 Honesty -->
+<div class="slide">
+  <h2>The honesty check</h2>
+  <div style="font-size:120px;font-weight:900;color:var(--amber);text-align:center;margin-top:34px;">0 of 7</div>
+  <div style="font-size:22px;text-align:center;margin-top:16px;">Out-of-sample, the signal beat buy-and-hold on ZERO of 7 stocks.</div>
+  <div class="card" style="margin:34px auto 0;max-width:8.5in;padding:22px 26px;">
+    <div style="font-size:16px;color:var(--muted);text-align:center;">So we don't claim a magic edge. We compete on discipline, safety & transparency. Most teams hide this — we put it on a slide.</div>
+  </div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">8</div>
+</div>
+
+<!-- 9 Results -->
+<div class="slide">
+  <h2>Results</h2>
+  <div class="mono" style="font-size:13px;color:var(--muted);margin-top:8px;">Sep 1 – 3, 2026 · paper account PA327FXF8G6D</div>
+  <div class="row" style="margin-top:28px;">
+    <div class="card" style="flex:1;padding:22px;text-align:center;"><div style="font-size:30px;font-weight:800;color:var(--green);">+1.82%</div><div style="font-size:14px;color:var(--muted);margin-top:10px;">Final P&amp;L</div></div>
+    <div class="card" style="flex:1;padding:22px;text-align:center;"><div style="font-size:30px;font-weight:800;color:var(--green);">9</div><div style="font-size:14px;color:var(--muted);margin-top:10px;">Trades</div></div>
+    <div class="card" style="flex:1;padding:22px;text-align:center;"><div style="font-size:30px;font-weight:800;color:var(--green);">2 / 0</div><div style="font-size:14px;color:var(--muted);margin-top:10px;">TP / Stops</div></div>
+    <div class="card" style="flex:1;padding:22px;text-align:center;"><div style="font-size:30px;font-weight:800;color:var(--green);">87</div><div style="font-size:14px;color:var(--muted);margin-top:10px;">Risk-gate blocks</div></div>
+  </div>
+  <div class="card2" style="margin-top:26px;padding:26px 30px;text-align:center;">
+    <div style="font-size:16px;color:var(--muted);font-style:italic;">Final equity $101,823 · +1.82% total return since the $100k start · 2 take-profits (+54% SPY, +74% NVDA) · 0 stop-losses · ~1% max drawdown &nbsp;→&nbsp; full equity curve on the next slide</div>
+  </div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">9</div>
+</div>
+
+<!-- 10 Equity curve -->
+<div class="slide">
+  <h2>The week on Alpaca</h2>
+  <div class="mono" style="font-size:13px;color:var(--muted);margin-top:8px;">Paper account PA327FXF8G6D · $100,000 → $101,823 · +1.82% total return</div>
+  <div style="text-align:center;margin-top:22px;"><img src="equity.png" style="width:9.4in;border-radius:10px;"></div>
+  <div style="font-size:12px;color:var(--muted);font-style:italic;text-align:center;margin-top:14px;">The green +1.07% is Alpaca's same-day change; +1.82% is the total return since the $100,000 start.</div>
+  <div class="foot">Risk Gate · Honest Options AI</div><div class="pageno">10</div>
+</div>
+
+<!-- 11 Close -->
+<div class="slide">
+  <div style="font-size:96px;line-height:1;">🛡️</div>
+  <div style="font-size:56px;font-weight:900;margin-top:26px;">Honest. Disciplined. Safe.</div>
+  <div style="font-size:18px;color:var(--muted);margin-top:18px;max-width:10.5in;">An autonomous options agent that's honest about risk. Every trade explainable, every risk capped.</div>
+  <div class="mono blue" style="font-size:14px;margin-top:40px;line-height:1.9;">
+    github.com/fawad07/alpaca-options-agent   ·   MIT<br>
+    Account: PA327FXF8G6D   ·   @lablabai  @AlpacaHQ
+  </div>
+</div>
+
+</body></html>
