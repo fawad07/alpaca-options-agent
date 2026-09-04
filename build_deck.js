@@ -139,11 +139,21 @@ stats.forEach((st,i)=>{ const x=0.9+i*3.0; card(s,x,2.3,2.75,2.0,CARD);
   s.addText(st[1],{x:x+0.1,y:2.6,w:2.55,h:0.9,fontFace:SANS,fontSize:28,bold:true,color:GREEN,align:"center",isTextBox:true,margin:0});
   s.addText(st[0],{x:x+0.1,y:3.5,w:2.55,h:0.6,fontFace:SANS,fontSize:14,color:MUTED,align:"center",isTextBox:true,margin:0}); });
 card(s,0.9,4.6,11.5,1.7,CARD2);
-s.addText("Final equity $101,823  ·  +1.82% on the week  ·  2 take-profits captured (+54%, +74%)  ·  0 stop-losses\n[ add screenshot: Alpaca equity curve + P&L ]",
+s.addText("Final equity $101,823  ·  +1.82% total return since the $100k start  ·  2 take-profits (+54% SPY, +74% NVDA)  ·  0 stop-losses  ·  ~1% max drawdown\n→  full equity curve on the next slide",
   {x:1.1,y:4.6,w:11.1,h:1.7,fontFace:SANS,fontSize:16,color:MUTED,italic:true,align:"center",valign:"middle",isTextBox:true,margin:0});
 foot(s,9);
 
-// ── Slide 10 — Close ──────────────────────────────────────────
+// ── Slide 10 — Equity curve (Alpaca screenshot) ───────────────
+s = p.addSlide(); bg(s);
+s.addText("The week on Alpaca", {x:0.9,y:0.5,w:11,h:0.7,fontFace:SANS,fontSize:40,bold:true,color:TEXT,isTextBox:true,margin:0});
+s.addText("Paper account PA327FXF8G6D  ·  $100,000 → $101,823  ·  +1.82% total return",
+  {x:0.9,y:1.25,w:11.5,h:0.45,fontFace:MONO,fontSize:13,color:MUTED,isTextBox:true,margin:0});
+s.addImage({path:"submission/equity.png", x:2.06,y:1.8,w:9.18,h:4.7});
+s.addText("The green +1.07% is Alpaca's same-day change; +1.82% is the total return since the $100,000 start.",
+  {x:0.9,y:6.55,w:11.5,h:0.4,fontFace:SANS,fontSize:12,color:MUTED,italic:true,align:"center",isTextBox:true,margin:0});
+foot(s,10);
+
+// ── Slide 11 — Close ──────────────────────────────────────────
 s = p.addSlide(); bg(s);
 s.addText("🛡", {x:0.9,y:0.9,w:2,h:1.4,fontSize:90,isTextBox:true,margin:0});
 s.addText("Honest. Disciplined. Safe.", {x:0.9,y:2.5,w:11.5,h:1.1,fontFace:SANS,fontSize:52,bold:true,color:TEXT,isTextBox:true,margin:0});
