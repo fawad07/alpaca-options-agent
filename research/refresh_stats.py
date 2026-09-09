@@ -124,18 +124,23 @@ def write_snapshot(j: dict, a: dict) -> None:
 def append_history(j: dict, a: dict) -> None:
     fields = ["date", "equity", "total_pct", "realized", "closed_trades",
               "wins", "losses", "open_positions", "cycles", "gate_blocks"]
-    is_new = not os.path.exists(HIST)
-    with open(HIST, "a", newline="") as f:
+    today = dt.date.today().isoformat()
+    # keep exactly one row per date — a re-run today overwrites today's row
+    prior = [r for r in csv.DictReader(open(HIST))] if os.path.exists(HIST) else []
+    prior = [r for r in prior if r.get("date") != today]
+    row = {
+        "date": today, "equity": round(a["equity"], 2),
+        "total_pct": round(a["total_pct"], 2), "realized": round(a["realized"], 2),
+        "closed_trades": a["closed"], "wins": a["wins"], "losses": a["losses"],
+        "open_positions": a["open_positions"], "cycles": j["open_runs"],
+        "gate_blocks": j["sig_blocks"],
+    }
+    with open(HIST, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=fields)
-        if is_new:
-            w.writeheader()
-        w.writerow({
-            "date": dt.date.today().isoformat(), "equity": round(a["equity"], 2),
-            "total_pct": round(a["total_pct"], 2), "realized": round(a["realized"], 2),
-            "closed_trades": a["closed"], "wins": a["wins"], "losses": a["losses"],
-            "open_positions": a["open_positions"], "cycles": j["open_runs"],
-            "gate_blocks": j["sig_blocks"],
-        })
+        w.writeheader()
+        for r in prior:
+            w.writerow(r)
+        w.writerow(row)
 
 
 def main():
