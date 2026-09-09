@@ -89,11 +89,26 @@ KEEPING IN MIND:  risking 1.8% ($1,800) · 3/5 slots · daily loss 0.4% (< 5% ha
 
 ---
 
-## Open decisions (need your input)
-1. **First instrument focus:** options (continue), stocks, or crypto?
-2. **Notification channel:** Discord or Telegram?
-3. **Name:** keep "Risk Gate v2" or rebrand?
-4. **ML scope:** start simple (one gradient-boosted model per symbol) or go straight to an ensemble?
+## Locked decisions (2026-09-09)
+1. **Instruments:** **both stocks and crypto** (options where available). Multi-asset from the start.
+2. **Notification channel:** **Discord** (reuse the webhook from the prior project).
+3. **Name:** **rebrand** (candidates below — pick one).
+4. **ML scope:** **ensemble** from the start (multiple models → blended, calibrated confidence).
+5. **Real money:** **Phase 5 still wanted**, but **run paper meaningfully longer first** — extended live-paper track record with OOS outperformance before any real capital.
+
+### Name candidates (pick one, or mix)
+- **Sentinel** — watchful, risk-first guardian.
+- **Ledger** — honest, auditable record at its core.
+- **Cassandra** — tells the truth about risk even when unwelcome (the honesty angle).
+- **Bastion** — a defended position; risk-gated by design.
+- **Northstar** — disciplined guidance, not hype.
+- **Keel** — what keeps a ship stable; understated, stability-first.
+
+### Implications of these choices
+- Multi-asset (stocks + crypto) means the **data layer** needs a crypto adapter (Alpaca crypto and/or an exchange) alongside equities/options, and the **risk layer** must budget across asset classes under one global cap.
+- Discord means Phase 1's `notify/` targets a **Discord webhook** (you already have one).
+- Ensemble ML means `models/` ships with ≥2 base learners + a calibrator, and the **OOS gate** validates the *ensemble's* output, not a single model.
+- "Run paper longer" makes the **journal + track-record** the gating evidence for Phase 5.
 
 ---
 
