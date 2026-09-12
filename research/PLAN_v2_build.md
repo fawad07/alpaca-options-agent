@@ -15,7 +15,8 @@ untouched until we merge. Companion docs: `DESIGN_v2_multiaccount_multiasset.md`
 - **Assets:** stock/ETF **options** (as today) + crypto **spot** (BTC/USD, ETH/USD, SOL/USD, LTC/USD — config list, extensible; ETC dropped, not on Alpaca).
 - **Crypto stop mechanism:** **B — broker/bracket stop orders** (Alpaca holds the stop; no blind window). Agent A-style checks remain only as a backup monitor.
 - **Crypto percentages (from the WS1 backtest robust range):** **stop 15%**, **take-profit 30%**, **max-notional 15%/coin** (mid-plateau of stop 12–20% / TP 25–40%). Starting config — confirm on live paper (account B).
-- **Risk budget:** one **global cap per account** (5 open total, 2%/trade, 5% daily halt). Account-level 2%/5% unchanged.
+- **Risk budget:** one **global cap per account**. **Deployment B: cap 6** open total (options + crypto), 2%/trade, 5% daily halt → worst-case ~12% if all stops hit. Watchlist adds **GOOGL** (stocks: SPY,QQQ,AAPL,MSFT,NVDA,AMZN,TSLA,GOOGL; crypto: BTC,ETH,SOL,LTC).
+  - ⚠️ **Per-deployment override (build in step 7 before merge):** Deployment **A stays cap 5, options-only, no GOOGL** (pure V1 track record). The cap/universe must become **per-account config** so merging v2 doesn't change A. Until that exists, do NOT merge v2 to main.
 - **Edge/strategy path = Option B:** the WS1 backtest showed EMA/RSI beats buy-and-hold on **0/4 coins OOS** (no edge — same as options). So: **build the execution plumbing now** (multi-account, crypto orders, broker stops); treat **EMA/RSI as a placeholder** signal; **elevate the ensemble-ML workstream** to the priority for finding a *real*, OOS-validated edge. Honesty rule holds: no signal ships (crypto or ML) unless it survives out-of-sample.
 
 ## Key dependency to verify FIRST

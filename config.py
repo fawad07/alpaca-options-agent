@@ -25,14 +25,14 @@ ALPACA_SECRET_KEY = os.getenv('ALPACA_SECRET_KEY', '')
 ALPACA_PAPER_URL  = 'https://paper-api.alpaca.markets'
 
 # ── UNIVERSE — liquid, optionable US underlyings ──────────────
-UNIVERSE = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA']
+UNIVERSE = ['SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA', 'GOOGL']
 
 # ── ACCOUNT ───────────────────────────────────────────────────
 ACCOUNT_START = 100_000.0   # competition starting balance
 
 # ── RISK GATES (judges explicitly want these) ────────────────
 MAX_RISK_PER_TRADE_PCT = 0.02    # never risk >2% of equity on one option trade
-MAX_CONCURRENT         = 5       # at most 5 open option positions at once
+MAX_CONCURRENT         = 6       # at most 6 open positions at once (options + crypto combined)
 DAILY_LOSS_LIMIT_PCT   = 0.05    # stop opening new trades if down >5% on the day
 DEFINED_RISK_ONLY      = True    # only BUY options (long calls/puts) — never sell naked
 MIN_DTE                = 14      # days-to-expiry floor (avoid gamma/theta cliff)
