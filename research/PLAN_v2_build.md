@@ -7,7 +7,11 @@ untouched until we merge. Companion docs: `DESIGN_v2_multiaccount_multiasset.md`
 
 ## Locked decisions
 - **Where:** `v2` branch off `main`; merge back when proven.
-- **Accounts:** 2 personal paper accounts, isolated risk each.
+- **Accounts (stable vs experimental, NOT split by asset):**
+  - **Account A** = current V1 (PA327FXF8G6D), kept **options-only** → preserves the paper's clean track record. Unchanged.
+  - **Account B** = a **new paper account** = sandbox for the combined v2 agent (options + crypto) and all experiments.
+  - Realized as **two independent deployments of one codebase** (A: options-only config; B: combined config) — **no in-process multi-account loop needed.** The account+asset *config* does the work. A stays pure because its config never includes crypto.
+  - **Prerequisite for running B live:** user creates a 2nd Alpaca paper account + keys (not needed for backtester or refactor).
 - **Assets:** stock/ETF **options** (as today) + crypto **spot** (BTC/USD, ETH/USD, ETC/USD).
 - **Crypto stop mechanism:** **B — broker/bracket stop orders** (Alpaca holds the stop; no blind window). Agent A-style checks remain only as a backup monitor.
 - **Crypto percentages:** set from a **backtested robust range** (walk-forward, out-of-sample), not guessed.
@@ -44,7 +48,7 @@ Each step is small, DRY_RUN-testable, and must leave single-account/options beha
 4. **`data.fetch_bars(symbol, asset_class)`** crypto path + **`CryptoSpotHandler`** (DRY_RUN: prints intended crypto trades only).
 5. **Crypto sizing in `risk.py`** (using backtested ranges) + **broker stop/bracket order** placement (decision B).
 6. **Crypto live exits / position management** (broker stop is primary; agent monitors as backup).
-7. **Multi-account loop** (both paper accounts, isolated risk).
+7. **Second deployment (account B)** — a combined-config deployment pointed at account B's keys (options + crypto). No in-process loop; A's options-only deployment is just V1 unchanged. (Needs account B keys.)
 8. **Journal + reporting**: add `account` + `asset_class` columns; update `dashboard.py`, `results.py`, `refresh_stats.py`.
 9. **Cloud**: add a **24/7 `trade-crypto.yml`** workflow + per-account secrets; keep the market-hours options workflow.
 
