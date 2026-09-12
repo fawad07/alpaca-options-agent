@@ -140,7 +140,7 @@ options regression passes — so the live track record is never disrupted.
 
 ## 8b. Decisions locked (2026-09-12)
 - **Accounts:** 2, both the user's **own personal paper accounts**. No third-party money (avoids RIA/regulatory issues).
-- **Crypto universe:** BTC/USD, ETH/USD, ETC/USD *(verify Alpaca lists ETC/USD before relying on it)*.
+- **Crypto universe:** BTC/USD, ETH/USD, SOL/USD, LTC/USD (config-driven list — easy to add more later). *ETC/USD dropped — not on Alpaca (Step 0).*
 
 ## 8. Open questions for you (decide before step 1)
 1. **Where:** confirm the **`v2` branch** approach (recommended) vs new repo.

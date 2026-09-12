@@ -12,7 +12,7 @@ untouched until we merge. Companion docs: `DESIGN_v2_multiaccount_multiasset.md`
   - **Account B** = a **new paper account** = sandbox for the combined v2 agent (options + crypto) and all experiments.
   - Realized as **two independent deployments of one codebase** (A: options-only config; B: combined config) — **no in-process multi-account loop needed.** The account+asset *config* does the work. A stays pure because its config never includes crypto.
   - **Prerequisite for running B live:** user creates a 2nd Alpaca paper account + keys (not needed for backtester or refactor).
-- **Assets:** stock/ETF **options** (as today) + crypto **spot** (BTC/USD, ETH/USD, ETC/USD).
+- **Assets:** stock/ETF **options** (as today) + crypto **spot** (BTC/USD, ETH/USD, SOL/USD, LTC/USD — config list, extensible; ETC dropped, not on Alpaca).
 - **Crypto stop mechanism:** **B — broker/bracket stop orders** (Alpaca holds the stop; no blind window). Agent A-style checks remain only as a backup monitor.
 - **Crypto percentages:** set from a **backtested robust range** (walk-forward, out-of-sample), not guessed.
 - **Risk budget:** one **global cap per account** (5 open total, 2%/trade, 5% daily halt). Account-level 2%/5% unchanged.
