@@ -138,6 +138,10 @@ Back-compat: if `ACCOUNTS` is unset, build a single default account from today's
 Each step merges to `main` only after the DRY_RUN output looks right and the single-account/
 options regression passes — so the live track record is never disrupted.
 
+## 8b. Decisions locked (2026-09-12)
+- **Accounts:** 2, both the user's **own personal paper accounts**. No third-party money (avoids RIA/regulatory issues).
+- **Crypto universe:** BTC/USD, ETH/USD, ETC/USD *(verify Alpaca lists ETC/USD before relying on it)*.
+
 ## 8. Open questions for you (decide before step 1)
 1. **Where:** confirm the **`v2` branch** approach (recommended) vs new repo.
 2. **Risk budget:** global cap (recommended) vs per-asset sub-budgets? (Q-A)
