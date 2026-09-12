@@ -14,6 +14,14 @@ from __future__ import annotations
 class InstrumentHandler:
     asset_class: str = "base"
 
+    def wants(self, sig) -> bool:
+        """Is this signal tradable by this asset class? (Options: bull/bear; crypto: bull only.)"""
+        return sig.get('direction') in ('bull', 'bear')
+
+    def dry_candidate(self, symbol, sig, price, rm) -> dict:
+        """Session-free viability + label for DRY_RUN. Returns {'ok': bool, 'label'/'note': str}."""
+        raise NotImplementedError
+
     async def get_positions(self, session) -> list:
         raise NotImplementedError
 

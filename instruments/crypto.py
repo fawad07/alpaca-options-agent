@@ -18,13 +18,21 @@ from mcp_client import (crypto_positions, buy_crypto, crypto_stop,
 class CryptoSpotHandler(InstrumentHandler):
     asset_class = "crypto"
 
-    # ── pure planning (no session) — used by DRY_RUN preview + LIVE entry ──
+    def wants(self, sig) -> bool:
+        return sig.get('direction') == 'bull'             # long-only spot: no shorting
+
+    def dry_candidate(self, symbol, sig, price, rm) -> dict:
+        plan = self.plan_entry(symbol, sig, price, rm)
+        if not plan:
+            return {'ok': False, 'note': 'no long entry / too small'}
+        return {'ok': True,
+                'label': (f"BULL BUY {plan['qty']:.4f} (~${plan['notional']:,.0f}) @ ${price:,.2f}"
+                          f" · stop ${plan['stop_price']:,.2f} / TP ${plan['tp_price']:,.2f}")}
+
+    # ── pure planning (no session, capacity-agnostic) — used by DRY preview + LIVE entry ──
     def plan_entry(self, symbol: str, sig: dict, price: float, rm) -> dict | None:
         if sig.get('direction') != 'bull':
             return None                                   # long-only spot: no shorting
-        ok, _ = rm.can_open_new()
-        if not ok:
-            return None                                   # global cap (shared with options)
         qty, notional, worst = rm.size_crypto(
             price, C.CRYPTO_STOP_PCT, C.CRYPTO_MAX_NOTIONAL_PCT)
         if qty <= 0 or notional < 1:

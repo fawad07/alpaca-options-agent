@@ -34,82 +34,88 @@ def _dte(expiration_date: str) -> int:
     return (dt.date.fromisoformat(expiration_date) - dt.date.today()).days
 
 
+# ── multi-asset orchestration (v2, step 7) ─────────────────────
+def _handlers():
+    """Asset handlers this deployment trades, each with its universe. (Per-account
+    selection lands in step 7's config; for now the combined agent trades both.)"""
+    from instruments.options import OptionsHandler
+    from instruments.crypto import CryptoSpotHandler
+    return [(OptionsHandler(), C.UNIVERSE, 'option'),
+            (CryptoSpotHandler(), C.CRYPTO_UNIVERSE, 'crypto')]
+
+
+def _ranked_signals(handlers):
+    """Gather actionable, handler-supported signals across ALL asset classes and rank
+    by confidence (strongest first) — so options and crypto compete for the shared cap.
+    Session-free (signals use daily bars). Returns (ranked, skipped)."""
+    ranked, skipped = [], []
+    for h, uni, ac in handlers:
+        for sym in uni:
+            df = D.fetch_bars(sym, ac)
+            if df.empty:
+                skipped.append((sym, ac, 'no data')); continue
+            sig = S.signal(df); price = float(df['close'].iloc[-1])
+            if sig['direction'] == 'neutral' or sig['confidence'] < C.MIN_CONFIDENCE:
+                skipped.append((sym, ac, f"no signal ({sig['reason']})")); continue
+            if not h.wants(sig):
+                skipped.append((sym, ac, f"{sig['direction']} unsupported (long-only)")); continue
+            ranked.append((sig['confidence'], h, ac, sym, sig, price))
+    ranked.sort(key=lambda c: c[0], reverse=True)
+    return ranked, skipped
+
+
 # ─────────────────────────── DRY RUN ───────────────────────────
 def run_dry():
     print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [DRY_RUN] ===")
     equity = C.ACCOUNT_START
     rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=0)
-    print(f"  Equity ${equity:,.0f} | risk cap/trade ${rm.max_spend():,.0f}")
-    for sym in C.UNIVERSE:
-        df = D.fetch_daily(sym)
-        if df.empty:
-            print(f"  {sym}: no data"); continue
-        sig = S.signal(df); price = float(df['close'].iloc[-1])
-        if sig['direction'] == 'neutral' or sig['confidence'] < C.MIN_CONFIDENCE:
-            print(f"  {sym}: no trade — {sig['reason']} (conf {sig['confidence']})"); continue
-        est = round(price * 0.03, 2)          # rough ATM ~30DTE premium estimate
-        qty = rm.size_contracts(est)
-        right = 'C' if sig['direction'] == 'bull' else 'P'
-        if qty < 1:
-            print(f"  {sym}: 1 lot (~${est*100:,.0f}) exceeds risk cap"); continue
-        print(f"  {sym}: {sig['direction'].upper()} — would BUY {qty}x ~{round(price)}{right} "
-              f"(~${est}/ct) — {sig['reason']}")
-        rm.open_positions += 1
-
-    # crypto spot preview (v2) — long-only, broker-stop; shares the global position cap
-    from instruments.crypto import CryptoSpotHandler
-    ch = CryptoSpotHandler()
-    print(f"  --- crypto spot (stop {C.CRYPTO_STOP_PCT:.0%} / TP {C.CRYPTO_TP_PCT:.0%} / "
-          f"max {C.CRYPTO_MAX_NOTIONAL_PCT:.0%} notional) ---")
-    for sym in C.CRYPTO_UNIVERSE:
-        df = D.fetch_bars(sym, 'crypto')
-        if df.empty:
-            print(f"  {sym}: no data"); continue
-        sig = S.signal(df); price = float(df['close'].iloc[-1])
-        if sig['direction'] == 'neutral' or sig['confidence'] < C.MIN_CONFIDENCE:
-            print(f"  {sym}: no trade — {sig['reason']} (conf {sig['confidence']})"); continue
-        plan = ch.plan_entry(sym, sig, price, rm)
-        if not plan:
-            reason = 'bearish (crypto long-only)' if sig['direction'] != 'bull' else 'over cap / too small'
-            print(f"  {sym}: {sig['direction'].upper()} — no entry ({reason})"); continue
-        print(f"  {sym}: BULL — would BUY {plan['qty']:.4f} (~${plan['notional']:,.0f}) @ ~${price:,.2f}")
-        print(f"        broker STOP ${plan['stop_price']:,.2f} (-{C.CRYPTO_STOP_PCT:.0%}) · "
-              f"TP ${plan['tp_price']:,.2f} (+{C.CRYPTO_TP_PCT:.0%}) · worst-case -${plan['worst_loss']:,.0f}")
-        rm.open_positions += 1
+    print(f"  Equity ${equity:,.0f} | cap {C.MAX_CONCURRENT} positions | risk/trade ${rm.max_spend():,.0f}")
+    ranked, skipped = _ranked_signals(_handlers())
+    print(f"  --- {len(ranked)} candidate signal(s), best-first, fill up to {C.MAX_CONCURRENT} "
+          f"(options + crypto compete) ---")
+    filled = 0
+    for conf, h, ac, sym, sig, price in ranked:
+        if filled >= C.MAX_CONCURRENT:
+            print(f"  [no slot]  {sym:8} {ac:6} conf {conf:.2f}"); continue
+        prev = h.dry_candidate(sym, sig, price, rm)
+        if not prev.get('ok'):
+            print(f"  [skip]     {sym:8} {ac:6} conf {conf:.2f} — {prev.get('note')}"); continue
+        filled += 1
+        print(f"  [FILL {filled}/{C.MAX_CONCURRENT}] {sym:8} {ac:6} conf {conf:.2f} — {prev['label']}")
+    if skipped:
+        print(f"  ({len(skipped)} not actionable: " +
+              ", ".join(f"{s}" for s, _, _ in skipped[:14]) + ")")
 
 
 # ────────────────────────── LIVE PAPER (via MCP) ───────────────
 async def run_live(account=None) -> dict:
     from mcp_client import mcp_session, account as acct_info
-    from instruments.options import OptionsHandler
-    handler = OptionsHandler()
+    handlers = _handlers()
     print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [LIVE_PAPER via MCP] ===")
-    placed, blocked, signals_n, exits_n = [], [], 0, 0
+    placed, exits_n = [], 0
     async with mcp_session(account) as s:
         acct = await acct_info(s)
         equity = float(acct.get('equity', C.ACCOUNT_START))
-        positions = await handler.get_positions(s)
-        rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=len(positions))
-        print(f"  Equity ${equity:,.0f} | open option positions {len(positions)} | "
-              f"risk cap/trade ${rm.max_spend():,.0f}")
+        # starting open positions across all asset classes → one global count
+        pos_by_h = [await h.get_positions(s) for h, _, _ in handlers]
+        open0 = sum(len(p) for p in pos_by_h)
+        rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=open0)
+        print(f"  Equity ${equity:,.0f} | open {open0}/{C.MAX_CONCURRENT} | risk/trade ${rm.max_spend():,.0f}")
 
-        # 1) manage exits — take-profit / stop (handler-specific)
-        exits_n = await handler.manage_exits(s, positions, rm)
+        # 1) manage exits per asset class
+        for (h, _, _), pos in zip(handlers, pos_by_h):
+            exits_n += await h.manage_exits(s, pos, rm)
 
-        # 2) scan for new entries (generic signal → handler places the trade)
-        for symu in C.UNIVERSE:
-            df = D.fetch_daily(symu)
-            if df.empty:
-                print(f"  {symu}: no data"); continue
-            sig = S.signal(df); price = float(df['close'].iloc[-1])
-            if sig['direction'] == 'neutral' or sig['confidence'] < C.MIN_CONFIDENCE:
-                print(f"  {symu}: no trade — {sig['reason']}"); continue
-            signals_n += 1                      # an actionable signal fired
-            label = await handler.scan_and_enter(s, symu, sig, price, rm)
+        # 2) ranked entries — strongest signals win the shared slots (options + crypto)
+        ranked, _ = _ranked_signals(handlers)
+        signals_n = len(ranked)
+        for conf, h, ac, sym, sig, price in ranked:
+            ok, _ = rm.can_open_new()
+            if not ok:
+                break
+            label = await h.scan_and_enter(s, sym, sig, price, rm)
             if label:
                 placed.append(label)
-            else:
-                blocked.append(symu)
 
     # build the one-line journal summary of this pass
     parts = []
@@ -119,10 +125,9 @@ async def run_live(account=None) -> dict:
         parts.append(f"closed {exits_n} position(s)")
     if not placed:
         if signals_n == 0:
-            parts.append(f"no signal — all {len(C.UNIVERSE)} symbols neutral/low-confidence")
+            parts.append("no signal — nothing actionable across options + crypto")
         else:
-            parts.append(f"{signals_n} signal(s) fired but none opened "
-                         f"(risk gate / no contract / over cap): {', '.join(blocked)}")
+            parts.append(f"{signals_n} signal(s) ranked but none opened (cap full / risk gate / no contract)")
     return {'equity': round(equity, 2), 'open_positions': rm.open_positions,
             'new_trades': len(placed), 'exits': exits_n, 'summary': "; ".join(parts)}
 

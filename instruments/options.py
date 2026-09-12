@@ -20,6 +20,15 @@ def _dte(expiration_date: str) -> int:
 class OptionsHandler(InstrumentHandler):
     asset_class = "option"
 
+    def dry_candidate(self, symbol, sig, price, rm) -> dict:
+        est = round(price * 0.03, 2)          # rough ATM ~30DTE premium estimate
+        qty = rm.size_contracts(est)
+        if qty < 1:
+            return {'ok': False, 'note': f'1 lot (~${est*100:,.0f}) exceeds risk cap'}
+        right = 'C' if sig['direction'] == 'bull' else 'P'
+        return {'ok': True,
+                'label': f"{sig['direction'].upper()} BUY {qty}x ~{round(price)}{right} (~${est}/ct)"}
+
     async def get_positions(self, s) -> list:
         return await option_positions(s)
 
