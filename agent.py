@@ -15,7 +15,7 @@ Run once:   .venv/bin/python agent.py
 Loop:       .venv/bin/python agent.py --loop 900      (every 15 min, during market hours)
 """
 from __future__ import annotations
-import sys, json, time, asyncio, datetime as dt
+import os, sys, json, time, asyncio, datetime as dt
 from datetime import datetime
 import config as C
 import data as D
@@ -35,6 +35,16 @@ def _dte(expiration_date: str) -> int:
 
 
 # ── multi-asset orchestration (v2, step 7) ─────────────────────
+def deployment_name() -> str:
+    """Which account this deployment is for (set per cloud job). Default 'A' = legacy V1."""
+    return os.getenv('DEPLOY_ACCOUNT', 'A')
+
+
+def deployment_assets() -> str:
+    """Asset classes this deployment trades, e.g. 'option+crypto'."""
+    return "+".join(dict.fromkeys(ac for _, _, ac in _handlers()))
+
+
 def _handlers():
     """Asset handlers this deployment trades, each with its universe. (Per-account
     selection lands in step 7's config; for now the combined agent trades both.)"""
@@ -128,7 +138,9 @@ async def run_live(account=None) -> dict:
             parts.append("no signal — nothing actionable across options + crypto")
         else:
             parts.append(f"{signals_n} signal(s) ranked but none opened (cap full / risk gate / no contract)")
-    return {'equity': round(equity, 2), 'open_positions': rm.open_positions,
+    return {'account': (account.name if account else deployment_name()),
+            'assets': deployment_assets(),
+            'equity': round(equity, 2), 'open_positions': rm.open_positions,
             'new_trades': len(placed), 'exits': exits_n, 'summary': "; ".join(parts)}
 
 
@@ -136,7 +148,8 @@ def run_once() -> dict:
     if C.MODE == 'LIVE_PAPER':
         return asyncio.run(run_live())
     run_dry()
-    return {'summary': 'dry run (no live account)'}
+    return {'account': deployment_name(), 'assets': deployment_assets(),
+            'summary': 'dry run (no live account)'}
 
 
 if __name__ == '__main__':

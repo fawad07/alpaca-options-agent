@@ -9,26 +9,28 @@ decision journal (activity.csv / ACTIVITY.md) so there is always a visible recor
 """
 from datetime import datetime
 from zoneinfo import ZoneInfo
-import journal
+import journal, agent
 
 et = datetime.now(ZoneInfo('America/New_York'))
 is_open = et.weekday() < 5 and (et.hour, et.minute) >= (9, 30) and et.hour < 16
 stamp = f"{et:%Y-%m-%d %H:%M}"
+acct, assets = agent.deployment_name(), agent.deployment_assets()
 
 if not is_open:
     print(f"Market closed ({stamp} ET) — no action.")
-    journal.record({'timestamp_et': stamp, 'market': 'closed',
-                    'summary': 'market closed — no action'})
+    journal.record({'timestamp_et': stamp, 'account': acct, 'assets': assets,
+                    'market': 'closed', 'summary': 'market closed — no action'})
 else:
-    import agent
     try:
         summ = agent.run_once() or {}
         summ.setdefault('timestamp_et', stamp)
         summ.setdefault('market', 'open')
+        summ.setdefault('account', acct)
+        summ.setdefault('assets', assets)
         journal.record(summ)
     except Exception as e:
         import traceback
         traceback.print_exc()
-        journal.record({'timestamp_et': stamp, 'market': 'open',
-                        'summary': f'ERROR: {type(e).__name__}: {e}'})
+        journal.record({'timestamp_et': stamp, 'account': acct, 'assets': assets,
+                        'market': 'open', 'summary': f'ERROR: {type(e).__name__}: {e}'})
         raise
