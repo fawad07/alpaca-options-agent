@@ -58,34 +58,24 @@ def run_dry():
 
 
 # ────────────────────────── LIVE PAPER (via MCP) ───────────────
-async def run_live() -> dict:
-    from mcp_client import (mcp_session, account, option_positions,
-                            find_atm_contract, option_premium, buy_option, close_option)
+async def run_live(account=None) -> dict:
+    from mcp_client import mcp_session, account as acct_info
+    from instruments.options import OptionsHandler
+    handler = OptionsHandler()
     print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [LIVE_PAPER via MCP] ===")
     placed, blocked, signals_n, exits_n = [], [], 0, 0
-    async with mcp_session() as s:
-        acct = await account(s)
+    async with mcp_session(account) as s:
+        acct = await acct_info(s)
         equity = float(acct.get('equity', C.ACCOUNT_START))
-        positions = await option_positions(s)
+        positions = await handler.get_positions(s)
         rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=len(positions))
         print(f"  Equity ${equity:,.0f} | open option positions {len(positions)} | "
               f"risk cap/trade ${rm.max_spend():,.0f}")
 
-        # 1) manage exits — take-profit / stop on premium
-        for p in positions:
-            sym = p.get('symbol')
-            try:
-                plpc = float(p.get('unrealized_plpc', 0))
-            except Exception:
-                plpc = 0.0
-            if plpc >= C.TAKE_PROFIT_PCT:
-                print(f"  EXIT {sym}: {plpc:+.0%} — take-profit, closing")
-                await close_option(s, sym); rm.open_positions -= 1; exits_n += 1
-            elif plpc <= -C.STOP_LOSS_PCT:
-                print(f"  EXIT {sym}: {plpc:+.0%} — stop-loss, closing")
-                await close_option(s, sym); rm.open_positions -= 1; exits_n += 1
+        # 1) manage exits — take-profit / stop (handler-specific)
+        exits_n = await handler.manage_exits(s, positions, rm)
 
-        # 2) scan for new entries
+        # 2) scan for new entries (generic signal → handler places the trade)
         for symu in C.UNIVERSE:
             df = D.fetch_daily(symu)
             if df.empty:
@@ -94,29 +84,11 @@ async def run_live() -> dict:
             if sig['direction'] == 'neutral' or sig['confidence'] < C.MIN_CONFIDENCE:
                 print(f"  {symu}: no trade — {sig['reason']}"); continue
             signals_n += 1                      # an actionable signal fired
-            ok, why = rm.can_open_new()
-            if not ok:
-                print(f"  {symu}: BLOCKED — {why}"); blocked.append(symu); continue
-            right = 'call' if sig['direction'] == 'bull' else 'put'
-            c = await find_atm_contract(s, symu, right, price, C.MIN_DTE, C.MAX_DTE)
-            if not c:
-                print(f"  {symu}: no suitable contract"); blocked.append(symu); continue
-            ok, why = rm.contract_ok(_dte(c['expiration_date']), is_long=True)
-            if not ok:
-                print(f"  {symu}: contract rejected — {why}"); blocked.append(symu); continue
-            prem = await option_premium(s, c['symbol'])
-            if not prem:
-                print(f"  {symu}: no premium quote"); blocked.append(symu); continue
-            qty = rm.size_contracts(prem)
-            if qty < 1:
-                print(f"  {symu}: 1 lot (${prem*100:,.0f}) exceeds risk cap"); blocked.append(symu); continue
-            print(f"  {symu}: {sig['direction'].upper()} — BUY {qty}x {c['symbol']} @ ~${prem:.2f}"
-                  f"  ({sig['reason']})")
-            res = await buy_option(s, c['symbol'], qty)
-            log({'symbol': symu, 'contract': c['symbol'], 'qty': qty, 'premium': prem,
-                 'signal': sig, 'order_result': str(res)[:400], 'mode': 'LIVE_PAPER'})
-            placed.append(f"{qty}x {symu} {right}")
-            rm.open_positions += 1
+            label = await handler.scan_and_enter(s, symu, sig, price, rm)
+            if label:
+                placed.append(label)
+            else:
+                blocked.append(symu)
 
     # build the one-line journal summary of this pass
     parts = []
