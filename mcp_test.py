@@ -24,10 +24,13 @@ def _resolve_server_cmd() -> str:
 
 SERVER_CMD = _resolve_server_cmd()
 
-def server_params() -> StdioServerParameters:
+def server_params(account=None) -> StdioServerParameters:
+    """Launch the MCP server keyed to `account` (defaults to the single ALPACA_* account)."""
+    from accounts import default_account
+    acct = account or default_account()
     env = {**os.environ,
-           'ALPACA_API_KEY': C.ALPACA_API_KEY,
-           'ALPACA_SECRET_KEY': C.ALPACA_SECRET_KEY,
+           'ALPACA_API_KEY': acct.api_key,
+           'ALPACA_SECRET_KEY': acct.secret_key,
            'ALPACA_PAPER_TRADE': 'true'}          # paper only
     return StdioServerParameters(command=SERVER_CMD, args=[], env=env)
 

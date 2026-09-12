@@ -24,8 +24,9 @@ def _parse(result):
 
 
 @asynccontextmanager
-async def mcp_session():
-    async with stdio_client(server_params()) as (read, write):
+async def mcp_session(account=None):
+    """Open an MCP session for `account` (defaults to the single ALPACA_* account)."""
+    async with stdio_client(server_params(account)) as (read, write):
         async with ClientSession(read, write) as session:
             await session.initialize()
             yield session
