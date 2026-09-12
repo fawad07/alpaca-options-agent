@@ -14,8 +14,9 @@ untouched until we merge. Companion docs: `DESIGN_v2_multiaccount_multiasset.md`
   - **Prerequisite for running B live:** user creates a 2nd Alpaca paper account + keys (not needed for backtester or refactor).
 - **Assets:** stock/ETF **options** (as today) + crypto **spot** (BTC/USD, ETH/USD, SOL/USD, LTC/USD — config list, extensible; ETC dropped, not on Alpaca).
 - **Crypto stop mechanism:** **B — broker/bracket stop orders** (Alpaca holds the stop; no blind window). Agent A-style checks remain only as a backup monitor.
-- **Crypto percentages:** set from a **backtested robust range** (walk-forward, out-of-sample), not guessed.
+- **Crypto percentages (from the WS1 backtest robust range):** **stop 15%**, **take-profit 30%**, **max-notional 15%/coin** (mid-plateau of stop 12–20% / TP 25–40%). Starting config — confirm on live paper (account B).
 - **Risk budget:** one **global cap per account** (5 open total, 2%/trade, 5% daily halt). Account-level 2%/5% unchanged.
+- **Edge/strategy path = Option B:** the WS1 backtest showed EMA/RSI beats buy-and-hold on **0/4 coins OOS** (no edge — same as options). So: **build the execution plumbing now** (multi-account, crypto orders, broker stops); treat **EMA/RSI as a placeholder** signal; **elevate the ensemble-ML workstream** to the priority for finding a *real*, OOS-validated edge. Honesty rule holds: no signal ships (crypto or ML) unless it survives out-of-sample.
 
 ## Key dependency to verify FIRST
 Decision **B depends on Alpaca supporting stop/bracket orders for _crypto_** (confirmed for stocks; crypto order types are more limited). Also confirm **ETC/USD** is listed. → **Step 0** below. If crypto stops are NOT supported, we pause and choose: interim A (with a tighter/ more-frequent loop) or defer crypto until B is possible.
