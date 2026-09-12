@@ -45,8 +45,9 @@ STOP_LOSS_PCT          = 0.50    # close a losing option at -50% of premium
 # Broker holds the stop (Alpaca crypto supports a standalone stop order, not a bracket).
 CRYPTO_UNIVERSE          = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'LTC/USD']
 CRYPTO_STOP_PCT          = 0.15    # broker stop distance below entry
-CRYPTO_TP_PCT            = 0.30    # take-profit distance above entry
+CRYPTO_TP_PCT            = 0.30    # take-profit distance above entry (agent-managed — no OCO on crypto)
 CRYPTO_MAX_NOTIONAL_PCT  = 0.15    # cap one coin's notional vs equity
+CRYPTO_STOP_LIMIT_BUFFER = 0.02    # stop_limit's limit sits this far below the stop (crypto = stop_limit, not stop)
 
 # ── SIGNAL PARAMS ─────────────────────────────────────────────
 EMA_FAST      = 20

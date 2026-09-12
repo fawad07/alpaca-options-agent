@@ -120,15 +120,32 @@ async def buy_crypto(session, symbol: str, qty: float) -> dict:
         'type': 'market', 'time_in_force': 'gtc'})
 
 
-async def crypto_stop(session, symbol: str, qty: float, stop_price: float) -> dict:
-    """Broker-held stop-loss sell (Alpaca crypto supports a standalone stop order)."""
+async def crypto_stop(session, symbol: str, qty: float, stop_price: float,
+                      limit_price: float) -> dict:
+    """Broker-held stop-loss. Alpaca crypto rejects plain 'stop' — it accepts 'stop_limit',
+    so we place a stop_limit whose limit sits just below the stop (fills on the way down)."""
     return await call(session, 'place_crypto_order', {
-        'symbol': symbol, 'qty': str(qty), 'side': 'sell',
-        'type': 'stop', 'stop_price': str(round(stop_price, 2)), 'time_in_force': 'gtc'})
+        'symbol': symbol, 'qty': str(qty), 'side': 'sell', 'type': 'stop_limit',
+        'stop_price': str(round(stop_price, 2)), 'limit_price': str(round(limit_price, 2)),
+        'time_in_force': 'gtc'})
 
 
-async def crypto_take_profit(session, symbol: str, qty: float, limit_price: float) -> dict:
-    """Resting take-profit limit sell (no OCO on crypto — the agent cancels the sibling)."""
-    return await call(session, 'place_crypto_order', {
-        'symbol': symbol, 'qty': str(qty), 'side': 'sell',
-        'type': 'limit', 'limit_price': str(round(limit_price, 2)), 'time_in_force': 'gtc'})
+def _norm(sym: str) -> str:
+    return str(sym or '').replace('/', '').upper()
+
+
+def to_pair(sym: str) -> str:
+    """Position symbols come back as 'ETHUSD'; orders need 'ETH/USD'."""
+    s = str(sym or '')
+    if '/' not in s and s.upper().endswith('USD'):
+        return s[:-3] + '/' + s[-3:]
+    return s
+
+
+async def open_crypto_orders(session, symbol: str | None = None) -> list:
+    rows = _rows(await call(session, 'get_orders', {'status': 'open', 'limit': 200}))
+    return [o for o in rows if symbol is None or _norm(o.get('symbol')) == _norm(symbol)]
+
+
+async def cancel_order(session, order_id: str) -> dict:
+    return await call(session, 'cancel_order_by_id', {'order_id': order_id})
