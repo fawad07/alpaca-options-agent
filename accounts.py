@@ -40,10 +40,14 @@ ACCOUNT_A = Account(
 )
 
 # Account B — experimental combined agent: options + crypto, cap 6, GOOGL + coins.
+# Keys fall back to the MAIN account if ALPACA_B_* isn't set — so you can run the
+# combined agent on your EXISTING paper account (no 2nd account needed). If you do
+# this, run ONLY the combined deployment (DEPLOY_ACCOUNT=B), not the A one too, or
+# they'd double-trade the same account.
 ACCOUNT_B = Account(
     name='B',
-    api_key=os.getenv('ALPACA_B_API_KEY', ''),
-    secret_key=os.getenv('ALPACA_B_SECRET_KEY', ''),
+    api_key=os.getenv('ALPACA_B_API_KEY', C.ALPACA_API_KEY),
+    secret_key=os.getenv('ALPACA_B_SECRET_KEY', C.ALPACA_SECRET_KEY),
     asset_classes=('option', 'crypto'),
     max_concurrent=6,
     option_universe=('SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA', 'GOOGL'),
