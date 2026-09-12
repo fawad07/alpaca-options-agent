@@ -9,11 +9,17 @@ market-close when the target is hit). Verified live on account B (2026-09-12).
 `plan_entry` is pure/session-free (used by the DRY preview + LIVE entry).
 """
 from __future__ import annotations
-import asyncio
+import asyncio, math
 import config as C
 from instruments.base import InstrumentHandler
 from mcp_client import (crypto_positions, buy_crypto, crypto_stop,
                         open_crypto_orders, cancel_order, close_option, _norm, to_pair)
+
+
+def _floor6(x: float) -> float:
+    """Truncate to 6 decimals — NEVER round up past the available balance (a stop
+    order for more than you hold is rejected as 'insufficient balance')."""
+    return math.floor(float(x) * 1e6) / 1e6
 
 
 class CryptoSpotHandler(InstrumentHandler):
@@ -85,7 +91,7 @@ class CryptoSpotHandler(InstrumentHandler):
                 sp = round(entry * (1 - C.CRYPTO_STOP_PCT), 2)
                 slp = round(sp * (1 - C.CRYPTO_STOP_LIMIT_BUFFER), 2)
                 print(f"  PROTECT {sym}: no stop found — placing stop_limit ${sp}→${slp}")
-                await crypto_stop(s, to_pair(sym), round(avail, 6), sp, slp)
+                await crypto_stop(s, to_pair(sym), _floor6(avail), sp, slp)
         return exits_n
 
     async def scan_and_enter(self, s, symbol, sig, price, rm):
@@ -108,7 +114,7 @@ class CryptoSpotHandler(InstrumentHandler):
                 if fqty > 0:
                     break
         if fqty > 0:
-            await crypto_stop(s, symbol, round(fqty, 6),
+            await crypto_stop(s, symbol, _floor6(fqty),
                               plan['stop_price'], plan['stop_limit_price'])
         else:
             print(f"  {symbol}: ⚠️ qty not available yet — stop placed next run (ensure-protection)")

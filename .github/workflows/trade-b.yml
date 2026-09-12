@@ -1,0 +1,48 @@
+name: risk-gate-agent-B
+
+# Account B = the experimental COMBINED agent (options + crypto). Runs 24/7 because
+# crypto never closes; the agent itself gates options to US market hours, so off-hours
+# runs only touch crypto. Separate from account A's trade.yml (which stays options-only).
+# Needs repo secrets ALPACA_B_API_KEY / ALPACA_B_SECRET_KEY (account B's paper keys).
+
+on:
+  schedule:
+    - cron: "3,23,43 * * * *"   # every ~20 min, ALL hours/days (crypto is 24/7)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: risk-gate-agent-B
+  cancel-in-progress: false
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Run the combined agent (account B)
+        env:
+          AGENT_MODE: LIVE_PAPER
+          DEPLOY_ACCOUNT: B
+          ALPACA_B_API_KEY: ${{ secrets.ALPACA_B_API_KEY }}
+          ALPACA_B_SECRET_KEY: ${{ secrets.ALPACA_B_SECRET_KEY }}
+        run: python cron_once.py
+      - name: Commit account B's decision journal
+        if: always()
+        run: |
+          git config user.name  "risk-gate-bot"
+          git config user.email "actions@github.com"
+          git add activity-B.csv ACTIVITY-B.md 2>/dev/null || true
+          git diff --cached --quiet && { echo "no journal change"; exit 0; }
+          git commit -m "journal B: run at $(TZ=America/New_York date '+%Y-%m-%d %H:%M ET')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main && git push && exit 0
+            sleep 4
+          done
+          echo "journal B push failed after retries" >&2; exit 1

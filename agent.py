@@ -45,6 +45,13 @@ def deployment_assets() -> str:
     return "+".join(current_account().asset_classes)
 
 
+def market_open() -> bool:
+    """US equity/options market hours (ET). Crypto ignores this — it trades 24/7."""
+    from zoneinfo import ZoneInfo
+    et = datetime.now(ZoneInfo('America/New_York'))
+    return et.weekday() < 5 and (et.hour, et.minute) >= (9, 30) and et.hour < 16
+
+
 def _handlers(account):
     """Asset handlers for THIS account, each with the account's own universe.
     Account A → options only; account B → options + crypto."""
@@ -106,7 +113,7 @@ def run_dry():
 
 # ────────────────────────── LIVE PAPER (via MCP) ───────────────
 async def run_live(account=None) -> dict:
-    from mcp_client import mcp_session, account as acct_info
+    from mcp_client import mcp_session, account as acct_info, _norm
     from accounts import current_account
     acct_cfg = account or current_account()
     handlers = _handlers(acct_cfg)
@@ -123,20 +130,30 @@ async def run_live(account=None) -> dict:
         print(f"  Equity ${equity:,.0f} | open {open0}/{acct_cfg.max_concurrent} | "
               f"assets {'+'.join(acct_cfg.asset_classes)} | risk/trade ${rm.max_spend():,.0f}")
 
-        # 1) manage exits per asset class
-        for (h, _, _), pos in zip(handlers, pos_by_h):
+        mkt = market_open()
+        held_syms = {_norm(p.get('symbol')) for pos in pos_by_h for p in pos}
+        # 1) manage exits — options only during market hours; crypto anytime
+        for (h, _, ac), pos in zip(handlers, pos_by_h):
+            if ac == 'option' and not mkt:
+                continue
             exits_n += await h.manage_exits(s, pos, rm)
 
-        # 2) ranked entries — strongest signals win the shared slots (options + crypto)
+        # 2) ranked entries — options gated to market hours; crypto 24/7;
+        #    skip any symbol we already hold (one position per symbol — no pyramiding)
         ranked, _ = _ranked_signals(handlers)
+        if not mkt:
+            ranked = [c for c in ranked if c[2] != 'option']
         signals_n = len(ranked)
         for conf, h, ac, sym, sig, price in ranked:
             ok, _ = rm.can_open_new()
             if not ok:
                 break
+            if _norm(sym) in held_syms:
+                continue
             label = await h.scan_and_enter(s, sym, sig, price, rm)
             if label:
                 placed.append(label)
+                held_syms.add(_norm(sym))
 
     # build the one-line journal summary of this pass
     parts = []

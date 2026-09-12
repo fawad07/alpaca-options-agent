@@ -15,8 +15,11 @@ et = datetime.now(ZoneInfo('America/New_York'))
 is_open = et.weekday() < 5 and (et.hour, et.minute) >= (9, 30) and et.hour < 16
 stamp = f"{et:%Y-%m-%d %H:%M}"
 acct, assets = agent.deployment_name(), agent.deployment_assets()
+trades_crypto = 'crypto' in assets      # crypto accounts run 24/7; options-only gate to hours
 
-if not is_open:
+# Run when the market's open OR this account trades crypto (24/7). The agent itself
+# gates options to market hours, so an off-hours crypto run won't touch options.
+if not is_open and not trades_crypto:
     print(f"Market closed ({stamp} ET) — no action.")
     journal.record({'timestamp_et': stamp, 'account': acct, 'assets': assets,
                     'market': 'closed', 'summary': 'market closed — no action'})
@@ -24,7 +27,7 @@ else:
     try:
         summ = agent.run_once() or {}
         summ.setdefault('timestamp_et', stamp)
-        summ.setdefault('market', 'open')
+        summ.setdefault('market', 'open' if is_open else 'closed')
         summ.setdefault('account', acct)
         summ.setdefault('assets', assets)
         journal.record(summ)
