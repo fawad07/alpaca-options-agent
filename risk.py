@@ -53,6 +53,19 @@ class RiskManager:
         cost_each = premium_per_contract * 100
         return int(self.max_spend() // cost_each)
 
+    def size_crypto(self, price: float, stop_pct: float,
+                    max_notional_pct: float) -> tuple[float, float, float]:
+        """Crypto spot is NOT defined-risk, so risk = position notional × stop distance.
+        notional = min( (2% of equity) / stop%,  max_notional% × equity );  qty = notional/price.
+        Returns (qty, notional$, worst_case_loss$). The max-notional cap keeps one coin
+        from dominating and usually holds actual risk at or below the 2% cap."""
+        if price <= 0 or stop_pct <= 0:
+            return 0.0, 0.0, 0.0
+        notional = min(self.equity * C.MAX_RISK_PER_TRADE_PCT / stop_pct,
+                       self.equity * max_notional_pct)
+        qty = notional / price
+        return round(qty, 6), round(notional, 2), round(notional * stop_pct, 2)
+
     # ── one call that checks the portfolio gates ─────────────
     def can_open_new(self) -> tuple[bool, str]:
         for ok, why in (self.daily_loss_ok(), self.capacity_ok()):

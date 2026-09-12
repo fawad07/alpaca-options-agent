@@ -9,6 +9,13 @@ import requests
 import pandas as pd
 
 
+def fetch_bars(symbol: str, asset_class: str = 'stock', rng: str = '1y') -> pd.DataFrame:
+    """Daily OHLC for any asset. Crypto pairs ('BTC/USD') map to Yahoo's 'BTC-USD'.
+    Signals are computed the same way for every asset class."""
+    yahoo = symbol.replace('/', '-') if asset_class == 'crypto' else symbol
+    return fetch_daily(yahoo, rng)
+
+
 def fetch_daily(symbol: str, rng: str = '1y') -> pd.DataFrame:
     """Daily OHLC for a stock/ETF from Yahoo. Returns empty DataFrame on failure."""
     try:

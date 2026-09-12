@@ -105,3 +105,30 @@ async def buy_option(session, option_symbol: str, qty: int) -> dict:
 async def close_option(session, option_symbol: str, percentage: float = 100.0) -> dict:
     return await call(session, 'close_position',
                       {'symbol_or_asset_id': option_symbol, 'percentage': percentage})
+
+
+# ── crypto spot (v2) ──────────────────────────────────────────
+async def crypto_positions(session) -> list:
+    rows = _rows(await call(session, 'get_all_positions'))
+    return [p for p in rows if 'crypto' in str(p.get('asset_class', '')).lower()
+            or '/' in str(p.get('symbol', ''))]
+
+
+async def buy_crypto(session, symbol: str, qty: float) -> dict:
+    return await call(session, 'place_crypto_order', {
+        'symbol': symbol, 'qty': str(qty), 'side': 'buy',
+        'type': 'market', 'time_in_force': 'gtc'})
+
+
+async def crypto_stop(session, symbol: str, qty: float, stop_price: float) -> dict:
+    """Broker-held stop-loss sell (Alpaca crypto supports a standalone stop order)."""
+    return await call(session, 'place_crypto_order', {
+        'symbol': symbol, 'qty': str(qty), 'side': 'sell',
+        'type': 'stop', 'stop_price': str(round(stop_price, 2)), 'time_in_force': 'gtc'})
+
+
+async def crypto_take_profit(session, symbol: str, qty: float, limit_price: float) -> dict:
+    """Resting take-profit limit sell (no OCO on crypto — the agent cancels the sibling)."""
+    return await call(session, 'place_crypto_order', {
+        'symbol': symbol, 'qty': str(qty), 'side': 'sell',
+        'type': 'limit', 'limit_price': str(round(limit_price, 2)), 'time_in_force': 'gtc'})

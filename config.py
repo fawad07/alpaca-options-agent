@@ -40,6 +40,14 @@ MAX_DTE                = 60      # days-to-expiry ceiling
 TAKE_PROFIT_PCT        = 0.50    # close a winning option at +50% of premium
 STOP_LOSS_PCT          = 0.50    # close a losing option at -50% of premium
 
+# ── CRYPTO (v2 — spot, long-only) ─────────────────────────────
+# Numbers from the WS1 backtest robust range (stop 12–20% / TP 25–40%); mid-plateau.
+# Broker holds the stop (Alpaca crypto supports a standalone stop order, not a bracket).
+CRYPTO_UNIVERSE          = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'LTC/USD']
+CRYPTO_STOP_PCT          = 0.15    # broker stop distance below entry
+CRYPTO_TP_PCT            = 0.30    # take-profit distance above entry
+CRYPTO_MAX_NOTIONAL_PCT  = 0.15    # cap one coin's notional vs equity
+
 # ── SIGNAL PARAMS ─────────────────────────────────────────────
 EMA_FAST      = 20
 EMA_SLOW      = 50

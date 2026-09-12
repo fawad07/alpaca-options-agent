@@ -56,6 +56,27 @@ def run_dry():
               f"(~${est}/ct) — {sig['reason']}")
         rm.open_positions += 1
 
+    # crypto spot preview (v2) — long-only, broker-stop; shares the global position cap
+    from instruments.crypto import CryptoSpotHandler
+    ch = CryptoSpotHandler()
+    print(f"  --- crypto spot (stop {C.CRYPTO_STOP_PCT:.0%} / TP {C.CRYPTO_TP_PCT:.0%} / "
+          f"max {C.CRYPTO_MAX_NOTIONAL_PCT:.0%} notional) ---")
+    for sym in C.CRYPTO_UNIVERSE:
+        df = D.fetch_bars(sym, 'crypto')
+        if df.empty:
+            print(f"  {sym}: no data"); continue
+        sig = S.signal(df); price = float(df['close'].iloc[-1])
+        if sig['direction'] == 'neutral' or sig['confidence'] < C.MIN_CONFIDENCE:
+            print(f"  {sym}: no trade — {sig['reason']} (conf {sig['confidence']})"); continue
+        plan = ch.plan_entry(sym, sig, price, rm)
+        if not plan:
+            reason = 'bearish (crypto long-only)' if sig['direction'] != 'bull' else 'over cap / too small'
+            print(f"  {sym}: {sig['direction'].upper()} — no entry ({reason})"); continue
+        print(f"  {sym}: BULL — would BUY {plan['qty']:.4f} (~${plan['notional']:,.0f}) @ ~${price:,.2f}")
+        print(f"        broker STOP ${plan['stop_price']:,.2f} (-{C.CRYPTO_STOP_PCT:.0%}) · "
+              f"TP ${plan['tp_price']:,.2f} (+{C.CRYPTO_TP_PCT:.0%}) · worst-case -${plan['worst_loss']:,.0f}")
+        rm.open_positions += 1
+
 
 # ────────────────────────── LIVE PAPER (via MCP) ───────────────
 async def run_live(account=None) -> dict:
