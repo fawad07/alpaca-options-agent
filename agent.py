@@ -36,22 +36,26 @@ def _dte(expiration_date: str) -> int:
 
 # ── multi-asset orchestration (v2, step 7) ─────────────────────
 def deployment_name() -> str:
-    """Which account this deployment is for (set per cloud job). Default 'A' = legacy V1."""
-    return os.getenv('DEPLOY_ACCOUNT', 'A')
+    from accounts import current_account
+    return current_account().name
 
 
 def deployment_assets() -> str:
-    """Asset classes this deployment trades, e.g. 'option+crypto'."""
-    return "+".join(dict.fromkeys(ac for _, _, ac in _handlers()))
+    from accounts import current_account
+    return "+".join(current_account().asset_classes)
 
 
-def _handlers():
-    """Asset handlers this deployment trades, each with its universe. (Per-account
-    selection lands in step 7's config; for now the combined agent trades both.)"""
-    from instruments.options import OptionsHandler
-    from instruments.crypto import CryptoSpotHandler
-    return [(OptionsHandler(), C.UNIVERSE, 'option'),
-            (CryptoSpotHandler(), C.CRYPTO_UNIVERSE, 'crypto')]
+def _handlers(account):
+    """Asset handlers for THIS account, each with the account's own universe.
+    Account A → options only; account B → options + crypto."""
+    hs = []
+    if 'option' in account.asset_classes:
+        from instruments.options import OptionsHandler
+        hs.append((OptionsHandler(), list(account.option_universe), 'option'))
+    if 'crypto' in account.asset_classes:
+        from instruments.crypto import CryptoSpotHandler
+        hs.append((CryptoSpotHandler(), list(account.crypto_universe), 'crypto'))
+    return hs
 
 
 def _ranked_signals(handlers):
@@ -76,22 +80,25 @@ def _ranked_signals(handlers):
 
 # ─────────────────────────── DRY RUN ───────────────────────────
 def run_dry():
-    print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [DRY_RUN] ===")
+    from accounts import current_account
+    acct = current_account()
+    print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [DRY_RUN · account {acct.name}] ===")
     equity = C.ACCOUNT_START
-    rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=0)
-    print(f"  Equity ${equity:,.0f} | cap {C.MAX_CONCURRENT} positions | risk/trade ${rm.max_spend():,.0f}")
-    ranked, skipped = _ranked_signals(_handlers())
-    print(f"  --- {len(ranked)} candidate signal(s), best-first, fill up to {C.MAX_CONCURRENT} "
-          f"(options + crypto compete) ---")
+    rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=0,
+                     max_concurrent=acct.max_concurrent)
+    print(f"  Equity ${equity:,.0f} | cap {acct.max_concurrent} | assets {'+'.join(acct.asset_classes)}"
+          f" | risk/trade ${rm.max_spend():,.0f}")
+    ranked, skipped = _ranked_signals(_handlers(acct))
+    print(f"  --- {len(ranked)} candidate signal(s), best-first, fill up to {acct.max_concurrent} ---")
     filled = 0
     for conf, h, ac, sym, sig, price in ranked:
-        if filled >= C.MAX_CONCURRENT:
+        if filled >= acct.max_concurrent:
             print(f"  [no slot]  {sym:8} {ac:6} conf {conf:.2f}"); continue
         prev = h.dry_candidate(sym, sig, price, rm)
         if not prev.get('ok'):
             print(f"  [skip]     {sym:8} {ac:6} conf {conf:.2f} — {prev.get('note')}"); continue
         filled += 1
-        print(f"  [FILL {filled}/{C.MAX_CONCURRENT}] {sym:8} {ac:6} conf {conf:.2f} — {prev['label']}")
+        print(f"  [FILL {filled}/{acct.max_concurrent}] {sym:8} {ac:6} conf {conf:.2f} — {prev['label']}")
     if skipped:
         print(f"  ({len(skipped)} not actionable: " +
               ", ".join(f"{s}" for s, _, _ in skipped[:14]) + ")")
@@ -100,17 +107,21 @@ def run_dry():
 # ────────────────────────── LIVE PAPER (via MCP) ───────────────
 async def run_live(account=None) -> dict:
     from mcp_client import mcp_session, account as acct_info
-    handlers = _handlers()
-    print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [LIVE_PAPER via MCP] ===")
+    from accounts import current_account
+    acct_cfg = account or current_account()
+    handlers = _handlers(acct_cfg)
+    print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [LIVE_PAPER · account {acct_cfg.name}] ===")
     placed, exits_n = [], 0
-    async with mcp_session(account) as s:
-        acct = await acct_info(s)
-        equity = float(acct.get('equity', C.ACCOUNT_START))
+    async with mcp_session(acct_cfg) as s:
+        info = await acct_info(s)
+        equity = float(info.get('equity', C.ACCOUNT_START))
         # starting open positions across all asset classes → one global count
         pos_by_h = [await h.get_positions(s) for h, _, _ in handlers]
         open0 = sum(len(p) for p in pos_by_h)
-        rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=open0)
-        print(f"  Equity ${equity:,.0f} | open {open0}/{C.MAX_CONCURRENT} | risk/trade ${rm.max_spend():,.0f}")
+        rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=open0,
+                         max_concurrent=acct_cfg.max_concurrent)
+        print(f"  Equity ${equity:,.0f} | open {open0}/{acct_cfg.max_concurrent} | "
+              f"assets {'+'.join(acct_cfg.asset_classes)} | risk/trade ${rm.max_spend():,.0f}")
 
         # 1) manage exits per asset class
         for (h, _, _), pos in zip(handlers, pos_by_h):
@@ -138,8 +149,7 @@ async def run_live(account=None) -> dict:
             parts.append("no signal — nothing actionable across options + crypto")
         else:
             parts.append(f"{signals_n} signal(s) ranked but none opened (cap full / risk gate / no contract)")
-    return {'account': (account.name if account else deployment_name()),
-            'assets': deployment_assets(),
+    return {'account': acct_cfg.name, 'assets': "+".join(acct_cfg.asset_classes),
             'equity': round(equity, 2), 'open_positions': rm.open_positions,
             'new_trades': len(placed), 'exits': exits_n, 'summary': "; ".join(parts)}
 

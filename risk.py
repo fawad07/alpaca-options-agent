@@ -10,10 +10,12 @@ import config as C
 
 
 class RiskManager:
-    def __init__(self, equity: float, day_start_equity: float, open_positions: int):
+    def __init__(self, equity: float, day_start_equity: float, open_positions: int,
+                 max_concurrent: int | None = None):
         self.equity = equity
         self.day_start_equity = day_start_equity
         self.open_positions = open_positions
+        self.max_concurrent = max_concurrent if max_concurrent is not None else C.MAX_CONCURRENT
 
     # ── portfolio-level gates ────────────────────────────────
     def daily_loss_ok(self) -> tuple[bool, str]:
@@ -25,8 +27,8 @@ class RiskManager:
         return True, ''
 
     def capacity_ok(self) -> tuple[bool, str]:
-        if self.open_positions >= C.MAX_CONCURRENT:
-            return False, f'max {C.MAX_CONCURRENT} concurrent positions reached'
+        if self.open_positions >= self.max_concurrent:
+            return False, f'max {self.max_concurrent} concurrent positions reached'
         return True, ''
 
     # ── trade-level gates ────────────────────────────────────
