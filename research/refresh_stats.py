@@ -16,12 +16,17 @@ import os, re, csv, sys, asyncio, datetime as dt
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # import project root
 import config as C
-from mcp_client import mcp_session, call, account, option_positions, _rows
+import journal as _journal
+from accounts import current_account
+from mcp_client import mcp_session, call, account, option_positions, crypto_positions, _rows
 
 HERE = os.path.dirname(__file__)
-JOURNAL = os.path.join(os.path.dirname(HERE), "activity.csv")
-SNAP = os.path.join(HERE, "stats_snapshot.md")
-HIST = os.path.join(HERE, "stats_history.csv")
+# Account-aware: DEPLOY_ACCOUNT selects which account/journal to snapshot.
+_ACCT = current_account()
+_SUFFIX = '' if _ACCT.name in ('A', 'default') else f'-{_ACCT.name}'
+JOURNAL = _journal._paths(_ACCT.name)[0]                    # activity.csv (A) or activity-B.csv
+SNAP = os.path.join(HERE, f"stats_snapshot{_SUFFIX}.md")
+HIST = os.path.join(HERE, f"stats_history{_SUFFIX}.csv")
 
 
 def journal_stats() -> dict:
@@ -49,9 +54,9 @@ def journal_stats() -> dict:
 
 
 async def account_stats() -> dict:
-    async with mcp_session() as s:
+    async with mcp_session(_ACCT) as s:
         a = await account(s)
-        pos = await option_positions(s)
+        pos = await option_positions(s) + await crypto_positions(s)
         orders = _rows(await call(s, "get_orders", {"status": "all", "limit": 500}))
     fills = [o for o in orders if str(o.get("status")) == "filled"]
     fills.sort(key=lambda o: o.get("filled_at") or "")
@@ -59,17 +64,18 @@ async def account_stats() -> dict:
     ledger = []
     for o in fills:
         sym = o["symbol"]; side = o["side"]
-        q = int(float(o["filled_qty"])); px = float(o["filled_avg_price"])
+        q = float(o["filled_qty"]); px = float(o["filled_avg_price"])
+        mult = 100 if "option" in str(o.get("asset_class", "")) else 1   # options=100/contract, crypto=1
         t = (o.get("filled_at") or "")[:16].replace("T", " ")
         ledger.append((t, side, q, sym, px))
-        book.setdefault(sym, []).append((side, q, px))
+        book.setdefault(sym, []).append((side, q, px, mult))
     roundtrips = []
     for sym, legs in book.items():
-        buys = [(q, px) for sd, q, px in legs if sd == "buy"]
-        sells = [(q, px) for sd, q, px in legs if sd == "sell"]
+        buys = [(q, px, m) for sd, q, px, m in legs if sd == "buy"]
+        sells = [(q, px, m) for sd, q, px, m in legs if sd == "sell"]
         if buys and sells:
-            bpx = buys[0][1]; spx, q = sells[0][1], sells[0][0]
-            pl = (spx - bpx) * 100 * q
+            bpx = buys[0][1]; spx, q, m = sells[0][1], sells[0][0], sells[0][2]
+            pl = (spx - bpx) * m * q
             roundtrips.append({"sym": sym, "buy": bpx, "sell": spx,
                                "pct": (spx - bpx) / bpx * 100, "pl": pl})
     wins = [r for r in roundtrips if r["pl"] > 0]
