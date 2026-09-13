@@ -1,0 +1,2 @@
+timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summary
+2026-09-12 20:45,B,option+crypto,closed,99421.81,4,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
