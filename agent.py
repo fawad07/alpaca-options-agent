@@ -65,9 +65,10 @@ def _handlers(account):
     return hs
 
 
-def _ranked_signals(handlers):
-    """Gather actionable, handler-supported signals across ALL asset classes and rank
-    by confidence (strongest first) — so options and crypto compete for the shared cap.
+def _ranked_signals(handlers, ordering='confidence'):
+    """Gather actionable, handler-supported signals across the given asset classes.
+    ordering='confidence' → strongest-first (options + crypto compete for the shared cap).
+    ordering='universe'   → keep watchlist/list order (V1 behavior — account A).
     Session-free (signals use daily bars). Returns (ranked, skipped)."""
     ranked, skipped = [], []
     for h, uni, ac in handlers:
@@ -81,7 +82,9 @@ def _ranked_signals(handlers):
             if not h.wants(sig):
                 skipped.append((sym, ac, f"{sig['direction']} unsupported (long-only)")); continue
             ranked.append((sig['confidence'], h, ac, sym, sig, price))
-    ranked.sort(key=lambda c: c[0], reverse=True)
+    if ordering == 'confidence':
+        ranked.sort(key=lambda c: c[0], reverse=True)
+    # 'universe' → leave in insertion order (handlers × watchlist order) = V1 behavior
     return ranked, skipped
 
 
@@ -95,8 +98,8 @@ def run_dry():
                      max_concurrent=acct.max_concurrent)
     print(f"  Equity ${equity:,.0f} | cap {acct.max_concurrent} | assets {'+'.join(acct.asset_classes)}"
           f" | risk/trade ${rm.max_spend():,.0f}")
-    ranked, skipped = _ranked_signals(_handlers(acct))
-    print(f"  --- {len(ranked)} candidate signal(s), best-first, fill up to {acct.max_concurrent} ---")
+    ranked, skipped = _ranked_signals(_handlers(acct), acct.ordering)
+    print(f"  --- {len(ranked)} candidate signal(s) [{acct.ordering}-order], fill up to {acct.max_concurrent} ---")
     filled = 0
     for conf, h, ac, sym, sig, price in ranked:
         if filled >= acct.max_concurrent:
@@ -140,7 +143,7 @@ async def run_live(account=None) -> dict:
 
         # 2) ranked entries — options gated to market hours; crypto 24/7;
         #    skip any symbol we already hold (one position per symbol — no pyramiding)
-        ranked, _ = _ranked_signals(handlers)
+        ranked, _ = _ranked_signals(handlers, acct_cfg.ordering)
         if not mkt:
             ranked = [c for c in ranked if c[2] != 'option']
         signals_n = len(ranked)

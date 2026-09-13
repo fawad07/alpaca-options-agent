@@ -26,6 +26,7 @@ class Account:
     max_concurrent: int = 5
     option_universe: tuple = ()
     crypto_universe: tuple = ()
+    ordering: str = 'confidence'      # 'universe' = V1 list-order fill; 'confidence' = strongest-first
 
 
 # Account A — pinned to V1 behavior (do not change): options only, cap 5, 7 symbols.
@@ -37,6 +38,7 @@ ACCOUNT_A = Account(
     max_concurrent=5,
     option_universe=('SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA'),
     crypto_universe=(),
+    ordering='universe',              # keep A byte-identical to V1 (list-order fill)
 )
 
 # Account B — experimental combined agent: options + crypto, cap 6, GOOGL + coins.
@@ -52,6 +54,7 @@ ACCOUNT_B = Account(
     max_concurrent=6,
     option_universe=('SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA', 'GOOGL'),
     crypto_universe=('BTC/USD', 'ETH/USD', 'SOL/USD', 'LTC/USD'),
+    ordering='confidence',           # B: options + crypto compete by signal strength
 )
 
 ACCOUNTS = {'A': ACCOUNT_A, 'B': ACCOUNT_B}
