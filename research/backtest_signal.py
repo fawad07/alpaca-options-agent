@@ -13,6 +13,8 @@ the thing that separates a credible agent from a curve-fit demo.
 Run:  python3 backtest_signal.py
 """
 from __future__ import annotations
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))   # import from project root
 import numpy as np, pandas as pd
 import config as C, data as D
 from signals import add_features

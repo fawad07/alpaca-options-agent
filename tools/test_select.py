@@ -4,6 +4,8 @@ works after hours). For each universe symbol: signal -> pick ATM contract -> pri
 Run: .venv/bin/python test_select.py
 """
 from __future__ import annotations
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))   # import from project root
 import asyncio
 import config as C, data as D, signals as S
 from mcp_client import mcp_session, find_atm_contract, option_premium

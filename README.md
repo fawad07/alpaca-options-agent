@@ -1,83 +1,131 @@
-# 🛡️ Risk Gate — Honest Options AI
+# 🛡️ Risk Gate — Honest Autonomous Trading Agent
 
-**Team:** Risk Gate · **Tagline:** Honest options AI
+An autonomous agent that trades a **paper** Alpaca account **through the Alpaca MCP server**.
+Its edge isn't a magic signal — it's **discipline, risk gates, and honesty**. Every decision is
+logged; the strategy is openly reported to have no proven edge out-of-sample. **Paper money only.**
 
-An autonomous options-trading agent for the Alpaca AI Trading Agents Hackathon
-(Aug 28 – Sep 4, 2026). Its edge isn't a magic signal — it's **discipline and risk
-gates**, with every decision explainable and honestly validated. **Paper account
-only. Never real money.**
+- **Account A** — the original **options-only** agent (the hackathon entry). Kept pure.
+- **Account B** — the evolved **options + crypto** agent (24/7), the experiment going forward.
 
-Start here → **docs/PLAN.md** (the week plan) and **docs/TRACKER.md** (the checklist).
-Write-up is in **submission/WRITEUP.md**. Docs live in **docs/**, deliverables in **submission/**.
+> Not financial advice. Educational project. Paper trading only — never real money.
 
-## Setup (once)
+---
+
+## 📁 Directory map
+
 ```
+alpaca-options-agent/
+│
+├── CORE AGENT (flat modules — imported by name; keep at root)
+│   ├── config.py          central settings + risk params (reads keys from .env)
+│   ├── accounts.py        per-account profiles (A = options-only; B = options+crypto)
+│   ├── agent.py           the brain: rank signals → risk gates → place trades → journal
+│   ├── signals.py         the "AI logic" (EMA/RSI → bull/bear/neutral)
+│   ├── data.py            daily price bars (stocks + crypto) via Yahoo
+│   ├── risk.py            the risk gates (sizing, caps, daily-loss halt)
+│   ├── journal.py         per-account decision journal (activity*.csv / ACTIVITY*.md)
+│   ├── mcp_client.py      talks to Alpaca THROUGH the MCP server (orders, positions)
+│   └── mcp_test.py        launches the MCP server; verifies the connection
+│
+├── instruments/          how each asset class is traded (the swappable handlers)
+│   ├── base.py            the InstrumentHandler interface
+│   ├── options.py         OptionsHandler (ATM contract, premium, defined risk)
+│   └── crypto.py          CryptoSpotHandler (long-only, broker stop_limit, agent TP)
+│
+├── ENTRYPOINTS & SCRIPTS (run these)
+│   ├── cron_once.py       one market-gated pass — used by the cloud workflows
+│   ├── check.sh           daily status: cloud runs + journal + P&L
+│   ├── trade-now.sh       force one cloud trade pass now
+│   ├── autopilot.sh       local hourly backstop (fires a pass during market hours)
+│   ├── run_agent.sh       local market-gated wrapper
+│   └── market_open.py     prints OPEN/CLOSED (used by run_agent.sh)
+│
+├── APPS
+│   ├── dashboard.py       live status web dashboard (→ localhost:8095)
+│   ├── results.py         one-command P&L numbers
+│   └── templates/         dashboard HTML
+│
+├── ACCOUNT JOURNALS (auto-written each run)
+│   ├── activity.csv / ACTIVITY.md        account A decision journal
+│   └── activity-B.csv / ACTIVITY-B.md    account B decision journal
+│
+├── tools/                standalone dev/verification scripts
+│   ├── test_connection.py   check account connects
+│   └── test_select.py       pick + price an ATM option per symbol via MCP
+│
+├── research/             offline analysis (never touches live trading)
+│   ├── backtest_crypto.py / backtest_fetch.py   crypto backtester (walk-forward OOS)
+│   ├── backtest_signal.py                       v1 options OOS honesty check
+│   ├── refresh_stats.py                         account-aware track-record snapshot
+│   ├── stats_history*.csv / stats_snapshot*.md  the growing track record (A and B)
+│   ├── build_paper_pdf.py + RESEARCH_PAPER.*    the research paper
+│   ├── data/                                    cached historical crypto bars
+│   └── *.md                                     v2 design, plan, backtest, Step 0 docs
+│
+├── submission/           hackathon deliverables (deck, write-up, video script, cover, social)
+├── docs/                 guides (automation, deploy, monitoring, plan, tracker, checklist)
+├── .github/workflows/    cloud autonomy (see below)
+│
+└── config: .env.example · requirements.txt · render.yaml · LICENSE · build_deck.js · .gitignore
+```
+
+---
+
+## 👥 The two accounts (deployments)
+
+Same codebase, selected by the `DEPLOY_ACCOUNT` env var (default `A`):
+
+| | **Account A** | **Account B** |
+|---|---|---|
+| Trades | options only | options **+ crypto spot** |
+| Position cap | 5 | 6 |
+| Fill order | universe (V1) | confidence-ranked |
+| Schedule | market hours | **24/7** (options still gated to hours) |
+| Keys (`.env`) | `ALPACA_API_KEY` | `ALPACA_B_API_KEY` |
+| Journal | `activity.csv` | `activity-B.csv` |
+
+---
+
+## ⚙️ Setup (once)
+```bash
 cd ~/Desktop/alpaca-options-agent
 python3.11 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-cp .env.example .env          # then paste your PAPER keys into .env
-```
-> Uses a Python 3.11 virtualenv (the MCP tooling needs 3.10+). Run everything
-> with `.venv/bin/python …`.
-
-## Dry-run (no orders — prints what it WOULD do)
-```
-.venv/bin/python agent.py
-```
-Applies every risk gate and prints the option trades it would place. Places nothing.
-
-## Verify the plumbing
-```
-.venv/bin/python test_connection.py    # account balance via Alpaca API
-.venv/bin/python mcp_test.py           # connect to Alpaca MCP server, list tools
-.venv/bin/python test_select.py        # pick + price an ATM option per symbol via MCP
-.venv/bin/python backtest_signal.py    # out-of-sample honesty check on the signal
+cp .env.example .env        # then paste your PAPER keys into .env
 ```
 
-## Live status dashboard (also your demo URL)
+## ▶️ Run
+```bash
+# Dry run (no orders — prints intended trades). Try either account:
+AGENT_MODE=DRY_RUN .venv/bin/python agent.py                 # account A (options)
+AGENT_MODE=DRY_RUN DEPLOY_ACCOUNT=B .venv/bin/python agent.py # account B (options+crypto)
+
+# Live status dashboard
+.venv/bin/python dashboard.py            # → http://localhost:8095
+
+# Daily monitoring
+./check.sh                               # runs + journal + P&L
+./trade-now.sh                           # force a cloud pass
+
+# Verify plumbing
+.venv/bin/python tools/test_connection.py
+.venv/bin/python research/backtest_signal.py   # options OOS honesty check
 ```
-.venv/bin/python dashboard.py     # → http://localhost:8095
-```
-Shows account equity + P&L, open option positions, recent orders, and the agent's
-decisions — all read through the Alpaca MCP server. Auto-refreshes. Read-only.
 
-## Go live on the PAPER account (during US market hours)
-1. In `.env` set `AGENT_MODE=LIVE_PAPER`
-2. `.venv/bin/python agent.py`            (one pass — places/manages via MCP)
-   or `.venv/bin/python agent.py --loop 900`   (every 15 min)
-
-**Architecture:** `agent.py` (signal + risk gates) → `mcp_client.py` → Alpaca **MCP server**
-→ Alpaca paper account. Options only, defined-risk (long calls/puts), paper money only.
-
-## Autonomous cloud trading + monitoring
-The agent trades itself in the cloud — **no computer needed** — via GitHub Actions
-(`.github/workflows/trade.yml`), which runs `cron_once.py` on a market-hours schedule.
-Every run writes to a **decision journal** (`journal.py` → `ACTIVITY.md` + `activity.csv`),
-committed back to the repo, so there's an honest, timestamped record of *every* decision —
-traded, no-signal, risk-gated, or market-closed.
-
-Helper scripts:
-```
-./check.sh        # one-shot status: recent cloud runs + journal + live P&L
-./trade-now.sh    # force one cloud trade pass now, and show what it did
-./autopilot.sh    # local hourly backstop: fire a pass every hour during market hours
-.venv/bin/python results.py   # slide-ready P&L numbers (writes results.txt/json)
-```
-See **docs/MONITORING.md** for the daily routine and **ACTIVITY.md** for the live journal.
-
-## Files
-| File | Role | Reused from |
+## ☁️ Cloud autonomy (`.github/workflows/`)
+| Workflow | What | Cadence |
 |---|---|---|
-| `agent.py` | Autonomous loop: signal → option → risk gates → order | new |
-| `signals.py` | AI logic (EMA/RSI features → bull/bear/neutral) | ai-trading-pipeline |
-| `risk.py` | Risk gates (sizing, limits, defined-risk) | Trading_signal_production discipline |
-| `data.py` | Free daily bars for underlyings | crypto-companion |
-| `backtest_signal.py` | Out-of-sample honesty check | ai-trading-pipeline |
-| `config.py` | Central settings + .env keys | Trading_signal_production pattern |
+| `trade.yml` | account A agent | market hours |
+| `trade-b.yml` | account B combined agent | 24/7 |
+| `snapshot.yml` | account A daily track-record snapshot | daily |
+| `snapshot-b.yml` | account B daily track-record snapshot | daily |
 
-## Guardrails (built in)
-- Paper only · defined-risk only (buys options, never sells naked)
-- 2% max risk/trade · ≤5 open · 5% daily-loss halt · DTE 14–60
-- You do all account/key setup and submission; the code never touches real money.
+## 🚦 Risk gates (the heart of it)
+Per account: **≤2%** risked/trade · **≤ cap** open positions · **5%** daily-loss halt ·
+defined-risk (long only) · options 14–60 DTE, TP+50%/SL−50% · crypto stop 15% / TP 30% /
+≤15% notional per coin, with a broker `stop_limit` on every position.
 
-*Not financial advice. Educational hackathon project.*
+## 🎯 The honest thesis
+Out-of-sample, the EMA/RSI signal beat buy-and-hold on **0 of 7** stocks and **0 of 4** coins.
+We report that openly. Risk Gate competes on **discipline, safety, and transparency** — not a
+pretended edge. Every trade is explainable; every risk is capped; every decision is journaled.
