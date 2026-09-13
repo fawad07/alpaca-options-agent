@@ -1,7 +1,7 @@
-# Stats snapshot — 2026-09-12 20:08
+# Stats snapshot — 2026-09-13 01:14
 
-- **Equity:** $99,437.65  ·  **Total P&L:** -562.35 (-0.56%)
-- **Realized:** $-154.95  ·  **Unrealized:** $-407.40  ·  **Cash:** $46,366.93
+- **Equity:** $99,475.92  ·  **Total P&L:** -524.08 (-0.52%)
+- **Realized:** $-154.95  ·  **Unrealized:** $-369.13  ·  **Cash:** $46,366.93
 - **Open positions:** 4
 - **Closed round-trips:** 4  (W 1 / L 3, win rate 25%, profit factor 0.11)
 - **Journal:** 1 rows · 0 market-hours cycles · 0 entries · 0 exits · 4 signal-level gate blocks
