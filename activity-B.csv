@@ -10,3 +10,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-09-14 01:57,B,option+crypto,closed,99354.64,4,0,0,3 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-09-14 08:20,B,option+crypto,closed,99352.64,4,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-09-14 14:06,B,option+crypto,open,99903.66,6,2,0,BOUGHT 1x MSFT call; 1x NVDA call
+2026-09-14 17:54,B,option+crypto,closed,99643.23,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
