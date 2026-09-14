@@ -1,9 +1,9 @@
-# 📓 Risk Gate — Decision Journal
+# 📓 Risk Gate — Decision Journal (A)
 
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 45  (31 during market hours)
+- **Runs logged:** 46  (32 during market hours)
 - **Trades placed:** 9   ·   **Positions closed:** 4
 
 | Time (ET) | Market | Equity | Open | New | Exits | What happened |
@@ -53,4 +53,5 @@ honest record of what it decided — including days with no trades.
 | 2026-09-11 13:00 | open | $99,106 | 5 | 0 | 0 | 6 signal(s) fired but none opened (risk gate / no contract / over cap): SPY, AAPL, MSFT, NVDA, AMZN, TSLA |
 | 2026-09-11 15:37 | open | $99,080 | 5 | 0 | 0 | 6 signal(s) fired but none opened (risk gate / no contract / over cap): SPY, AAPL, MSFT, NVDA, AMZN, TSLA |
 | 2026-09-11 18:02 | closed | — | — | 0 | 0 | market closed — no action |
+| 2026-09-14 14:34 | open | $98,451 | 5 | 0 | 0 | 6 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 
