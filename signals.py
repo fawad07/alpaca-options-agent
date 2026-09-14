@@ -50,3 +50,19 @@ def signal(df: pd.DataFrame) -> dict:
                 'reason': f'downtrend (EMA{C.EMA_FAST}<EMA{C.EMA_SLOW}), RSI {rsi:.0f} not oversold'}
     return {'direction': 'neutral', 'confidence': round(conf, 2),
             'reason': f'no clean setup (RSI {rsi:.0f})'}
+
+
+def calibrated_confidence(df: pd.DataFrame, lookback: int = 252) -> float:
+    """L1 calibration: today's raw confidence expressed as its PERCENTILE within this asset's
+    own recent history (last `lookback` bars). Raw confidence pins high-volatility assets near
+    1.00, so they'd crowd the ranking; the percentile is comparable across assets, letting
+    options and crypto compete fairly. Returns 0..1. Ranking-only — does not change the
+    actionable filter (that still uses raw confidence >= MIN_CONFIDENCE)."""
+    c = df['close']
+    ema_f, ema_s = c.ewm(span=C.EMA_FAST).mean(), c.ewm(span=C.EMA_SLOW).mean()
+    gap = (ema_f - ema_s).abs() / ema_s
+    conf = (0.5 + gap * 8).clip(upper=1.0).dropna()
+    if len(conf) < 20:
+        return 0.5
+    w = conf.iloc[-lookback:]
+    return float((w <= w.iloc[-1]).mean())

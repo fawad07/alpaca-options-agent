@@ -81,7 +81,10 @@ def _ranked_signals(handlers, ordering='confidence'):
                 skipped.append((sym, ac, f"no signal ({sig['reason']})")); continue
             if not h.wants(sig):
                 skipped.append((sym, ac, f"{sig['direction']} unsupported (long-only)")); continue
-            ranked.append((sig['confidence'], h, ac, sym, sig, price))
+            # L1 calibration: rank by cross-asset-comparable percentile (confidence accounts);
+            # raw confidence still gates "is it actionable" above. Universe-order keeps raw.
+            score = S.calibrated_confidence(df) if ordering == 'confidence' else sig['confidence']
+            ranked.append((score, h, ac, sym, sig, price))
     if ordering == 'confidence':
         ranked.sort(key=lambda c: c[0], reverse=True)
     # 'universe' → leave in insertion order (handlers × watchlist order) = V1 behavior
