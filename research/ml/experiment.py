@@ -82,7 +82,8 @@ def simulate(df, variant, lo=1, hi=None):
         r = exit_px / entry - 1 - ROUNDTRIP
         # sizing
         if variant["sizing"] == "invvol" and rvol[i] and not np.isnan(rvol[i]):
-            size = float(np.clip(tgt_vol / rvol[i], 0.25, 2.0))
+            size = float(np.clip(tgt_vol / rvol[i],
+                                 variant.get("size_lo", 0.25), variant.get("size_hi", 2.0)))
         else:
             size = 1.0
         rets.append(r); sizes.append(size)
