@@ -49,6 +49,12 @@
   <div class="cards" id="cards"></div>
 
   <div class="panel">
+    <h2>Equity curve — Account A (options) vs B (options + crypto)</h2>
+    <canvas id="equityChart" height="110"></canvas>
+    <div class="note" id="chartNote" style="margin-top:10px">loading chart…</div>
+  </div>
+
+  <div class="panel">
     <h2>Open option positions</h2>
     <table><thead><tr><th>Contract</th><th>Type</th><th>Qty</th><th>Avg</th><th>Now</th><th>Value</th><th>P/L</th></tr></thead>
       <tbody id="pos"></tbody></table>
@@ -70,10 +76,37 @@
     Refreshes every 20s.</div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
 const money=n=>'$'+Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
 const cls=n=>n>=0?'green':'red', sg=n=>n>=0?'+':'';
+
+let equityChart=null;
+async function loadChart(){
+  try{
+    const d=await(await fetch('/api/chart')).json();
+    const mk=(arr,color,label)=>({label,data:(arr||[]).map(p=>({x:p.t,y:p.v})),
+      borderColor:color,backgroundColor:color+'22',borderWidth:2,pointRadius:0,tension:.3,fill:true});
+    const ds=[mk(d.A,'#e0a13a','A · options'),mk(d.B,'#5fa8ff','B · options+crypto')];
+    const note=[];
+    if(d.A&&d.A.length) note.push('A now '+money(d.A[d.A.length-1].v));
+    if(d.B&&d.B.length) note.push('B now '+money(d.B[d.B.length-1].v));
+    note.push('both started '+money(d.start));
+    $('chartNote').textContent=note.join('  ·  ')+(d.A_err?(' · A err: '+d.A_err):'')+(d.B_err?(' · B err: '+d.B_err):'');
+    if(equityChart){ equityChart.data.datasets=ds; equityChart.update('none'); return; }
+    equityChart=new Chart($('equityChart'),{type:'line',data:{datasets:ds},
+      options:{responsive:true,animation:false,interaction:{mode:'index',intersect:false},
+        plugins:{legend:{labels:{color:'#8296ad',usePointStyle:true,boxWidth:8}},
+          tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.parsed.y),
+            title:i=>i.length?new Date(i[0].parsed.x).toLocaleString():''}}},
+        scales:{
+          x:{type:'linear',grid:{color:'#26313f'},ticks:{color:'#8296ad',maxTicksLimit:8,
+             callback:v=>new Date(v).toLocaleDateString(undefined,{month:'short',day:'numeric'})}},
+          y:{grid:{color:'#26313f'},ticks:{color:'#8296ad',callback:v=>'$'+(v/1000).toFixed(1)+'k'}}}}});
+  }catch(e){ $('chartNote').textContent='chart offline — retrying'; }
+}
+loadChart(); setInterval(loadChart,60000);
 
 async function refresh(){
   try{

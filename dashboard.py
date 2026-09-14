@@ -14,9 +14,11 @@ from zoneinfo import ZoneInfo
 from flask import Flask, jsonify, render_template, request, abort
 import config as C
 from mcp_client import mcp_session, account, option_positions, call, _rows
+from accounts import ACCOUNT_A, ACCOUNT_B
 
 app = Flask(__name__)
 _cache = {'t': 0.0, 'data': None}
+_chart = {'t': 0.0, 'data': None}
 
 # Optional access gate: if DASH_TOKEN is set, every request needs ?token=…
 # (handy when the dashboard is deployed to a public URL). Leave unset = open.
@@ -105,6 +107,29 @@ def build_status() -> dict:
     return data
 
 
+async def _history(acct) -> list:
+    async with mcp_session(acct) as s:
+        h = await call(s, 'get_portfolio_history', {'period': '1M', 'timeframe': '1D'})
+    if not isinstance(h, dict):
+        h = {}
+    ts, eq = h.get('timestamp') or [], h.get('equity') or []
+    return [{'t': int(t) * 1000, 'v': _f(e)} for t, e in zip(ts, eq) if e]
+
+
+def build_chart() -> dict:
+    now = time.time()
+    if _chart['data'] and now - _chart['t'] < 60:
+        return _chart['data']
+    out = {'start': C.ACCOUNT_START, 'A': [], 'B': []}
+    for key, acct in (('A', ACCOUNT_A), ('B', ACCOUNT_B)):
+        try:
+            out[key] = asyncio.run(_history(acct))
+        except Exception as e:
+            out[key + '_err'] = str(e)[:120]
+    _chart.update(t=now, data=out)
+    return out
+
+
 @app.route('/')
 def index():
     return render_template('dashboard.html')
@@ -112,6 +137,10 @@ def index():
 @app.route('/api/status')
 def api_status():
     return jsonify(build_status())
+
+@app.route('/api/chart')
+def api_chart():
+    return jsonify(build_chart())
 
 
 if __name__ == '__main__':
