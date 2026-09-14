@@ -59,8 +59,9 @@ alpaca-options-agent/
 │   ├── refresh_stats.py                         account-aware track-record snapshot
 │   ├── stats_history*.csv / stats_snapshot*.md  the growing track record (A and B)
 │   ├── build_paper_pdf.py + RESEARCH_PAPER.*    the research paper
+│   ├── ml/                                      ML phase (M0–M1, levers L1/L2/L3) — see ml/README.md
 │   ├── data/                                    cached historical crypto bars
-│   └── *.md                                     v2 design, plan, backtest, Step 0 docs
+│   └── *.md                                     v2 design, plan, backtest, Step 0, ML docs
 │
 ├── submission/           hackathon deliverables (deck, write-up, video script, cover, social)
 ├── docs/                 guides (automation, deploy, monitoring, plan, tracker, checklist)
@@ -79,7 +80,7 @@ Same codebase, selected by the `DEPLOY_ACCOUNT` env var (default `A`):
 |---|---|---|
 | Trades | options only | options **+ crypto spot** |
 | Position cap | 5 | 6 |
-| Fill order | universe (V1) | confidence-ranked |
+| Fill order | universe (V1) | calibrated confidence (L1 — fair options-vs-crypto) |
 | Schedule | market hours | **24/7** (options still gated to hours) |
 | Keys (`.env`) | `ALPACA_API_KEY` | `ALPACA_B_API_KEY` |
 | Journal | `activity.csv` | `activity-B.csv` |
@@ -127,5 +128,8 @@ defined-risk (long only) · options 14–60 DTE, TP+50%/SL−50% · crypto stop 
 
 ## 🎯 The honest thesis
 Out-of-sample, the EMA/RSI signal beat buy-and-hold on **0 of 7** stocks and **0 of 4** coins.
-We report that openly. Risk Gate competes on **discipline, safety, and transparency** — not a
-pretended edge. Every trade is explainable; every risk is capped; every decision is journaled.
+We even ran a full **ML study** (meta-labeling + adaptive exits + vol-sizing) — and it *also*
+found no durable edge out-of-sample, so we shipped none of it except a **fairness** fix
+(calibrated ranking). See `research/ml/README.md`. Risk Gate competes on **discipline, safety,
+and transparency** — not a pretended edge. Every trade is explainable; every risk is capped;
+every decision is journaled.
