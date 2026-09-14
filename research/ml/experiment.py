@@ -46,13 +46,14 @@ def indicators(df):
     return bull.values, atr.values, rvol.values
 
 
-def simulate(df, variant):
+def simulate(df, variant, lo=1, hi=None):
     o, h, l, c = (df[k].values for k in ("open", "high", "low", "close"))
     bull, atr, rvol = indicators(df)
     n = len(df)
+    hi = n if hi is None else min(hi, n)
     tgt_vol = np.nanmedian(rvol)
-    rets, sizes, i = [], [], 1
-    while i < n - 1:
+    rets, sizes, i = [], [], max(lo, 1)
+    while i < hi - 1:
         if not bull[i] or np.isnan(atr[i]) or atr[i] <= 0:
             i += 1; continue
         entry = o[i + 1]

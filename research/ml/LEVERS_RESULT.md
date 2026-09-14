@@ -30,7 +30,20 @@ drawdowns are huge because it's always-long a single coin through crypto crashes
 - 🟡 **L2 (vol-sizing)** — optional; keep if smaller drawdown > max return for you (L2+L3 best DD).
 - ❌ **Drop trailing.**
 
-## Honest caveats
-- Params were fixed, not walk-forward-validated → L3's edge must survive a robustness check.
+## ⚠️ UPDATE — L3 robustness check: FAILED (2026-09-13)
+The +2.39%/1.26 "win" was **one lucky cell (2/4)**, not a robust improvement:
+- **Plateau: ❌** only **8/16 (50%)** ATR-multiple combos beat the fixed baseline — a coin flip,
+  not a broad good region. Good cells are scattered; neighbors are bad.
+- **Out-of-sample: ❌** tuning the best multiples on train(60%) then testing on unseen(40%),
+  **L3 lost to the fixed baseline on 3 of 4 coins** (OOS avg ret/DD −0.64 vs −0.57). The tuned
+  settings did NOT generalize forward.
+
+**Verdict: DO NOT adopt L3.** The robustness gate caught a false positive — exactly its job.
+The fixed 30/15 exit is fine; there's no durable edge in exit-tuning either (consistent with
+everything else). What survives: **L1 (calibration — fairness, no edge needed)**; **L2 (vol-sizing)
+optional as a standard risk-dampener, if separately OOS-checked.**
+
+## (original, now-superseded) Honest caveats
+- Params were fixed, not walk-forward-validated → L3's edge must survive a robustness check. ← it didn't.
 - Drawdowns are per-coin and severe; real safety comes from the portfolio (cap, 5% daily halt,
   diversification), tested at integration on account B.
