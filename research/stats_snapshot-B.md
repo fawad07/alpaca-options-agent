@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-09-13 23:30
+# Stats snapshot — 2026-09-14 23:59
 
-- **Equity:** $98,783.07  ·  **Total P&L:** -1,216.93 (-1.22%)
-- **Realized:** $-154.95  ·  **Unrealized:** $-1,061.98  ·  **Cash:** $46,366.93
-- **Open positions:** 4
+- **Equity:** $99,279.39  ·  **Total P&L:** -720.61 (-0.72%)
+- **Realized:** $-154.95  ·  **Unrealized:** $-565.66  ·  **Cash:** $43,806.87
+- **Open positions:** 6
 - **Closed round-trips:** 4  (W 1 / L 3, win rate 25%, profit factor 0.11)
-- **Journal:** 7 rows · 0 market-hours cycles · 0 entries · 0 exits · 25 signal-level gate blocks
-- **Equity path:** first $0 · peak $0 · trough $0 · last $0
-- **Window:**  →  ET
+- **Journal:** 12 rows · 1 market-hours cycles · 2 entries · 0 exits · 39 signal-level gate blocks
+- **Equity path:** first $99,904 · peak $99,904 · trough $99,904 · last $99,904
+- **Window:** 2026-09-14 14:06 → 2026-09-14 14:06 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -30,4 +30,6 @@
 2026-09-12 23:05  BUY  130.577996x SOL/USD @ $101.86
 2026-09-12 23:06  BUY  0.171902x BTC/USD @ $77272.47
 2026-09-12 23:06  BUY  248.036967x LTC/USD @ $53.81
+2026-09-14 18:06  BUY  1.0x MSFT261016C00510000 @ $15.50
+2026-09-14 18:06  BUY  1.0x NVDA261016C00210000 @ $10.10
 ```
