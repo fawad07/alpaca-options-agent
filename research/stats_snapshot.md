@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-09-14 23:56
+# Stats snapshot — 2026-09-15 23:35
 
-- **Equity:** $98,189.08  ·  **Total P&L:** -1,810.92 (-1.81%)
-- **Realized:** $+283.00  ·  **Unrealized:** $-2,093.92  ·  **Cash:** $93,346.08
+- **Equity:** $97,229.90  ·  **Total P&L:** -2,770.10 (-2.77%)
+- **Realized:** $-1,871.00  ·  **Unrealized:** $-899.10  ·  **Cash:** $91,297.90
 - **Open positions:** 5
-- **Closed round-trips:** 4  (W 2 / L 2, win rate 50%, profit factor 1.20)
-- **Journal:** 47 rows · 32 market-hours cycles · 9 entries · 4 exits · 147 signal-level gate blocks
-- **Equity path:** first $100,000 · peak $102,200 · trough $98,148 · last $98,451
-- **Window:** 2026-09-01 10:20 → 2026-09-14 14:34 ET
+- **Closed round-trips:** 7  (W 2 / L 5, win rate 29%, profit factor 0.47)
+- **Journal:** 50 rows · 33 market-hours cycles · 12 entries · 7 exits · 147 signal-level gate blocks
+- **Equity path:** first $100,000 · peak $102,200 · trough $97,417 · last $97,417
+- **Window:** 2026-09-01 10:20 → 2026-09-15 13:39 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -14,7 +14,10 @@
 | SPY260930C00763000 | $11.03 | $17.01 | +54.2% | $+598 |
 | MSFT261002C00505000 | $15.65 | $7.80 | -50.2% | $-785 |
 | NVDA261002C00220000 | $7.30 | $12.70 | +74.0% | $+1,080 |
+| AMZN261002C00255000 | $8.75 | $4.20 | -52.0% | $-910 |
+| SPY261002C00765000 | $11.26 | $4.86 | -56.8% | $-640 |
 | SPY261002C00774000 | $10.58 | $4.48 | -57.7% | $-610 |
+| SPY261009C00768000 | $11.34 | $5.30 | -53.3% | $-604 |
 
 ## Full fill ledger
 ```
@@ -31,4 +34,10 @@
 2026-09-08 17:14  BUY  1.0x SPY261009C00768000 @ $11.34
 2026-09-09 17:08  SELL 1.0x SPY261002C00774000 @ $4.48
 2026-09-09 17:08  BUY  1.0x SPY261009C00763000 @ $11.76
+2026-09-15 17:39  SELL 2.0x AMZN261002C00255000 @ $4.20
+2026-09-15 17:39  SELL 1.0x SPY261002C00765000 @ $4.86
+2026-09-15 17:39  SELL 1.0x SPY261009C00768000 @ $5.30
+2026-09-15 17:39  BUY  1.0x SPY261016C00757000 @ $12.94
+2026-09-15 17:39  BUY  1.0x AAPL261016C00330000 @ $10.45
+2026-09-15 17:39  BUY  1.0x MSFT261016C00500000 @ $15.65
 ```
