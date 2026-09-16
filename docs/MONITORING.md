@@ -7,10 +7,10 @@ Best time: mid-morning and mid-afternoon **during US market hours**
 Everything is one command. From the project folder:
 ```bash
 cd ~/Desktop/alpaca-options-agent
-./check.sh
+./run.sh status
 ```
 
-`check.sh` shows you three things. Here's exactly what to look for in each.
+`run.sh status` shows you three things. Here's exactly what to look for in each.
 
 ---
 
@@ -26,7 +26,7 @@ Each line is one run. The 2nd word is what matters:
 apart, through the day. A stray old `failure` from before today is fine — ignore it.
 
 **🚩 Red flag:** no new runs in the last ~30 min during market hours →
-GitHub skipped them. Fix in 10 seconds: **`./trade-now.sh`** (forces a run).
+GitHub skipped them. Fix in 10 seconds: **`./run.sh trade`** (forces a run).
 
 ---
 
@@ -59,8 +59,8 @@ version Thursday after close (see `SUBMISSION_CHECKLIST.md`).
 
 | I want to… | Command |
 |---|---|
-| **Check status** (runs + journal + P&L) | `./check.sh` |
-| **Force a trade pass now** (guarantee a run) | `./trade-now.sh` |
+| **Check status** (runs + journal + P&L) | `./run.sh status` |
+| **Force a trade pass now** (guarantee a run) | `./run.sh trade` |
 
 You can also force a run with no terminal at all:
 **GitHub → your repo → Actions → risk-gate-agent → "Run workflow".**
@@ -68,9 +68,9 @@ You can also force a run with no terminal at all:
 ---
 
 ## 30-second daily plan (that's it)
-1. **Late morning:** `./check.sh`. See `success` runs + journal rows appearing? Done.
-2. If there's a **gap** (no runs in 30 min): `./trade-now.sh`. Done.
-3. **Mid-afternoon:** `./check.sh` once more.
+1. **Late morning:** `./run.sh status`. See `success` runs + journal rows appearing? Done.
+2. If there's a **gap** (no runs in 30 min): `./run.sh trade`. Done.
+3. **Mid-afternoon:** `./run.sh status` once more.
 4. See a **`failure`** or **`ERROR`**? Copy it here and I'll fix it.
 
 Do that Tue/Wed/Thu and you're guaranteed trades on the board — with a full,

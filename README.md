@@ -34,11 +34,8 @@ alpaca-options-agent/
 │
 ├── ENTRYPOINTS & SCRIPTS (run these)
 │   ├── cron_once.py       one market-gated pass — used by the cloud workflows
-│   ├── check.sh           daily status: cloud runs + journal + P&L
-│   ├── trade-now.sh       force one cloud trade pass now
-│   ├── autopilot.sh       local hourly backstop (fires a pass during market hours)
-│   ├── run_agent.sh       local market-gated wrapper
-│   └── market_open.py     prints OPEN/CLOSED (used by run_agent.sh)
+│   ├── run.sh             THE launcher — menu, or ./run.sh <status|compare|dashboard|trade|autopilot|results|market>
+│   └── market_open.py     prints OPEN/CLOSED
 │
 ├── APPS
 │   ├── dashboard.py       live status web dashboard (→ localhost:8095)
@@ -105,8 +102,9 @@ AGENT_MODE=DRY_RUN DEPLOY_ACCOUNT=B .venv/bin/python agent.py # account B (optio
 .venv/bin/python dashboard.py            # → http://localhost:8095
 
 # Daily monitoring
-./check.sh                               # runs + journal + P&L
-./trade-now.sh                           # force a cloud pass
+./run.sh                                 # menu of everything
+./run.sh status                          # cloud runs + journals + A/B P&L
+./run.sh trade                           # force a cloud pass (A + B)
 
 # Verify plumbing
 .venv/bin/python tools/test_connection.py
