@@ -23,3 +23,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-09-16 10:52,B,option+crypto,open,96275.6,6,1,1,BOUGHT 1x MSFT call; closed 1 position(s)
 2026-09-16 14:46,B,option+crypto,open,96821.19,6,0,0,10 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-09-16 16:16,B,option+crypto,closed,96646.47,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
+2026-09-16 17:17,B,option+crypto,closed,96725.08,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
