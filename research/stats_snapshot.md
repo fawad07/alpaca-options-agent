@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-09-16 23:43
+# Stats snapshot — 2026-09-17 23:36
 
-- **Equity:** $96,495.71  ·  **Total P&L:** -3,504.29 (-3.50%)
-- **Realized:** $-1,871.00  ·  **Unrealized:** $-1,633.29  ·  **Cash:** $91,297.71
+- **Equity:** $97,115.66  ·  **Total P&L:** -2,884.34 (-2.88%)
+- **Realized:** $-2,781.00  ·  **Unrealized:** $-103.34  ·  **Cash:** $91,014.66
 - **Open positions:** 5
-- **Closed round-trips:** 7  (W 2 / L 5, win rate 29%, profit factor 0.47)
-- **Journal:** 53 rows · 34 market-hours cycles · 12 entries · 7 exits · 152 signal-level gate blocks
-- **Equity path:** first $100,000 · peak $102,200 · trough $97,062 · last $97,062
-- **Window:** 2026-09-01 10:20 → 2026-09-16 13:36 ET
+- **Closed round-trips:** 8  (W 2 / L 6, win rate 25%, profit factor 0.38)
+- **Journal:** 56 rows · 35 market-hours cycles · 13 entries · 8 exits · 152 signal-level gate blocks
+- **Equity path:** first $100,000 · peak $102,200 · trough $96,897 · last $96,897
+- **Window:** 2026-09-01 10:20 → 2026-09-17 13:36 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -15,6 +15,7 @@
 | MSFT261002C00505000 | $15.65 | $7.80 | -50.2% | $-785 |
 | NVDA261002C00220000 | $7.30 | $12.70 | +74.0% | $+1,080 |
 | AMZN261002C00255000 | $8.75 | $4.20 | -52.0% | $-910 |
+| TSLA261002P00360000 | $17.50 | $8.40 | -52.0% | $-910 |
 | SPY261002C00765000 | $11.26 | $4.86 | -56.8% | $-640 |
 | SPY261002C00774000 | $10.58 | $4.48 | -57.7% | $-610 |
 | SPY261009C00768000 | $11.34 | $5.30 | -53.3% | $-604 |
@@ -40,4 +41,6 @@
 2026-09-15 17:39  BUY  1.0x SPY261016C00757000 @ $12.94
 2026-09-15 17:39  BUY  1.0x AAPL261016C00330000 @ $10.45
 2026-09-15 17:39  BUY  1.0x MSFT261016C00500000 @ $15.65
+2026-09-17 17:36  SELL 1.0x TSLA261002P00360000 @ $8.40
+2026-09-17 17:36  BUY  1.0x SPY261016C00762000 @ $11.23
 ```
