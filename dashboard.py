@@ -107,25 +107,30 @@ def build_status() -> dict:
     return data
 
 
-async def _history(acct) -> list:
+async def _history(acct) -> dict:
     async with mcp_session(acct) as s:
         h = await call(s, 'get_portfolio_history', {'period': '1M', 'timeframe': '1D'})
     if not isinstance(h, dict):
         h = {}
     ts, eq = h.get('timestamp') or [], h.get('equity') or []
-    return [{'t': int(t) * 1000, 'v': _f(e)} for t, e in zip(ts, eq) if e]
+    # {day_ms: equity} — normalized to the UTC day so A and B align by date.
+    return {(int(t) // 86400) * 86400 * 1000: _f(e) for t, e in zip(ts, eq) if e}
 
 
 def build_chart() -> dict:
     now = time.time()
     if _chart['data'] and now - _chart['t'] < 60:
         return _chart['data']
-    out = {'start': C.ACCOUNT_START, 'A': [], 'B': []}
+    hist, errs = {}, {}
     for key, acct in (('A', ACCOUNT_A), ('B', ACCOUNT_B)):
         try:
-            out[key] = asyncio.run(_history(acct))
+            hist[key] = asyncio.run(_history(acct))
         except Exception as e:
-            out[key + '_err'] = str(e)[:120]
+            hist[key] = {}; errs[key + '_err'] = str(e)[:120]
+    A, B = hist.get('A', {}), hist.get('B', {})
+    days = sorted(set(A) | set(B))                       # shared date axis
+    out = {'start': C.ACCOUNT_START, 'labels': days,
+           'A': [A.get(d) for d in days], 'B': [B.get(d) for d in days], **errs}
     _chart.update(t=now, data=out)
     return out
 

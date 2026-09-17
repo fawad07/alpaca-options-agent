@@ -83,26 +83,26 @@ const money=n=>'$'+Number(n).toLocaleString(undefined,{maximumFractionDigits:2})
 const cls=n=>n>=0?'green':'red', sg=n=>n>=0?'+':'';
 
 let equityChart=null;
+const lastVal=a=>{for(let i=(a||[]).length-1;i>=0;i--) if(a[i]!=null) return a[i]; return null;};
 async function loadChart(){
   try{
     const d=await(await fetch('/api/chart')).json();
-    const mk=(arr,color,label)=>({label,data:(arr||[]).map(p=>({x:p.t,y:p.v})),
-      borderColor:color,backgroundColor:color+'22',borderWidth:2,pointRadius:0,tension:.3,fill:true});
+    const labels=(d.labels||[]).map(ms=>new Date(ms).toLocaleDateString(undefined,{month:'short',day:'numeric'}));
+    const mk=(arr,color,label)=>({label,data:arr||[],borderColor:color,backgroundColor:color+'22',
+      borderWidth:2,pointRadius:0,tension:.3,fill:true,spanGaps:false});
     const ds=[mk(d.A,'#e0a13a','A · options'),mk(d.B,'#5fa8ff','B · options+crypto')];
-    const note=[];
-    if(d.A&&d.A.length) note.push('A now '+money(d.A[d.A.length-1].v));
-    if(d.B&&d.B.length) note.push('B now '+money(d.B[d.B.length-1].v));
+    const la=lastVal(d.A), lb=lastVal(d.B), note=[];
+    if(la!=null) note.push('A now '+money(la));
+    if(lb!=null) note.push('B now '+money(lb));
     note.push('both started '+money(d.start));
     $('chartNote').textContent=note.join('  ·  ')+(d.A_err?(' · A err: '+d.A_err):'')+(d.B_err?(' · B err: '+d.B_err):'');
-    if(equityChart){ equityChart.data.datasets=ds; equityChart.update('none'); return; }
-    equityChart=new Chart($('equityChart'),{type:'line',data:{datasets:ds},
+    if(equityChart){ equityChart.data.labels=labels; equityChart.data.datasets=ds; equityChart.update('none'); return; }
+    equityChart=new Chart($('equityChart'),{type:'line',data:{labels,datasets:ds},
       options:{responsive:true,animation:false,interaction:{mode:'index',intersect:false},
         plugins:{legend:{labels:{color:'#8296ad',usePointStyle:true,boxWidth:8}},
-          tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.parsed.y),
-            title:i=>i.length?new Date(i[0].parsed.x).toLocaleString():''}}},
+          tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y==null?'—':money(c.parsed.y))}}},
         scales:{
-          x:{type:'linear',grid:{color:'#26313f'},ticks:{color:'#8296ad',maxTicksLimit:8,
-             callback:v=>new Date(v).toLocaleDateString(undefined,{month:'short',day:'numeric'})}},
+          x:{grid:{color:'#26313f'},ticks:{color:'#8296ad',maxTicksLimit:8}},
           y:{grid:{color:'#26313f'},ticks:{color:'#8296ad',callback:v=>'$'+(v/1000).toFixed(1)+'k'}}}}});
   }catch(e){ $('chartNote').textContent='chart offline — retrying'; }
 }
