@@ -58,3 +58,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-09-18 15:57,B,option+crypto,open,102531.18,6,1,1,BOUGHT 2x AAPL call; closed 1 position(s)
 2026-09-18 16:02,B,option+crypto,closed,102328.7,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-09-18 17:03,B,option+crypto,closed,102200.86,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
+2026-09-18 18:03,B,option+crypto,closed,102442.9,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
