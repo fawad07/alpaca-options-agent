@@ -57,3 +57,4 @@ timestamp_et,market,equity,open_positions,new_trades,exits,summary
 2026-09-17 19:04,closed,,,,,market closed — no action
 2026-09-18 12:58,open,96305.59,5,0,0,3 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-09-18 13:03,open,96281.59,5,0,0,3 signal(s) ranked but none opened (cap full / risk gate / no contract)
+2026-09-18 13:59,open,96467.59,5,0,0,3 signal(s) ranked but none opened (cap full / risk gate / no contract)
