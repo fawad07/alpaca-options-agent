@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-09-22 00:13
+# Stats snapshot — 2026-09-22 23:41
 
-- **Equity:** $99,563.47  ·  **Total P&L:** -436.53 (-0.44%)
-- **Realized:** $-984.00  ·  **Unrealized:** $+547.47  ·  **Cash:** $92,079.47
+- **Equity:** $99,349.22  ·  **Total P&L:** -650.78 (-0.65%)
+- **Realized:** $-454.00  ·  **Unrealized:** $-196.78  ·  **Cash:** $92,421.22
 - **Open positions:** 5
-- **Closed round-trips:** 10  (W 4 / L 6, win rate 40%, profit factor 0.78)
-- **Journal:** 64 rows · 41 market-hours cycles · 15 entries · 10 exits · 167 signal-level gate blocks
-- **Equity path:** first $100,000 · peak $102,200 · trough $96,282 · last $99,480
-- **Window:** 2026-09-01 10:20 → 2026-09-21 14:38 ET
+- **Closed round-trips:** 11  (W 5 / L 6, win rate 45%, profit factor 0.90)
+- **Journal:** 67 rows · 42 market-hours cycles · 16 entries · 11 exits · 167 signal-level gate blocks
+- **Equity path:** first $100,000 · peak $102,200 · trough $96,282 · last $99,579
+- **Window:** 2026-09-01 10:20 → 2026-09-22 13:37 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -20,6 +20,7 @@
 | SPY261002C00774000 | $10.58 | $4.48 | -57.7% | $-610 |
 | SPY261009C00768000 | $11.34 | $5.30 | -53.3% | $-604 |
 | SPY261016C00757000 | $12.94 | $23.08 | +78.4% | $+1,014 |
+| AAPL261016C00330000 | $10.45 | $15.75 | +50.7% | $+530 |
 | SPY261016C00762000 | $11.23 | $19.06 | +69.7% | $+783 |
 
 ## Full fill ledger
@@ -49,4 +50,6 @@
 2026-09-21 18:38  SELL 1.0x SPY261016C00762000 @ $19.06
 2026-09-21 18:38  BUY  1.0x SPY261023C00774000 @ $12.69
 2026-09-21 18:38  BUY  2.0x AAPL261023C00340000 @ $9.40
+2026-09-22 17:37  SELL 1.0x AAPL261016C00330000 @ $15.75
+2026-09-22 17:37  BUY  1.0x SPY261023C00773000 @ $12.33
 ```
