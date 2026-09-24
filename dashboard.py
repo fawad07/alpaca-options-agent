@@ -69,6 +69,15 @@ def fmt_order(o: dict) -> dict:
             'time': (o.get('submitted_at') or o.get('created_at') or '')[:19].replace('T', ' ')}
 
 
+async def _acct_only(acct) -> dict:
+    """Just the headline numbers for one account (used for account B's cards)."""
+    async with mcp_session(acct) as s:
+        a = await account(s)
+    eq, start = _f(a.get('equity')), C.ACCOUNT_START
+    return {'equity': eq, 'cash': _f(a.get('cash')),
+            'pl': eq - start, 'pl_pct': (eq - start) / start * 100 if start else 0}
+
+
 async def _fetch_live():
     async with mcp_session() as s:
         acct = await account(s)
@@ -101,6 +110,10 @@ def build_status() -> dict:
                 'pl': eq - start, 'pl_pct': (eq - start) / start * 100 if start else 0}
             data['positions'] = [fmt_pos(p) for p in pos]
             data['orders'] = [fmt_order(o) for o in orders][:15]
+            try:
+                data['accountB'] = asyncio.run(_acct_only(ACCOUNT_B))
+            except Exception as e:
+                data['accountB_err'] = str(e)[:120]
         except Exception as e:
             data['error'] = str(e)[:200]
     _cache.update(t=now, data=data)

@@ -21,6 +21,9 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
   .card .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
   .card .v{font-size:24px;font-weight:700;margin-top:6px}
+  .acctlabel{grid-column:1/-1;color:var(--muted);font-size:12px;text-transform:uppercase;
+             letter-spacing:.06em;margin:10px 0 -4px;font-weight:600}
+  .acctlabel:first-child{margin-top:0}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px}
   .panel h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
   table{width:100%;border-collapse:collapse}
@@ -119,13 +122,16 @@ async function refresh(){
       ? `<div class="banner">Not connected to Alpaca yet — add your paper keys to <b>.env</b>. ${d.error?('('+d.error+')'):''}</div>`
       : (d.mode!=='LIVE_PAPER' ? `<div class="banner">Currently in <b>DRY_RUN</b> — showing your account, but the agent is placing no trades. Set AGENT_MODE=LIVE_PAPER to trade (paper).</div>`:'');
 
-    const a=d.account;
-    $('cards').innerHTML = a ? `
-      <div class="card"><div class="k">Equity</div><div class="v">${money(a.equity)}</div></div>
-      <div class="card"><div class="k">P&L vs $100k</div><div class="v ${cls(a.pl)}">${sg(a.pl)}${money(a.pl)}<span style="font-size:14px"> (${sg(a.pl_pct)}${a.pl_pct.toFixed(2)}%)</span></div></div>
-      <div class="card"><div class="k">Cash</div><div class="v">${money(a.cash)}</div></div>
-      <div class="card"><div class="k">Options buying power</div><div class="v">${money(a.options_bp)}</div></div>`
-      : `<div class="card"><div class="k">Account</div><div class="v muted">—</div></div>`;
+    const card=(k,v,c='')=>`<div class="card"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`;
+    const acctBlock=(name,a)=> a ? (
+      `<div class="acctlabel">${name}</div>`+
+      card('Equity',money(a.equity))+
+      card('P&L vs $100k',`${sg(a.pl)}${money(a.pl)} <span style="font-size:13px">(${sg(a.pl_pct)}${a.pl_pct.toFixed(2)}%)</span>`,cls(a.pl))+
+      card('Cash',money(a.cash))
+    ) : '';
+    $('cards').innerHTML =
+      (acctBlock('Account A · options', d.account) + acctBlock('Account B · options + crypto', d.accountB))
+      || `<div class="card"><div class="k">Account</div><div class="v muted">—</div></div>`;
 
     $('pos').innerHTML = (d.positions&&d.positions.length) ? d.positions.map(p=>`
       <tr><td>${p.symbol}</td><td>${p.right}</td><td>${p.qty}</td><td>${money(p.avg)}</td>
