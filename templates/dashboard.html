@@ -24,6 +24,9 @@
   .acctlabel{grid-column:1/-1;color:var(--muted);font-size:12px;text-transform:uppercase;
              letter-spacing:.06em;margin:10px 0 -4px;font-weight:600}
   .acctlabel:first-child{margin-top:0}
+  .poswrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.poswrap{grid-template-columns:1fr}}   /* stack, never side-scroll */
+  .subh{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px}
   .panel h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
   table{width:100%;border-collapse:collapse}
@@ -58,13 +61,23 @@
   </div>
 
   <div class="panel">
-    <h2>Open option positions</h2>
-    <table><thead><tr><th>Contract</th><th>Type</th><th>Qty</th><th>Avg</th><th>Now</th><th>Value</th><th>P/L</th></tr></thead>
-      <tbody id="pos"></tbody></table>
+    <h2>Open positions</h2>
+    <div class="poswrap">
+      <div>
+        <div class="subh">Account A · options</div>
+        <table><thead><tr><th>Symbol</th><th>Qty</th><th>Value</th><th>P/L</th></tr></thead>
+          <tbody id="posA"></tbody></table>
+      </div>
+      <div>
+        <div class="subh">Account B · options + crypto</div>
+        <table><thead><tr><th>Symbol</th><th>Qty</th><th>Value</th><th>P/L</th></tr></thead>
+          <tbody id="posB"></tbody></table>
+      </div>
+    </div>
   </div>
 
   <div class="panel">
-    <h2>Recent orders</h2>
+    <h2>Recent orders (account A)</h2>
     <table><thead><tr><th>Time</th><th>Contract</th><th>Side</th><th>Qty</th><th>Status</th></tr></thead>
       <tbody id="orders"></tbody></table>
   </div>
@@ -133,11 +146,12 @@ async function refresh(){
       (acctBlock('Account A · options', d.account) + acctBlock('Account B · options + crypto', d.accountB))
       || `<div class="card"><div class="k">Account</div><div class="v muted">—</div></div>`;
 
-    $('pos').innerHTML = (d.positions&&d.positions.length) ? d.positions.map(p=>`
-      <tr><td>${p.symbol}</td><td>${p.right}</td><td>${p.qty}</td><td>${money(p.avg)}</td>
-      <td>${money(p.price)}</td><td>${money(p.value)}</td>
+    const posRows=arr=>(arr&&arr.length)?arr.map(p=>`
+      <tr><td>${p.symbol}</td><td>${p.qty}</td><td>${money(p.value)}</td>
       <td class="${cls(p.pl)}">${sg(p.pl)}${money(p.pl)} (${sg(p.plpc)}${p.plpc.toFixed(0)}%)</td></tr>`).join('')
-      : '<tr><td class="muted" colspan="7">No open positions.</td></tr>';
+      : '<tr><td class="muted" colspan="4">No open positions.</td></tr>';
+    $('posA').innerHTML=posRows(d.positions);
+    $('posB').innerHTML=posRows(d.positionsB);
 
     $('orders').innerHTML=(d.orders&&d.orders.length)?d.orders.map(o=>`
       <tr><td>${o.time||''}</td><td>${o.symbol||''}</td>

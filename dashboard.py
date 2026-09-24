@@ -13,7 +13,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from flask import Flask, jsonify, render_template, request, abort
 import config as C
-from mcp_client import mcp_session, account, option_positions, call, _rows
+from mcp_client import mcp_session, account, option_positions, crypto_positions, call, _rows
 from accounts import ACCOUNT_A, ACCOUNT_B
 
 app = Flask(__name__)
@@ -51,15 +51,20 @@ def _f(x, d=0.0):
         return d
 
 
-def _right(sym: str) -> str:
-    m = re.search(r'\d{6}([CP])\d{8}$', sym or '')
-    return {'C': 'CALL', 'P': 'PUT'}.get(m.group(1), '') if m else ''
+def _short_sym(sym: str) -> str:
+    """Compact display: 'AAPL261016C00330000' → 'AAPL 330C'; 'ETHUSD'/'ETH/USD' → 'ETH'."""
+    s = str(sym or '')
+    m = re.match(r'^([A-Z]+)(\d{6})([CP])(\d{8})$', s)
+    if m:
+        return f"{m.group(1)} {int(m.group(4)) / 1000:g}{m.group(3)}"
+    if s.replace('/', '').upper().endswith('USD'):
+        return s.replace('/', '')[:-3]
+    return s
 
 
 def fmt_pos(p: dict) -> dict:
-    return {'symbol': p.get('symbol'), 'right': _right(p.get('symbol', '')),
-            'qty': p.get('qty'), 'avg': _f(p.get('avg_entry_price')),
-            'price': _f(p.get('current_price')), 'value': _f(p.get('market_value')),
+    return {'symbol': _short_sym(p.get('symbol', '')),
+            'qty': p.get('qty'), 'value': _f(p.get('market_value')),
             'pl': _f(p.get('unrealized_pl')), 'plpc': _f(p.get('unrealized_plpc')) * 100}
 
 
@@ -69,13 +74,15 @@ def fmt_order(o: dict) -> dict:
             'time': (o.get('submitted_at') or o.get('created_at') or '')[:19].replace('T', ' ')}
 
 
-async def _acct_only(acct) -> dict:
-    """Just the headline numbers for one account (used for account B's cards)."""
-    async with mcp_session(acct) as s:
+async def _fetch_b():
+    """Account B headline numbers + its positions (options + crypto)."""
+    async with mcp_session(ACCOUNT_B) as s:
         a = await account(s)
+        pos = await option_positions(s) + await crypto_positions(s)
     eq, start = _f(a.get('equity')), C.ACCOUNT_START
-    return {'equity': eq, 'cash': _f(a.get('cash')),
+    nums = {'equity': eq, 'cash': _f(a.get('cash')),
             'pl': eq - start, 'pl_pct': (eq - start) / start * 100 if start else 0}
+    return nums, pos
 
 
 async def _fetch_live():
@@ -111,7 +118,8 @@ def build_status() -> dict:
             data['positions'] = [fmt_pos(p) for p in pos]
             data['orders'] = [fmt_order(o) for o in orders][:15]
             try:
-                data['accountB'] = asyncio.run(_acct_only(ACCOUNT_B))
+                data['accountB'], bpos = asyncio.run(_fetch_b())
+                data['positionsB'] = [fmt_pos(p) for p in bpos]
             except Exception as e:
                 data['accountB_err'] = str(e)[:120]
         except Exception as e:
