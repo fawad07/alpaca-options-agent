@@ -8,7 +8,7 @@ Auto-refreshes. Read-only — it never places trades.
 Run:   .venv/bin/python dashboard.py    →   http://localhost:8095
 """
 from __future__ import annotations
-import os, asyncio, json, time, re
+import os, csv, asyncio, json, time, re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from flask import Flask, jsonify, render_template, request, abort
@@ -36,12 +36,25 @@ def market_status() -> str:
     return 'OPEN' if open_ else 'CLOSED'
 
 
-def read_log(n: int = 15) -> list:
-    try:
-        lines = C.TRADE_LOG.read_text().strip().splitlines()[-n:]
-        return [json.loads(l) for l in reversed(lines)]
-    except Exception:
-        return []
+def read_decisions(n: int = 14) -> list:
+    """Recent agent decisions from the committed journals (activity.csv = A,
+    activity-B.csv = B) — the trade log is cloud-only/ephemeral, the journal is what
+    the workflows commit back. Merged, newest first. Reflects the last `git pull`."""
+    here = os.path.dirname(__file__)
+    rows = []
+    for fn, default_acct in (('activity.csv', 'A'), ('activity-B.csv', 'B')):
+        path = os.path.join(here, fn)
+        if not os.path.exists(path):
+            continue
+        try:
+            for r in csv.DictReader(open(path)):
+                rows.append({'ts': r.get('timestamp_et', ''),
+                             'acct': r.get('account') or default_acct,
+                             'summary': r.get('summary', '')})
+        except Exception:
+            pass
+    rows.sort(key=lambda r: r['ts'])
+    return rows[-n:][::-1]
 
 
 def _f(x, d=0.0):
@@ -104,7 +117,7 @@ def build_status() -> dict:
     data = {'mode': C.MODE, 'market': market_status(),
             'updated': datetime.now().strftime('%H:%M:%S'),
             'connected': False, 'account': None, 'positions': [], 'orders': [],
-            'log': read_log()}
+            'log': read_decisions()}
     if keyed:
         try:
             acct, pos, orders = asyncio.run(_fetch_live())

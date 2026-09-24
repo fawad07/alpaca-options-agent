@@ -83,8 +83,8 @@
   </div>
 
   <div class="panel">
-    <h2>Agent decisions (from log)</h2>
-    <table><thead><tr><th>Time</th><th>Symbol</th><th>Contract</th><th>Qty</th></tr></thead>
+    <h2>Agent decisions (from journal — A &amp; B)</h2>
+    <table><thead><tr><th>Time (ET)</th><th>Acct</th><th style="text-align:left">Decision</th></tr></thead>
       <tbody id="log"></tbody></table>
   </div>
 
@@ -160,9 +160,9 @@ async function refresh(){
       : '<tr><td class="muted" colspan="5">No orders yet.</td></tr>';
 
     $('log').innerHTML=(d.log&&d.log.length)?d.log.map(e=>`
-      <tr><td>${(e.ts||'').replace('T',' ')}</td><td>${e.symbol||''}</td>
-      <td>${e.contract||''}</td><td>${e.qty||''}</td></tr>`).join('')
-      : '<tr><td class="muted" colspan="4">No agent trades logged yet.</td></tr>';
+      <tr><td>${e.ts||''}</td><td>${e.acct||''}</td>
+      <td style="text-align:left">${e.summary||''}</td></tr>`).join('')
+      : '<tr><td class="muted" colspan="3">No decisions yet — run ./run.sh status to pull the latest.</td></tr>';
   }catch(e){ $('clock').textContent='offline — retrying'; }
 }
 refresh(); setInterval(refresh,20000);
