@@ -32,6 +32,7 @@ jobs:
           DEPLOY_ACCOUNT: B
           ALPACA_B_API_KEY: ${{ secrets.ALPACA_B_API_KEY }}
           ALPACA_B_SECRET_KEY: ${{ secrets.ALPACA_B_SECRET_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: python cron_once.py
       - name: Commit account B's decision journal
         if: always()

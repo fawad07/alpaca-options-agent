@@ -172,6 +172,21 @@ async def run_live(account=None) -> dict:
             parts.append("no signal — nothing actionable across options + crypto")
         else:
             parts.append(f"{signals_n} signal(s) ranked but none opened (cap full / risk gate / no contract)")
+
+    # tell the user on Discord when the agent actually acted (bought / closed).
+    # no-op if DISCORD_WEBHOOK_URL isn't set, so this never breaks a run.
+    if placed or exits_n:
+        import notify
+        pct = (equity - C.ACCOUNT_START) / C.ACCOUNT_START * 100 if C.ACCOUNT_START else 0
+        m = [f"🛡️ **Risk Gate · Account {acct_cfg.name}** ({'+'.join(acct_cfg.asset_classes)})"]
+        if placed:
+            m.append("🟢 Bought: " + "; ".join(placed))
+        if exits_n:
+            m.append(f"🔴 Closed: {exits_n} position(s)")
+        m.append(f"📊 Equity ${equity:,.0f} · {pct:+.2f}% · "
+                 f"{rm.open_positions}/{acct_cfg.max_concurrent} slots held")
+        notify.send("\n".join(m))
+
     return {'account': acct_cfg.name, 'assets': "+".join(acct_cfg.asset_classes),
             'equity': round(equity, 2), 'open_positions': rm.open_positions,
             'new_trades': len(placed), 'exits': exits_n, 'summary': "; ".join(parts)}
