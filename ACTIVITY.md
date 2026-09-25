@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 73  (45 during market hours)
+- **Runs logged:** 74  (45 during market hours)
 - **Trades placed:** 16   ·   **Positions closed:** 11
 
 | Time (ET) | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|
-| 2026-09-02 12:50 | open | $100,689 | 5 | 0 | 0 | 5 signal(s) fired but none opened (risk gate / no contract / over cap): SPY, MSFT, NVDA, AMZN, TSLA |
 | 2026-09-02 13:07 | open | $100,763 | 5 | 0 | 0 | 5 signal(s) fired but none opened (risk gate / no contract / over cap): SPY, MSFT, NVDA, AMZN, TSLA |
 | 2026-09-02 15:53 | open | $100,710 | 5 | 0 | 0 | 5 signal(s) fired but none opened (risk gate / no contract / over cap): SPY, MSFT, NVDA, AMZN, TSLA |
 | 2026-09-02 18:34 | closed | — | — | 0 | 0 | market closed — no action |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-09-24 13:50 | open | $97,723 | 5 | 0 | 0 | 6 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-09-24 16:56 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-09-25 13:55 | open | $99,700 | 5 | 0 | 0 | 5 signal(s) ranked but none opened (cap full / risk gate / no contract) |
+| 2026-09-25 17:30 | closed | — | — | 0 | 0 | market closed — no action |
 
