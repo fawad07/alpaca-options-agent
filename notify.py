@@ -20,7 +20,10 @@ def send(text: str) -> bool:
     try:
         data = json.dumps({'content': text[:1900]}).encode()   # Discord 2000-char limit
         req = urllib.request.Request(
-            WEBHOOK, data=data, headers={'Content-Type': 'application/json'})
+            WEBHOOK, data=data, headers={
+                'Content-Type': 'application/json',
+                # Discord's Cloudflare rejects the default urllib agent (403/1010).
+                'User-Agent': 'RiskGate-Agent/1.0 (+https://github.com/fawad07/alpaca-options-agent)'})
         urllib.request.urlopen(req, timeout=10)
         return True
     except Exception:
