@@ -16,8 +16,10 @@ services:
         sync: false
       - key: ALPACA_SECRET_KEY   # set in the Render dashboard (secret)
         sync: false
-      - key: DASH_TOKEN          # optional: set a word to require ?token=WORD
-        sync: false
+      - key: DASH_TOKEN          # REQUIRED here: the app refuses to boot on a public
+        sync: false              # ($PORT) deploy without it, so data isn't world-readable.
+                                 # Use a long random string. First visit: /?token=THAT-STRING
+                                 # (it moves into an httponly cookie; the URL is then clean).
 
   # Autonomous trader — runs the agent every 15 min during US market hours.
   # NOTE: Render Cron Jobs are a PAID feature (small per-run cost). If you want

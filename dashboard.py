@@ -8,10 +8,10 @@ Auto-refreshes. Read-only — it never places trades.
 Run:   .venv/bin/python dashboard.py    →   http://localhost:8095
 """
 from __future__ import annotations
-import os, csv, asyncio, json, time, re
+import os, csv, asyncio, json, time, re, hmac
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from flask import Flask, jsonify, render_template, request, abort
+from flask import Flask, jsonify, render_template, request, abort, make_response, redirect
 import config as C
 from mcp_client import mcp_session, account, option_positions, crypto_positions, call, _rows
 from accounts import ACCOUNT_A, ACCOUNT_B
@@ -20,14 +20,40 @@ app = Flask(__name__)
 _cache = {'t': 0.0, 'data': None}
 _chart = {'t': 0.0, 'data': None}
 
-# Optional access gate: if DASH_TOKEN is set, every request needs ?token=…
-# (handy when the dashboard is deployed to a public URL). Leave unset = open.
+# Access gate. Local runs bind 127.0.0.1 and may stay open; a public deploy (a host
+# like Render sets $PORT and we bind 0.0.0.0) MUST have a token or we refuse to boot —
+# so account data is never world-readable by accident (fail-closed).
 DASH_TOKEN = os.getenv('DASH_TOKEN', '')
+_PUBLIC = bool(os.getenv('PORT'))          # a host provides $PORT → we're internet-facing
+
+if _PUBLIC and not DASH_TOKEN:
+    raise SystemExit(
+        "Refusing to start: $PORT is set (public deploy) but DASH_TOKEN is unset. "
+        "Set DASH_TOKEN so the dashboard isn't world-readable, then redeploy.")
+
+
+def _token_ok(val: str) -> bool:
+    """Constant-time compare — no timing side-channel on the token."""
+    return bool(val) and hmac.compare_digest(str(val), DASH_TOKEN)
+
 
 @app.before_request
 def _gate():
-    if DASH_TOKEN and request.args.get('token') != DASH_TOKEN:
-        abort(403)
+    if not DASH_TOKEN:
+        return                              # local, intentionally open (localhost-bound)
+    # Preferred: token via header or the httponly cookie — never lands in logs/history.
+    if _token_ok(request.headers.get('X-Dash-Token', '')) or \
+       _token_ok(request.cookies.get('dash_token', '')):
+        return
+    # First browser visit may pass ?token=… — accept it ONCE, stash it in an httponly
+    # cookie, and redirect to a clean URL so the secret doesn't linger in the address
+    # bar, history, or access logs on later requests.
+    if _token_ok(request.args.get('token', '')):
+        resp = make_response(redirect(request.path))
+        resp.set_cookie('dash_token', DASH_TOKEN, httponly=True,
+                        secure=_PUBLIC, samesite='Strict', max_age=7 * 24 * 3600)
+        return resp
+    abort(403)
 
 
 def market_status() -> str:

@@ -1,9 +1,11 @@
 # Core (dry-run works with just these three)
-pandas
-numpy
-requests
+# PINNED for reproducible CI installs (supply-chain hygiene — a yanked/compromised
+# floating release can't sneak into a fresh install).
+pandas==3.0.5
+numpy==2.4.6
+requests==2.34.2
 # Loads your Alpaca keys from .env
-python-dotenv
+python-dotenv==1.2.3
 # Needed only for LIVE_PAPER mode (placing real paper orders on Alpaca)
 alpaca-py==0.44.0
 # MCP integration (client SDK + Alpaca's official MCP server). Needs Python 3.10+
@@ -12,4 +14,4 @@ alpaca-py==0.44.0
 mcp==1.29.1
 alpaca-mcp-server==2.3.0
 # Live status dashboard
-flask
+flask==3.1.3

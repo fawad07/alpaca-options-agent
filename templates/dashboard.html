@@ -97,6 +97,9 @@
 const $=id=>document.getElementById(id);
 const money=n=>'$'+Number(n).toLocaleString(undefined,{maximumFractionDigits:2});
 const cls=n=>n>=0?'green':'red', sg=n=>n>=0?'+':'';
+// escape anything that goes into innerHTML — defense in depth (data is our own today,
+// but never trust a string in an HTML sink).
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 let equityChart=null;
 const lastVal=a=>{for(let i=(a||[]).length-1;i>=0;i--) if(a[i]!=null) return a[i]; return null;};
@@ -132,7 +135,7 @@ async function refresh(){
     const mk=$('market'); mk.textContent='Market '+d.market; mk.className='pill '+(d.market==='OPEN'?'open':'closed');
 
     $('banner').innerHTML = !d.connected
-      ? `<div class="banner">Not connected to Alpaca yet — add your paper keys to <b>.env</b>. ${d.error?('('+d.error+')'):''}</div>`
+      ? `<div class="banner">Not connected to Alpaca yet — add your paper keys to <b>.env</b>. ${d.error?('('+esc(d.error)+')'):''}</div>`
       : (d.mode!=='LIVE_PAPER' ? `<div class="banner">Currently in <b>DRY_RUN</b> — showing your account, but the agent is placing no trades. Set AGENT_MODE=LIVE_PAPER to trade (paper).</div>`:'');
 
     const card=(k,v,c='')=>`<div class="card"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`;
@@ -147,21 +150,21 @@ async function refresh(){
       || `<div class="card"><div class="k">Account</div><div class="v muted">—</div></div>`;
 
     const posRows=arr=>(arr&&arr.length)?arr.map(p=>`
-      <tr><td>${p.symbol}</td><td>${p.qty}</td><td>${money(p.value)}</td>
+      <tr><td>${esc(p.symbol)}</td><td>${esc(p.qty)}</td><td>${money(p.value)}</td>
       <td class="${cls(p.pl)}">${sg(p.pl)}${money(p.pl)} (${sg(p.plpc)}${p.plpc.toFixed(0)}%)</td></tr>`).join('')
       : '<tr><td class="muted" colspan="4">No open positions.</td></tr>';
     $('posA').innerHTML=posRows(d.positions);
     $('posB').innerHTML=posRows(d.positionsB);
 
     $('orders').innerHTML=(d.orders&&d.orders.length)?d.orders.map(o=>`
-      <tr><td>${o.time||''}</td><td>${o.symbol||''}</td>
-      <td class="${o.side==='buy'?'green':'red'}">${(o.side||'').toUpperCase()}</td>
-      <td>${o.qty||''}</td><td>${o.status||''}</td></tr>`).join('')
+      <tr><td>${esc(o.time)}</td><td>${esc(o.symbol)}</td>
+      <td class="${o.side==='buy'?'green':'red'}">${esc((o.side||'').toUpperCase())}</td>
+      <td>${esc(o.qty)}</td><td>${esc(o.status)}</td></tr>`).join('')
       : '<tr><td class="muted" colspan="5">No orders yet.</td></tr>';
 
     $('log').innerHTML=(d.log&&d.log.length)?d.log.map(e=>`
-      <tr><td>${e.ts||''}</td><td>${e.acct||''}</td>
-      <td style="text-align:left">${e.summary||''}</td></tr>`).join('')
+      <tr><td>${esc(e.ts)}</td><td>${esc(e.acct)}</td>
+      <td style="text-align:left">${esc(e.summary)}</td></tr>`).join('')
       : '<tr><td class="muted" colspan="3">No decisions yet — run ./run.sh status to pull the latest.</td></tr>';
   }catch(e){ $('clock').textContent='offline — retrying'; }
 }
