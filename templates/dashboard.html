@@ -106,7 +106,7 @@ const lastVal=a=>{for(let i=(a||[]).length-1;i>=0;i--) if(a[i]!=null) return a[i
 async function loadChart(){
   try{
     const d=await(await fetch('/api/chart')).json();
-    const labels=(d.labels||[]).map(ms=>new Date(ms).toLocaleDateString(undefined,{month:'short',day:'numeric'}));
+    const labels=d.labels||[];   // already formatted in US market time (ET) server-side
     const mk=(arr,color,label)=>({label,data:arr||[],borderColor:color,backgroundColor:color+'22',
       borderWidth:2,pointRadius:0,tension:.3,fill:true,spanGaps:false});
     const ds=[mk(d.A,'#e0a13a','A · options'),mk(d.B,'#5fa8ff','B · options+crypto')];

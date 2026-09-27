@@ -188,8 +188,18 @@ def build_chart() -> dict:
         except Exception as e:
             hist[key] = {}; errs[key + '_err'] = str(e)[:120]
     A, B = hist.get('A', {}), hist.get('B', {})
-    days = sorted(set(A) | set(B))                       # shared date axis
-    out = {'start': C.ACCOUNT_START, 'labels': days,
+    days = sorted(set(A) | set(B))                       # shared axis, keyed by day (ms)
+    # Label each point in US MARKET TIME (ET), not the viewer's local time. Alpaca stamps
+    # a trading day at 00:00 UTC of the NEXT calendar day (= 8pm ET, just after the 4pm
+    # close), so converting the stamp to ET recovers the true trading day — e.g. a point
+    # stamped 'Sep 26 00:00 UTC' is really Friday Sep 25's close. (Weekends have no point:
+    # Alpaca's daily history follows the equities calendar even for the crypto account.)
+    et = ZoneInfo('America/New_York')
+    def _label(ms):
+        d = datetime.fromtimestamp(ms / 1000, et)
+        return f"{d:%b} {d.day}"          # e.g. "Sep 25" (no zero-padding, portable)
+    labels = [_label(d) for d in days]
+    out = {'start': C.ACCOUNT_START, 'labels': labels,
            'A': [A.get(d) for d in days], 'B': [B.get(d) for d in days], **errs}
     _chart.update(t=now, data=out)
     return out
