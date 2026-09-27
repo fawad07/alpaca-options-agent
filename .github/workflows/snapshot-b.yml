@@ -32,12 +32,18 @@ jobs:
           ALPACA_B_API_KEY: ${{ secrets.ALPACA_B_API_KEY }}
           ALPACA_B_SECRET_KEY: ${{ secrets.ALPACA_B_SECRET_KEY }}
         run: python research/refresh_stats.py
+      - name: Archive 24/7 hourly equity (weekend crypto — before the 30-day window drops it)
+        env:
+          DEPLOY_ACCOUNT: B
+          ALPACA_B_API_KEY: ${{ secrets.ALPACA_B_API_KEY }}
+          ALPACA_B_SECRET_KEY: ${{ secrets.ALPACA_B_SECRET_KEY }}
+        run: python research/collect_hourly.py
       - name: Commit the snapshot
         if: always()
         run: |
           git config user.name  "risk-gate-bot"
           git config user.email "actions@github.com"
-          git add research/stats_snapshot-B.md research/stats_history-B.csv 2>/dev/null || true
+          git add research/stats_snapshot-B.md research/stats_history-B.csv research/equity_hourly-B.csv 2>/dev/null || true
           git diff --cached --quiet && { echo "no change"; exit 0; }
           git commit -m "daily snapshot B: $(TZ=America/New_York date '+%Y-%m-%d ET')"
           for i in 1 2 3; do
