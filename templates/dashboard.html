@@ -101,12 +101,13 @@ const cls=n=>n>=0?'green':'red', sg=n=>n>=0?'+':'';
 // but never trust a string in an HTML sink).
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-let equityChart=null;
+let equityChart=null, chartTips=[];
 const lastVal=a=>{for(let i=(a||[]).length-1;i>=0;i--) if(a[i]!=null) return a[i]; return null;};
 async function loadChart(){
   try{
     const d=await(await fetch('/api/chart')).json();
     const labels=d.labels||[];   // already formatted in US market time (ET) server-side
+    chartTips=d.tips||labels;    // full "Sep 27, 10AM" ET stamp for the tooltip title
     const mk=(arr,color,label)=>({label,data:arr||[],borderColor:color,backgroundColor:color+'22',
       borderWidth:2,pointRadius:0,tension:.3,fill:true,spanGaps:false});
     const ds=[mk(d.A,'#e0a13a','A · options'),mk(d.B,'#5fa8ff','B · options+crypto')];
@@ -119,7 +120,8 @@ async function loadChart(){
     equityChart=new Chart($('equityChart'),{type:'line',data:{labels,datasets:ds},
       options:{responsive:true,animation:false,interaction:{mode:'index',intersect:false},
         plugins:{legend:{labels:{color:'#8296ad',usePointStyle:true,boxWidth:8}},
-          tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y==null?'—':money(c.parsed.y))}}},
+          tooltip:{callbacks:{title:items=>chartTips[items[0]?.dataIndex]||'',
+            label:c=>c.dataset.label+': '+(c.parsed.y==null?'—':money(c.parsed.y))}}},
         scales:{
           x:{grid:{color:'#26313f'},ticks:{color:'#8296ad',maxTicksLimit:8}},
           y:{grid:{color:'#26313f'},ticks:{color:'#8296ad',callback:v=>'$'+(v/1000).toFixed(1)+'k'}}}}});

@@ -167,40 +167,58 @@ def build_status() -> dict:
     return data
 
 
-async def _history(acct) -> dict:
+# Equity curve source = the 24/7 CONTINUOUS hourly series (weekends included), keyed by
+# unix seconds. Two parts merged: (1) the growing local archive (unlimited history —
+# research/equity_hourly*.csv, written daily by collect_hourly.py) and (2) a live Alpaca
+# fetch for the freshest hours not yet archived. This is why weekend crypto moves show up
+# on the one main chart and why it keeps history past Alpaca's rolling 28-day window.
+_ARCHIVE = {'A': 'research/equity_hourly.csv', 'B': 'research/equity_hourly-B.csv'}
+
+
+def _read_archive(rel: str) -> dict:
+    """Archived hourly points {unix_ts: equity} — empty until the collector has run."""
+    out, path = {}, os.path.join(os.path.dirname(__file__), rel)
+    if os.path.exists(path):
+        try:
+            for r in csv.DictReader(open(path)):
+                out[int(r['timestamp'])] = _f(r['equity'])
+        except Exception:
+            pass
+    return out
+
+
+async def _live_continuous(acct) -> dict:
+    """Freshest 24/7 hourly points from Alpaca (<30-day window) {unix_ts: equity}."""
     async with mcp_session(acct) as s:
-        h = await call(s, 'get_portfolio_history', {'period': '1M', 'timeframe': '1D'})
+        h = await call(s, 'get_portfolio_history',
+                       {'period': '28D', 'timeframe': '1H',
+                        'intraday_reporting': 'continuous'})
     if not isinstance(h, dict):
-        h = {}
+        return {}
     ts, eq = h.get('timestamp') or [], h.get('equity') or []
-    # {day_ms: equity} — normalized to the UTC day so A and B align by date.
-    return {(int(t) // 86400) * 86400 * 1000: _f(e) for t, e in zip(ts, eq) if e}
+    return {int(t): _f(e) for t, e in zip(ts, eq) if e}
 
 
 def build_chart() -> dict:
     now = time.time()
     if _chart['data'] and now - _chart['t'] < 60:
         return _chart['data']
-    hist, errs = {}, {}
+    series, errs = {}, {}
     for key, acct in (('A', ACCOUNT_A), ('B', ACCOUNT_B)):
+        pts = _read_archive(_ARCHIVE[key])               # unlimited history from disk
         try:
-            hist[key] = asyncio.run(_history(acct))
+            pts.update(asyncio.run(_live_continuous(acct)))  # + freshest live hours
         except Exception as e:
-            hist[key] = {}; errs[key + '_err'] = str(e)[:120]
-    A, B = hist.get('A', {}), hist.get('B', {})
-    days = sorted(set(A) | set(B))                       # shared axis, keyed by day (ms)
-    # Label each point in US MARKET TIME (ET), not the viewer's local time. Alpaca stamps
-    # a trading day at 00:00 UTC of the NEXT calendar day (= 8pm ET, just after the 4pm
-    # close), so converting the stamp to ET recovers the true trading day — e.g. a point
-    # stamped 'Sep 26 00:00 UTC' is really Friday Sep 25's close. (Weekends have no point:
-    # Alpaca's daily history follows the equities calendar even for the crypto account.)
+            errs[key + '_err'] = str(e)[:120]
+        series[key] = pts
+    A, B = series['A'], series['B']
+    stamps = sorted(set(A) | set(B))                     # shared axis, hourly (unix secs)
+    # Labels/tooltips in US MARKET TIME (ET), same for every viewer regardless of location.
     et = ZoneInfo('America/New_York')
-    def _label(ms):
-        d = datetime.fromtimestamp(ms / 1000, et)
-        return f"{d:%b} {d.day}"          # e.g. "Sep 25" (no zero-padding, portable)
-    labels = [_label(d) for d in days]
-    out = {'start': C.ACCOUNT_START, 'labels': labels,
-           'A': [A.get(d) for d in days], 'B': [B.get(d) for d in days], **errs}
+    labels = [f"{(d := datetime.fromtimestamp(t, et)):%b} {d.day}" for t in stamps]  # x-axis
+    tips = [f"{datetime.fromtimestamp(t, et):%b %d, %I%p}".replace(' 0', ' ') for t in stamps]
+    out = {'start': C.ACCOUNT_START, 'labels': labels, 'tips': tips,
+           'A': [A.get(t) for t in stamps], 'B': [B.get(t) for t in stamps], **errs}
     _chart.update(t=now, data=out)
     return out
 
