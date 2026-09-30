@@ -78,3 +78,4 @@ timestamp_et,market,equity,open_positions,new_trades,exits,summary
 2026-09-29 14:35,open,96862.13,5,2,2,BOUGHT 1x SPY call; 1x QQQ call; closed 2 position(s)
 2026-09-29 18:35,closed,,,,,market closed — no action
 2026-09-30 14:25,open,98232.86,5,0,0,6 signal(s) ranked but none opened (cap full / risk gate / no contract)
+2026-09-30 18:34,closed,,,,,market closed — no action
