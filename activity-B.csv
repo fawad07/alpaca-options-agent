@@ -138,3 +138,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-09-30 19:57,B,option+crypto,closed,108002.51,6,0,0,no signal — nothing actionable across options + crypto
 2026-10-01 01:10,B,option+crypto,closed,108373.95,6,0,0,no signal — nothing actionable across options + crypto
 2026-10-01 07:41,B,option+crypto,closed,108099.79,6,0,0,no signal — nothing actionable across options + crypto
+2026-10-01 13:29,B,option+crypto,open,108604.86,6,0,0,6 signal(s) ranked but none opened (cap full / risk gate / no contract)
