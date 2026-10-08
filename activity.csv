@@ -88,3 +88,4 @@ timestamp_et,market,equity,open_positions,new_trades,exits,summary
 2026-10-06 18:59,closed,,,,,market closed — no action
 2026-10-07 15:18,open,102472.15,5,2,0,BOUGHT 1x SPY call; 1x AAPL call
 2026-10-07 19:38,closed,,,,,market closed — no action
+2026-10-08 15:15,open,102070.05,5,1,0,BOUGHT 1x SPY call
