@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-10-08 01:09
+# Stats snapshot — 2026-10-09 01:19
 
-- **Equity:** $102,281.09  ·  **Total P&L:** +2,281.09 (+2.28%)
-- **Realized:** $+1,919.00  ·  **Unrealized:** $+362.09  ·  **Cash:** $94,214.09
-- **Open positions:** 4
+- **Equity:** $102,206.02  ·  **Total P&L:** +2,206.02 (+2.21%)
+- **Realized:** $+1,919.00  ·  **Unrealized:** $+287.02  ·  **Cash:** $92,945.02
+- **Open positions:** 5
 - **Closed round-trips:** 18  (W 9 / L 9, win rate 50%, profit factor 1.28)
-- **Journal:** 89 rows · 51 market-hours cycles · 23 entries · 18 exits · 192 signal-level gate blocks
-- **Equity path:** first $100,000 · peak $102,472 · trough $96,282 · last $102,472
-- **Window:** 2026-09-01 10:20 → 2026-10-07 15:18 ET
+- **Journal:** 91 rows · 52 market-hours cycles · 24 entries · 18 exits · 192 signal-level gate blocks
+- **Equity path:** first $100,000 · peak $102,472 · trough $96,282 · last $102,070
+- **Window:** 2026-09-01 10:20 → 2026-10-08 15:15 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -73,4 +73,5 @@
 2026-10-06 18:53  BUY  1.0x TSLA261106C00380000 @ $19.65
 2026-10-07 19:18  BUY  1.0x SPY261106C00777000 @ $13.01
 2026-10-07 19:18  BUY  1.0x AAPL261106C00335000 @ $12.50
+2026-10-08 19:15  BUY  1.0x SPY261106C00773000 @ $12.69
 ```
