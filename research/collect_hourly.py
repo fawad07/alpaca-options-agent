@@ -17,6 +17,7 @@ import os, csv, sys, asyncio, datetime as dt
 from zoneinfo import ZoneInfo
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # import project root
+import config as C
 from accounts import current_account
 from mcp_client import mcp_session, call
 
@@ -26,15 +27,22 @@ _ACCT = current_account()
 _SUFFIX = '' if _ACCT.name in ('A', 'default') else f'-{_ACCT.name}'
 OUT = os.path.join(HERE, f"equity_hourly{_SUFFIX}.csv")
 FIELDS = ['timestamp', 'datetime_et', 'equity']
+# Sanity band — guards against Alpaca's `continuous` glitch (it adds base_value and
+# ~doubles equity when the window straddles the account's funding date). Nothing legit
+# for a ~$100k account lands outside this, so a bad point is dropped, never archived.
+_SANE_HI = C.ACCOUNT_START * 1.5
+_SANE_LO = C.ACCOUNT_START * 0.3
 
 
 async def _fetch() -> dict:
-    """Pull the widest continuous (24/7) hourly window Alpaca allows. Intraday history
-    is capped at UNDER 30 days (30D/1M are rejected as >30), so we request 28D — plenty
-    of overlap for a daily run, and a deep backfill on the very first run."""
+    """Pull a continuous (24/7) hourly window. We use 25D, not the 28D max: a 28-day
+    window reaches the account's initial $100k funding cashflow, which Alpaca's
+    continuous mode double-counts (equity jumps ~2x). 25D stays clear of it and there
+    are no future deposits (paper account), so it's reliably correct. 25D is still far
+    more overlap than a daily run needs."""
     async with mcp_session(_ACCT) as s:
         h = await call(s, 'get_portfolio_history',
-                       {'period': '28D', 'timeframe': '1H',
+                       {'period': '25D', 'timeframe': '1H',
                         'intraday_reporting': 'continuous'})
     if not isinstance(h, dict) or not h.get('timestamp'):
         raise RuntimeError(f"portfolio_history returned no data: {str(h)[:200]}")
@@ -58,8 +66,12 @@ def main() -> None:
     ts, eq = h.get('timestamp') or [], h.get('equity') or []
     have = _load_existing()
     added = 0
+    skipped = 0
     for t, e in zip(ts, eq):
         if not e:                              # skip null/zero valuation points
+            continue
+        if not (_SANE_LO < float(e) < _SANE_HI):   # drop Alpaca's inflated glitch points
+            skipped += 1
             continue
         t = int(t)
         if t in have:                          # already archived — dedupe
@@ -75,7 +87,9 @@ def main() -> None:
         for t in sorted(have):                 # keep chronological
             w.writerow(have[t])
     print(f"[collect_hourly] account {_ACCT.name}: +{added} new point(s), "
-          f"{len(have)} total → {os.path.basename(OUT)}")
+          f"{len(have)} total"
+          + (f", {skipped} glitch point(s) skipped" if skipped else "")
+          + f" → {os.path.basename(OUT)}")
 
 
 if __name__ == '__main__':

@@ -173,6 +173,12 @@ def build_status() -> dict:
 # fetch for the freshest hours not yet archived. This is why weekend crypto moves show up
 # on the one main chart and why it keeps history past Alpaca's rolling 28-day window.
 _ARCHIVE = {'A': 'research/equity_hourly.csv', 'B': 'research/equity_hourly-B.csv'}
+# Sanity band — Alpaca's `continuous` mode glitches when its window reaches the account's
+# funding cashflow: it adds base_value and ~doubles equity. We request 25D (clear of it)
+# AND drop any point outside this band, so a glitch can never corrupt the chart.
+_SANE_HI = C.ACCOUNT_START * 1.5
+_SANE_LO = C.ACCOUNT_START * 0.3
+_sane = lambda v: v is not None and _SANE_LO < v < _SANE_HI
 
 
 def _read_archive(rel: str) -> dict:
@@ -181,22 +187,25 @@ def _read_archive(rel: str) -> dict:
     if os.path.exists(path):
         try:
             for r in csv.DictReader(open(path)):
-                out[int(r['timestamp'])] = _f(r['equity'])
+                v = _f(r['equity'])
+                if _sane(v):
+                    out[int(r['timestamp'])] = v
         except Exception:
             pass
     return out
 
 
 async def _live_continuous(acct) -> dict:
-    """Freshest 24/7 hourly points from Alpaca (<30-day window) {unix_ts: equity}."""
+    """Freshest 24/7 hourly points from Alpaca {unix_ts: equity}. Uses 25D (not the 28D
+    max) to avoid the funding-date glitch, and sanity-filters anything implausible."""
     async with mcp_session(acct) as s:
         h = await call(s, 'get_portfolio_history',
-                       {'period': '28D', 'timeframe': '1H',
+                       {'period': '25D', 'timeframe': '1H',
                         'intraday_reporting': 'continuous'})
     if not isinstance(h, dict):
         return {}
     ts, eq = h.get('timestamp') or [], h.get('equity') or []
-    return {int(t): _f(e) for t, e in zip(ts, eq) if e}
+    return {int(t): _f(e) for t, e in zip(ts, eq) if _sane(_f(e))}
 
 
 def build_chart() -> dict:
