@@ -177,3 +177,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-10-09 08:05,B,option+crypto,closed,108383.93,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-10-09 14:25,B,option+crypto,open,107770.71,6,0,0,9 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-10-09 18:54,B,option+crypto,closed,107789.56,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
+2026-10-09 22:12,B,option+crypto,closed,107959.86,6,0,0,4 signal(s) ranked but none opened (cap full / risk gate / no contract)
