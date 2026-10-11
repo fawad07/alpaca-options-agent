@@ -39,6 +39,9 @@ MIN_DTE                = 14      # days-to-expiry floor (avoid gamma/theta cliff
 MAX_DTE                = 60      # days-to-expiry ceiling
 TAKE_PROFIT_PCT        = 0.50    # close a winning option at +50% of premium
 STOP_LOSS_PCT          = 0.50    # close a losing option at -50% of premium
+CLOSE_BEFORE_EXPIRY_DAYS = 2     # force-close any option with <= this many days to expiry,
+                                 # regardless of P&L — never let it expire into auto-exercise
+                                 # (which turns an ITM option into 100 shares of stock)
 
 # ── CRYPTO (v2 — spot, long-only) ─────────────────────────────
 # Numbers from the WS1 backtest robust range (stop 12–20% / TP 25–40%); mid-plateau.

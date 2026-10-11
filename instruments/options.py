@@ -6,6 +6,7 @@ unrealized_plpc vs ±TP/SL; entries via ATM contract selection, premium, risk-si
 contracts, buy-to-open). Behavior is unchanged — this is a pure move.
 """
 from __future__ import annotations
+import re
 import datetime as dt
 import config as C
 from instruments.base import InstrumentHandler
@@ -15,6 +16,19 @@ from mcp_client import (option_positions, find_atm_contract, option_premium,
 
 def _dte(expiration_date: str) -> int:
     return (dt.date.fromisoformat(expiration_date) - dt.date.today()).days
+
+
+def _dte_from_symbol(sym: str):
+    """Days-to-expiry from an OCC option symbol (SPY261106C00773000 → 2026-11-06).
+    Returns None if `sym` isn't a recognizable option symbol."""
+    m = re.match(r'^[A-Z]+(\d{2})(\d{2})(\d{2})[CP]\d{8}$', str(sym or ''))
+    if not m:
+        return None
+    yy, mm, dd = (int(g) for g in m.groups())
+    try:
+        return (dt.date(2000 + yy, mm, dd) - dt.date.today()).days
+    except ValueError:
+        return None
 
 
 class OptionsHandler(InstrumentHandler):
@@ -36,6 +50,15 @@ class OptionsHandler(InstrumentHandler):
         exits_n = 0
         for p in positions:
             sym = p.get('symbol')
+            # Time-based exit FIRST: never let an option expire into auto-exercise
+            # (an ITM call at expiry becomes 100 shares of stock — see
+            # docs/INCIDENT_option_exercise.md). Close it a couple days early regardless
+            # of P&L — this captures remaining value and sidesteps exercise entirely.
+            dte = _dte_from_symbol(sym)
+            if dte is not None and dte <= C.CLOSE_BEFORE_EXPIRY_DAYS:
+                print(f"  EXIT {sym}: {dte}d to expiry — force-close (avoid auto-exercise)")
+                await close_option(s, sym); rm.open_positions -= 1; exits_n += 1
+                continue
             try:
                 plpc = float(p.get('unrealized_plpc', 0))
             except Exception:
