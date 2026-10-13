@@ -196,8 +196,9 @@ def _read_archive(rel: str) -> dict:
 
 
 async def _live_continuous(acct) -> dict:
-    """Freshest 24/7 hourly points from Alpaca {unix_ts: equity}. Uses 25D (not the 28D
-    max) to avoid the funding-date glitch, and sanity-filters anything implausible."""
+    """Freshest 24/7 hourly points from Alpaca {unix_ts: equity}, RAW. Uses 25D (not the
+    28D max) to dodge the funding-date glitch. Cleaning happens in build_chart against the
+    daily truth-anchor (which can REPLACE a glitched hour, not just drop it → no holes)."""
     async with mcp_session(acct) as s:
         h = await call(s, 'get_portfolio_history',
                        {'period': '25D', 'timeframe': '1H',
@@ -205,13 +206,28 @@ async def _live_continuous(acct) -> dict:
     if not isinstance(h, dict):
         return {}
     ts, eq = h.get('timestamp') or [], h.get('equity') or []
-    return {int(t): _f(e) for t, e in zip(ts, eq) if _sane(_f(e))}
+    return {int(t): _f(e) for t, e in zip(ts, eq) if e}
+
+
+async def _daily_truth(acct) -> dict:
+    """Alpaca's DAILY (1D) equity {unix_ts: equity}. The reliable source of truth — unlike
+    the hourly feed, it does NOT double-count cashflows (deposits, option exercises). Used
+    both to anchor-check the hourly points and to fill gaps the glitch leaves behind.
+    See docs/INCIDENT_chart_equity_glitch.md."""
+    async with mcp_session(acct) as s:
+        h = await call(s, 'get_portfolio_history', {'period': '3M', 'timeframe': '1D'})
+    if not isinstance(h, dict):
+        return {}
+    return {int(t): _f(e) for t, e in zip(h.get('timestamp') or [], h.get('equity') or []) if e}
 
 
 def build_chart() -> dict:
     now = time.time()
     if _chart['data'] and now - _chart['t'] < 60:
         return _chart['data']
+    et = ZoneInfo('America/New_York')
+    _dayof = lambda ts: datetime.fromtimestamp(ts, et).date()
+    _TOL = 0.20          # hourly may differ from the day's close by at most this (intraday)
     series, errs = {}, {}
     for key, acct in (('A', ACCOUNT_A), ('B', ACCOUNT_B)):
         pts = _read_archive(_ARCHIVE[key])               # unlimited history from disk
@@ -219,11 +235,33 @@ def build_chart() -> dict:
             pts.update(asyncio.run(_live_continuous(acct)))  # + freshest live hours
         except Exception as e:
             errs[key + '_err'] = str(e)[:120]
-        series[key] = pts
+        daily = {}
+        try:
+            daily = asyncio.run(_daily_truth(acct))      # reliable per-day truth
+        except Exception as e:
+            errs[key + '_dayerr'] = str(e)[:120]
+        # Truth-anchor cleanse. For each hourly point, compare to that day's correct daily
+        # value: if it disagrees by more than _TOL it's a cashflow-glitch hour (any size, not
+        # just the fixed ceiling) → REPLACE it with the true daily value (no hole). Hours on
+        # days with no daily point (weekends, today) have no anchor → keep only if sane.
+        day_eq = {_dayof(t): v for t, v in daily.items()}
+        clean = {}
+        for t, v in pts.items():
+            d = _dayof(t)
+            if d in day_eq:
+                clean[t] = v if abs(v - day_eq[d]) <= _TOL * day_eq[d] else day_eq[d]
+            elif _sane(v):
+                clean[t] = v
+        # Gap-fill: a trading day with a daily value but NO hourly point at all still gets
+        # its correct daily value (so a fully-missing glitch day is never a blank).
+        covered = {_dayof(t) for t in clean}
+        for t, v in daily.items():
+            if _dayof(t) not in covered:
+                clean[t] = v
+        series[key] = clean
     A, B = series['A'], series['B']
     stamps = sorted(set(A) | set(B))                     # shared axis, hourly (unix secs)
     # Labels/tooltips in US MARKET TIME (ET), same for every viewer regardless of location.
-    et = ZoneInfo('America/New_York')
     labels = [f"{(d := datetime.fromtimestamp(t, et)):%b} {d.day}" for t in stamps]  # x-axis
     tips = [f"{datetime.fromtimestamp(t, et):%b %d, %I%p}".replace(' 0', ' ') for t in stamps]
     out = {'start': C.ACCOUNT_START, 'labels': labels, 'tips': tips,
