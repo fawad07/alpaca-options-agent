@@ -95,3 +95,4 @@ timestamp_et,market,equity,open_positions,new_trades,exits,summary
 2026-10-12 17:42,closed,,,,,market closed — no action
 2026-10-13 15:50,open,102633.99,5,1,0,BOUGHT 1x SPY call
 2026-10-13 19:31,closed,,,,,market closed — no action
+2026-10-14 13:58,open,99701.93,5,0,0,5 signal(s) ranked but none opened (cap full / risk gate / no contract)
