@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-10-13 02:43
+# Stats snapshot — 2026-10-14 00:37
 
-- **Equity:** $108,323.51  ·  **Total P&L:** +8,323.51 (+8.32%)
-- **Realized:** $+1,265.05  ·  **Unrealized:** $+7,058.46  ·  **Cash:** $61,015.52
+- **Equity:** $109,428.52  ·  **Total P&L:** +9,428.52 (+9.43%)
+- **Realized:** $+3,210.05  ·  **Unrealized:** $+6,218.47  ·  **Cash:** $49,262.88
 - **Open positions:** 6
-- **Closed round-trips:** 11  (W 5 / L 6, win rate 45%, profit factor 1.45)
-- **Journal:** 192 rows · 35 market-hours cycles · 10 entries · 8 exits · 766 signal-level gate blocks
-- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $108,510
-- **Window:** 2026-09-14 14:06 → 2026-10-12 15:18 ET
+- **Closed round-trips:** 13  (W 7 / L 6, win rate 54%, profit factor 2.14)
+- **Journal:** 195 rows · 36 market-hours cycles · 12 entries · 10 exits · 774 signal-level gate blocks
+- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $110,153
+- **Window:** 2026-09-14 14:06 → 2026-10-13 12:26 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -21,7 +21,9 @@
 | AAPL261016C00335000 | $9.55 | $4.70 | -50.8% | $-970 |
 | AAPL261023C00340000 | $8.45 | $3.95 | -53.3% | $-900 |
 | NVDA261023C00225000 | $8.10 | $14.35 | +77.2% | $+1,250 |
+| AAPL261030C00330000 | $11.10 | $16.75 | +50.9% | $+565 |
 | NVDA261030C00230000 | $7.75 | $11.95 | +54.2% | $+840 |
+| MSFT261030C00520000 | $19.50 | $33.30 | +70.8% | $+1,380 |
 
 ## Full fill ledger
 ```
@@ -55,4 +57,8 @@
 2026-10-02 14:08  SELL 2.0x NVDA261030C00230000 @ $11.95
 2026-10-02 14:08  BUY  2.0x AAPL261030C00335000 @ $9.45
 2026-10-02 14:08  BUY  1.0x MSFT261030C00520000 @ $19.50
+2026-10-13 16:26  SELL 1.0x AAPL261030C00330000 @ $16.75
+2026-10-13 16:26  SELL 1.0x MSFT261030C00520000 @ $33.30
+2026-10-13 16:26  BUY  239.328618x LTC/USD @ $61.75
+2026-10-13 16:26  BUY  2.0x NVDA261113C00225000 @ $9.90
 ```
