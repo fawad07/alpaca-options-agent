@@ -103,3 +103,4 @@ timestamp_et,market,equity,open_positions,new_trades,exits,summary
 2026-10-16 13:21,open,98824.93,5,2,2,BOUGHT 1x SPY call; 1x AAPL call; closed 2 position(s)
 2026-10-16 16:00,closed,,,,,market closed — no action
 2026-10-16 18:47,closed,,,,,market closed — no action
+2026-10-19 15:15,open,99027.7,5,0,0,5 signal(s) ranked but none opened (cap full / risk gate / no contract)
