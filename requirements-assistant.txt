@@ -1,0 +1,6 @@
+# Optional — ONLY for the dashboard's explainer assistant (assistant.py).
+# NOT installed by the trading workflows (they use requirements.txt). Install locally:
+#     .venv/bin/pip install -r requirements-assistant.txt
+# Then add ANTHROPIC_API_KEY=... to .env. If this isn't installed or the key is unset,
+# the dashboard simply hides the assistant and works exactly as before.
+anthropic

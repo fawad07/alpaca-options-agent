@@ -283,6 +283,22 @@ def api_chart():
     return jsonify(build_chart())
 
 
+@app.route('/api/assistant')
+def api_assistant():
+    """Whether the explainer is configured (key + package present)."""
+    import assistant
+    return jsonify({'available': assistant.available()})
+
+
+@app.route('/api/ask', methods=['POST'])
+def api_ask():
+    """Explainer assistant — grounded in the current dashboard data. Explain-only; it
+    never trades and never gives a buy/sell or safe/unsafe verdict (see assistant.py)."""
+    import assistant
+    q = (request.get_json(silent=True) or {}).get('question', '')
+    return jsonify(assistant.answer(q, build_status()))   # build_status is read-only + cached
+
+
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 8095))   # Render/hosts provide $PORT
     # Local runs bind to localhost only (don't expose account data on the LAN).

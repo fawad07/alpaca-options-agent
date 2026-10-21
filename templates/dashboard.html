@@ -94,6 +94,21 @@
       <tbody id="log"></tbody></table>
   </div>
 
+  <div class="panel" id="askPanel" style="display:none">
+    <h2>Ask about your numbers</h2>
+    <div id="askOut" style="min-height:8px;font-size:14px;line-height:1.55;white-space:pre-wrap;
+      margin-bottom:12px;color:var(--text)"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input id="askIn" placeholder="e.g. what does Account B's P&amp;L mean? what happens if I withdraw $10k?"
+        style="flex:1;min-width:220px;background:var(--card2);border:1px solid var(--line);
+        border-radius:8px;color:var(--text);padding:10px 12px;font-size:14px">
+      <button id="askBtn" style="background:var(--accent);border:none;border-radius:8px;
+        color:#06101f;font-weight:700;padding:10px 18px;cursor:pointer">Ask</button>
+    </div>
+    <div class="note" style="margin-top:10px">Explains your numbers in plain language — it is
+      <b>not financial advice</b> and never says whether something is “safe.” The decision is always yours.</div>
+  </div>
+
   <div class="note">Read-only. Paper account only — no real money. Data via Alpaca MCP server.
     Refreshes every 20s.</div>
 </div>
@@ -185,6 +200,27 @@ async function refresh(){
   }catch(e){ $('clock').textContent='offline — retrying'; }
 }
 refresh(); setInterval(refresh,20000);
+
+// Explainer assistant — only shows if configured (ANTHROPIC_API_KEY + package present).
+(async function initAsk(){
+  let on=false;
+  try{ on=(await(await fetch('/api/assistant')).json()).available; }catch(e){}
+  if(!on) return;
+  $('askPanel').style.display='';
+  const inp=$('askIn'), btn=$('askBtn'), out=$('askOut');
+  async function ask(){
+    const q=inp.value.trim(); if(!q) return;
+    btn.disabled=true; out.textContent='Thinking…';
+    try{
+      const r=await(await fetch('/api/ask',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({question:q})})).json();
+      out.textContent=r.text||'(no answer)';
+    }catch(e){ out.textContent='Assistant offline — try again.'; }
+    btn.disabled=false;
+  }
+  btn.onclick=ask;
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter') ask(); });
+})();
 </script>
 </body>
 </html>
