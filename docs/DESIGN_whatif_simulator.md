@@ -22,7 +22,9 @@ Applies the chosen account's **real past returns** to a regular-deposit schedule
   parallel balance that (a) grows by those real returns and (b) adds a contribution on
   schedule. Track *Contributed* (your money in) vs *Value* (what it grew to) separately;
   the gap = investment gain.
-- **Controls:** Returns from [A|B] · Start $ · Add $ · Every [2wk / 1mo / 2mo / 3mo].
+- **Controls:** Returns from [A|B] · Start $ (defaults to the selected account's **last
+  recorded equity** — A ≈ $102k, B ≈ $108k today — editable) · Add $ · Every [2wk / 1mo /
+  2mo / 3mo].
 - **Output:** two-line chart (Value vs Contributions over the real time window) +
   summary cards (Contributed / Value / Investment gain $ and %).
 
@@ -44,8 +46,8 @@ Projects the contribution curve **into the future** as a spread of outcomes — 
   sized by real volatility; add contributions on schedule), then take percentiles
   (e.g. 10th / 50th / 90th) at each future point. (Lighter alternative: an analytic
   ±σ√t band around the drift — less accurate with contributions, much less code.)
-- **Controls:** Volatility from [A|B] · Start $ · Add $ · Every · Horizon [1/3/5/10 yr] ·
-  Assumed avg return [default 0%].
+- **Controls:** Volatility from [A|B] · Start $ (defaults to that account's **last recorded
+  equity**, editable) · Add $ · Every · Horizon [1/3/5/10 yr] · Assumed avg return [default 0%].
 - **Output:** a **cone** — median line + shaded band between a good case and a **losing**
   case — plus a range summary ("in 5 yr: typically ~$X, range $A (bad) to $B (good)").
   The downside band is shown prominently, never hidden.
@@ -93,6 +95,9 @@ untouched — same isolation as the explainer assistant.
   number the user chooses; only the spread comes from real data. Losses are always in view.
 
 ## Open decisions before build
-1. Default **Start** amount — match the account ($100k) or a realistic retail $10k?
+1. ~~Default Start amount~~ — **DECIDED:** defaults to each account's **last recorded
+   equity** (A and B start from their own current value; still editable).
 2. Forward engine — **Monte Carlo cone** (accurate, more code) or **analytic ±band**
-   (simple, less code)?
+   (simple, less code)? *(still open)*
+
+**Build status: HELD** — recorded as a design; not building yet (user, 2026-10-22).
