@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-10-22 00:06
+# Stats snapshot — 2026-10-23 00:03
 
-- **Equity:** $99,859.70  ·  **Total P&L:** -140.30 (-0.14%)
-- **Realized:** $-74.00  ·  **Unrealized:** $-66.30  ·  **Cash:** $14,062.70
+- **Equity:** $99,232.60  ·  **Total P&L:** -767.40 (-0.77%)
+- **Realized:** $-1,612.00  ·  **Unrealized:** $+844.60  ·  **Cash:** $12,806.60
 - **Open positions:** 5
-- **Closed round-trips:** 20  (W 9 / L 11, win rate 45%, profit factor 0.99)
-- **Journal:** 110 rows · 60 market-hours cycles · 27 entries · 20 exits · 223 signal-level gate blocks
-- **Equity path:** first $100,000 · peak $102,745 · trough $96,282 · last $100,553
-- **Window:** 2026-09-01 10:20 → 2026-10-21 13:59 ET
+- **Closed round-trips:** 22  (W 9 / L 13, win rate 41%, profit factor 0.84)
+- **Journal:** 112 rows · 61 market-hours cycles · 29 entries · 22 exits · 223 signal-level gate blocks
+- **Equity path:** first $100,000 · peak $102,745 · trough $96,282 · last $98,427
+- **Window:** 2026-09-01 10:20 → 2026-10-22 13:56 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -31,6 +31,8 @@
 | QQQ261030C00743000 | $17.84 | $26.81 | +50.3% | $+897 |
 | TSLA261106C00380000 | $19.65 | $7.40 | -62.3% | $-1,225 |
 | SPY261106C00777000 | $13.01 | $5.33 | -59.0% | $-768 |
+| SPY261106C00773000 | $12.69 | $5.25 | -58.6% | $-744 |
+| SPY261113C00778000 | $12.93 | $4.99 | -61.4% | $-794 |
 
 ## Full fill ledger
 ```
@@ -81,4 +83,8 @@
 2026-10-16 17:21  SELL 1.0x TSLA261106C00380000 @ $7.40
 2026-10-16 17:21  BUY  1.0x SPY261113C00763000 @ $15.07
 2026-10-16 17:21  BUY  1.0x AAPL261113C00345000 @ $10.55
+2026-10-22 17:56  SELL 1.0x SPY261106C00773000 @ $5.25
+2026-10-22 17:56  SELL 1.0x SPY261113C00778000 @ $4.99
+2026-10-22 17:56  BUY  1.0x AAPL261120C00345000 @ $11.85
+2026-10-22 17:56  BUY  1.0x NVDA261120C00212500 @ $10.95
 ```
