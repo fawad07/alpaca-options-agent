@@ -42,10 +42,18 @@ Projects the contribution curve **into the future** as a spread of outcomes — 
     bumpy this account actually is.
   - Net: "Even assuming a modest/zero average return, here's how widely outcomes swing —
     including losing ones."
-- **Engine:** Monte Carlo — simulate many future paths (each day: drift + a random shock
-  sized by real volatility; add contributions on schedule), then take percentiles
-  (e.g. 10th / 50th / 90th) at each future point. (Lighter alternative: an analytic
-  ±σ√t band around the drift — less accurate with contributions, much less code.)
+- **Engines — build BOTH, shown side by side for comparison:**
+  1. **Formula (±band):** an analytic ±σ√t band around the drift — a smooth, symmetric
+     funnel. Simple, fast, idealized.
+  2. **Monte Carlo (1,000 runs):** simulate many future paths (each day: drift + a random
+     shock sized by real volatility; add contributions on schedule), then take percentiles
+     (e.g. 10th / 50th / 90th) at each future point — realistic, captures contribution
+     timing and uneven streaks.
+  The two cones render in two charts side by side (stack on mobile), plus a comparison
+  table of each method's bad / middle / good value at the horizon. Showing both is more
+  honest and educational — where they agree builds confidence, where they diverge is itself
+  informative. The Monte Carlo part is the real work; the formula band is cheap to add once
+  its plumbing exists.
 - **Controls:** Volatility from [A|B] · Start $ (defaults to that account's **last recorded
   equity**, editable) · Add $ · Every · Horizon [1/3/5/10 yr] · Assumed avg return [default 0%].
 - **Output:** a **cone** — median line + shaded band between a good case and a **losing**
@@ -97,7 +105,8 @@ untouched — same isolation as the explainer assistant.
 ## Open decisions before build
 1. ~~Default Start amount~~ — **DECIDED:** defaults to each account's **last recorded
    equity** (A and B start from their own current value; still editable).
-2. Forward engine — **Monte Carlo cone** (accurate, more code) or **analytic ±band**
-   (simple, less code)? *(still open)*
+2. ~~Forward engine~~ — **DECIDED:** build **BOTH** (formula ±band + Monte Carlo), shown
+   side by side with a comparison table, so the two methods can be compared directly.
 
 **Build status: HELD** — recorded as a design; not building yet (user, 2026-10-22).
+Spec is now complete (start = last recorded equity; both forward engines side by side).
