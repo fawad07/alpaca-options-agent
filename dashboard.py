@@ -9,7 +9,7 @@ Run:   .venv/bin/python dashboard.py    →   http://localhost:8095
 """
 from __future__ import annotations
 import os, csv, asyncio, json, time, re, hmac
-from datetime import datetime
+from datetime import datetime, timedelta as td
 from zoneinfo import ZoneInfo
 from flask import Flask, jsonify, render_template, request, abort, make_response, redirect
 import config as C
@@ -221,6 +221,13 @@ async def _daily_truth(acct) -> dict:
     return {int(t): _f(e) for t, e in zip(h.get('timestamp') or [], h.get('equity') or []) if e}
 
 
+async def _daily_equity(acct) -> list:
+    """Real daily equity as an ordered [(unix_ts, equity), ...] — the what-if simulator's
+    only data source (read-only; it never trades)."""
+    d = await _daily_truth(acct)
+    return [(t, d[t]) for t in sorted(d)]
+
+
 def build_chart() -> dict:
     now = time.time()
     if _chart['data'] and now - _chart['t'] < 60:
@@ -281,6 +288,44 @@ def api_status():
 @app.route('/api/chart')
 def api_chart():
     return jsonify(build_chart())
+
+
+@app.route('/api/simulate')
+def api_simulate():
+    """What-if contribution simulator (read-only, independent of the agent). Pulls an
+    account's REAL daily returns and runs them through simulator.py — History mode applies
+    the real past returns to a deposit schedule; Forward mode projects a RANGE (formula
+    band + Monte-Carlo cone), never a prediction. See docs/DESIGN_whatif_simulator.md."""
+    import statistics, simulator
+    et = ZoneInfo('America/New_York')
+    acct = ACCOUNT_B if request.args.get('account', 'B').upper() == 'B' else ACCOUNT_A
+    mode = request.args.get('mode', 'history')
+    add = _f(request.args.get('add'), 2000.0)
+    every = max(1, int(_f(request.args.get('every_days'), 30)))
+    try:
+        series = asyncio.run(_daily_equity(acct))
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)[:140]})
+    eqs = [e for _, e in series]
+    if len(eqs) < 3:
+        return jsonify({'ok': False, 'error': 'not enough history yet'})
+    start = _f(request.args.get('start')) or eqs[-1]      # default: last recorded equity
+    rets = [eqs[i] / eqs[i - 1] - 1 for i in range(1, len(eqs)) if eqs[i - 1]]
+
+    if mode == 'history':
+        res = simulator.simulate_history(rets, start, add, every)
+        labels = [f"{(d := datetime.fromtimestamp(t, et)):%b} {d.day}" for t, _ in series]
+        return jsonify({'ok': True, 'mode': 'history', 'start': round(start, 2),
+                        'labels': labels, **res})
+
+    horizon_days = max(30, int(_f(request.args.get('horizon_days'), 1825)))
+    mu = _f(request.args.get('annual_return'), 0.0) / 100.0 / 365.0    # assumption → daily
+    sigma = statistics.pstdev(rets) if len(rets) > 1 else 0.01         # real daily volatility
+    res = simulator.simulate_forward(start, add, every, horizon_days, mu, sigma)
+    today = datetime.now(et)
+    labels = [f"{(today + td(days=d)):%b %Y}" for d in res.pop('days')]
+    return jsonify({'ok': True, 'mode': 'forward', 'start': round(start, 2),
+                    'sigma_daily': round(sigma, 5), 'labels': labels, **res})
 
 
 if __name__ == '__main__':

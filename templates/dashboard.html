@@ -26,6 +26,21 @@
   .acctlabel:first-child{margin-top:0}
   .poswrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
   @media(max-width:760px){.poswrap{grid-template-columns:1fr}}   /* stack, never side-scroll */
+  .simctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:14px;font-size:13px;color:var(--muted)}
+  .simctl label{display:inline-flex;align-items:center;gap:6px}
+  .simctl input,.simctl select{background:var(--card2);border:1px solid var(--line);border-radius:6px;
+    color:var(--text);padding:6px 8px;font-size:13px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .segbtn{background:var(--card2);border:none;color:var(--muted);padding:7px 14px;cursor:pointer;font-size:13px;font-weight:600}
+  .segbtn.on{background:var(--accent);color:#06101f}
+  .segbtn.run{background:var(--accent);color:#06101f;border-radius:8px;padding:7px 18px}
+  .simcards{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+  .simcards .c{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:120px}
+  .simcards .c .k{color:var(--muted);font-size:11px;text-transform:uppercase}
+  .simcards .c .v{font-size:18px;font-weight:700;margin-top:3px}
+  .conewrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.conewrap{grid-template-columns:1fr}}
+  table.cmp{margin-top:14px}
   .subh{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:20px}
   .panel h2{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
@@ -92,6 +107,44 @@
     <h2>Agent decisions (from journal — A &amp; B)</h2>
     <table><thead><tr><th>Time (ET)</th><th>Acct</th><th style="text-align:left">Decision</th></tr></thead>
       <tbody id="log"></tbody></table>
+  </div>
+
+  <div class="panel">
+    <h2>What-if simulator — <span style="color:var(--amber)">model, not a prediction</span></h2>
+    <div class="simctl">
+      <span class="seg"><button id="mHist" class="segbtn on">History</button><button id="mFwd" class="segbtn">Forward</button></span>
+      <label>Returns from
+        <select id="simAcct"><option value="B">Account B</option><option value="A">Account A</option></select></label>
+      <label>Start $<input id="simStart" type="number" placeholder="last equity" style="width:100px"></label>
+      <label>Add $<input id="simAdd" type="number" value="2000" style="width:80px"></label>
+      <label>Every
+        <select id="simEvery"><option value="14">2 weeks</option><option value="30" selected>1 month</option>
+          <option value="60">2 months</option><option value="90">3 months</option></select></label>
+      <span id="fwdOnly" style="display:none">
+        <label>Horizon
+          <select id="simHorizon"><option value="365">1 yr</option><option value="1095">3 yr</option>
+            <option value="1825" selected>5 yr</option><option value="3650">10 yr</option></select></label>
+        <label>Avg return <input id="simRet" type="number" value="0" style="width:56px">%/yr</label>
+      </span>
+      <button id="simRun" class="segbtn run">Run</button>
+    </div>
+
+    <div id="simHistWrap">
+      <canvas id="simHistChart" height="110"></canvas>
+      <div class="simcards" id="simHistCards"></div>
+    </div>
+    <div id="simFwdWrap" style="display:none">
+      <div class="conewrap">
+        <div><div class="subh">① Formula (±band)</div><canvas id="simBandChart" height="150"></canvas></div>
+        <div><div class="subh">② Monte-Carlo (1,000 runs)</div><canvas id="simMcChart" height="150"></canvas></div>
+      </div>
+      <table class="cmp"><thead><tr><th>At horizon</th><th>Bad (10%)</th><th>Middle</th><th>Good (90%)</th></tr></thead>
+        <tbody id="simCmp"></tbody></table>
+    </div>
+    <div class="note" id="simNote" style="margin-top:10px">Applies an account's real returns to a
+      deposit schedule. Forward shows a <b>range of outcomes, including losses</b> — the average return is
+      an assumption you set (default 0%, since this strategy has no proven edge); only the spread comes from
+      real volatility. It is <b>not a prediction</b>.</div>
   </div>
 
   <div class="note">Read-only. Paper account only — no real money. Data via Alpaca MCP server.
@@ -185,6 +238,59 @@ async function refresh(){
   }catch(e){ $('clock').textContent='offline — retrying'; }
 }
 refresh(); setInterval(refresh,20000);
+
+// ── What-if simulator ──────────────────────────────────────────────────────
+(function initSim(){
+  let mode='history', charts={};
+  const line=(arr,color,label,opt={})=>Object.assign({label,data:arr||[],borderColor:color,
+    backgroundColor:color+'22',borderWidth:2,pointRadius:0,tension:.25,fill:false},opt);
+  function draw(id,cfg){ if(charts[id]){charts[id].data=cfg.data;charts[id].options=cfg.options;charts[id].update('none');}
+    else charts[id]=new Chart($(id),cfg); }
+  const axes={responsive:true,animation:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{color:'#8296ad',usePointStyle:true,boxWidth:8,font:{size:10}}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y==null?'—':money(c.parsed.y))}}},
+    scales:{x:{grid:{color:'#26313f'},ticks:{color:'#8296ad',maxTicksLimit:7}},
+      y:{grid:{color:'#26313f'},ticks:{color:'#8296ad',callback:v=>'$'+(v/1000).toFixed(0)+'k'}}}};
+  const cone=(labels,d)=>({type:'line',data:{labels,datasets:[
+      line(d.bad,'#f85149','Bad (10%)'),
+      line(d.good,'#3fb950','Good (90%)',{fill:'-1',backgroundColor:'rgba(63,185,80,.10)'}),
+      line(d.mid,'#5fa8ff','Middle'),
+      line(d.contributed,'#e0a13a','Contributed',{borderDash:[5,4]})]},options:axes});
+
+  function setMode(m){ mode=m;
+    $('mHist').classList.toggle('on',m==='history'); $('mFwd').classList.toggle('on',m==='forward');
+    $('fwdOnly').style.display=m==='forward'?'':'none';
+    $('simHistWrap').style.display=m==='history'?'':'none';
+    $('simFwdWrap').style.display=m==='forward'?'':'none'; }
+  $('mHist').onclick=()=>{setMode('history');run();}; $('mFwd').onclick=()=>{setMode('forward');run();};
+
+  async function run(){
+    const p=new URLSearchParams({account:$('simAcct').value,mode,add:$('simAdd').value||'0',
+      every_days:$('simEvery').value});
+    const s=$('simStart').value; if(s) p.set('start',s);
+    if(mode==='forward'){ p.set('horizon_days',$('simHorizon').value); p.set('annual_return',$('simRet').value||'0'); }
+    $('simNote').dataset.busy='1';
+    let d; try{ d=await(await fetch('/api/simulate?'+p)).json(); }catch(e){ return; }
+    if(!d.ok){ $('simHistCards').innerHTML='<div class="c"><div class="k">—</div><div class="v muted">'+(d.error||'error')+'</div></div>'; return; }
+    if(d.mode==='history'){
+      draw('simHistChart',{type:'line',data:{labels:d.labels,datasets:[
+        line(d.value,'#5fa8ff','Value (grown)',{fill:true}),
+        line(d.contributed,'#e0a13a','Contributed',{borderDash:[5,4]})]},options:axes});
+      const S=d.summary, card=(k,v,c='')=>`<div class="c"><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`;
+      $('simHistCards').innerHTML=card('Contributed',money(S.contributed))+card('Value',money(S.value))+
+        card('Investment gain',sg(S.gain)+money(S.gain)+' ('+sg(S.gain_pct)+S.gain_pct+'%)',cls(S.gain));
+    }else{
+      draw('simBandChart',cone(d.labels,{bad:d.band.bad,mid:d.band.mid,good:d.band.good,contributed:d.contributed}));
+      draw('simMcChart',cone(d.labels,{bad:d.mc.bad,mid:d.mc.mid,good:d.mc.good,contributed:d.contributed}));
+      const S=d.summary, row=(name,o)=>`<tr><td>${name}</td><td class="red">${money(o.bad)}</td>
+        <td>${money(o.mid)}</td><td class="green">${money(o.good)}</td></tr>`;
+      $('simCmp').innerHTML=`<tr><td>Contributed</td><td colspan="3" class="muted">${money(S.contributed)} put in</td></tr>`
+        +row('① Formula band',S.band)+row('② Monte-Carlo',S.mc);
+    }
+  }
+  $('simRun').onclick=run;
+  setMode('history'); run();   // initial render
+})();
 </script>
 </body>
 </html>
