@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 270  (49 during market hours)
+- **Runs logged:** 271  (49 during market hours)
 - **Trades placed:** 13   ·   **Positions closed:** 11
 
 | Time (ET) | Assets | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|---|
-| 2026-10-16 10:55 | option+crypto | open | $108,200 | 6 | 0 | 0 | 10 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-16 14:42 | option+crypto | open | $106,539 | 6 | 1 | 1 | BOUGHT 1x AAPL call; closed 1 position(s) |
 | 2026-10-16 17:44 | option+crypto | closed | $107,033 | 6 | 0 | 0 | 4 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-16 20:13 | option+crypto | closed | $107,026 | 6 | 0 | 0 | 4 signal(s) ranked but none opened (cap full / risk gate / no contract) |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-10-25 13:31 | option+crypto | closed | $105,922 | 6 | 0 | 0 | 2 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-25 15:56 | option+crypto | closed | $105,794 | 6 | 0 | 0 | 2 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-25 18:23 | option+crypto | closed | $105,654 | 6 | 0 | 0 | 2 signal(s) ranked but none opened (cap full / risk gate / no contract) |
+| 2026-10-25 20:43 | option+crypto | closed | $105,523 | 6 | 0 | 0 | 2 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 
