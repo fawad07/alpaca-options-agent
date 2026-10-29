@@ -120,3 +120,4 @@ timestamp_et,market,equity,open_positions,new_trades,exits,summary
 2026-10-27 18:40,closed,,,,,market closed — no action
 2026-10-28 14:48,open,98499.47,5,0,0,3 signal(s) ranked but none opened (cap full / risk gate / no contract)
 2026-10-28 18:54,closed,,,,,market closed — no action
+2026-10-29 14:56,open,99569.47,5,1,1,BOUGHT 1x AAPL call; closed 1 position(s)
