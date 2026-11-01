@@ -1,10 +1,10 @@
-# Stats snapshot — 2026-10-31 01:02
+# Stats snapshot — 2026-11-01 00:26
 
-- **Equity:** $103,118.64  ·  **Total P&L:** +3,118.64 (+3.12%)
-- **Realized:** $+2,200.05  ·  **Unrealized:** $+918.59  ·  **Cash:** $49,817.29
+- **Equity:** $102,850.56  ·  **Total P&L:** +2,850.56 (+2.85%)
+- **Realized:** $+2,200.05  ·  **Unrealized:** $+650.51  ·  **Cash:** $49,817.29
 - **Open positions:** 6
 - **Closed round-trips:** 15  (W 8 / L 7, win rate 53%, profit factor 1.56)
-- **Journal:** 294 rows · 56 market-hours cycles · 14 entries · 12 exits · 1149 signal-level gate blocks
+- **Journal:** 299 rows · 56 market-hours cycles · 14 entries · 12 exits · 1149 signal-level gate blocks
 - **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $102,464
 - **Window:** 2026-09-14 14:06 → 2026-10-30 15:57 ET
 
