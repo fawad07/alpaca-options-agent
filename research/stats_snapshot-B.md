@@ -1,10 +1,10 @@
-# Stats snapshot — 2026-11-01 00:26
+# Stats snapshot — 2026-11-02 01:02
 
-- **Equity:** $102,850.56  ·  **Total P&L:** +2,850.56 (+2.85%)
-- **Realized:** $+2,200.05  ·  **Unrealized:** $+650.51  ·  **Cash:** $49,817.29
+- **Equity:** $102,910.14  ·  **Total P&L:** +2,910.14 (+2.91%)
+- **Realized:** $+2,200.05  ·  **Unrealized:** $+710.09  ·  **Cash:** $63,112.94
 - **Open positions:** 6
 - **Closed round-trips:** 15  (W 8 / L 7, win rate 53%, profit factor 1.56)
-- **Journal:** 299 rows · 56 market-hours cycles · 14 entries · 12 exits · 1149 signal-level gate blocks
+- **Journal:** 304 rows · 56 market-hours cycles · 14 entries · 12 exits · 1149 signal-level gate blocks
 - **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $102,464
 - **Window:** 2026-09-14 14:06 → 2026-10-30 15:57 ET
 
@@ -67,4 +67,5 @@
 2026-10-16 18:42  BUY  1.0x AAPL261113C00340000 @ $12.15
 2026-10-28 14:30  SELL 2.0x AAPL261030C00335000 @ $10.05
 2026-10-28 14:30  BUY  1.0x AAPL261127C00345000 @ $10.90
+2026-11-01 06:09  SELL 238.730296x LTC/USD @ $55.83
 ```
