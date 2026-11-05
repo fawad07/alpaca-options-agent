@@ -10,7 +10,13 @@ the live A-vs-B comparison while that track record is still accumulating.
 
 ---
 
-## 1. "Bank Profit & Reset" button  —  *status: DESIGNED, DEFERRED*
+## 1. Cash-Out / Withdraw  —  *status: DESIGNED, DEFERRED — see `docs/DESIGN_cashout.md`*
+
+> **Evolved (2026-11-04):** the full, current design now lives in **`docs/DESIGN_cashout.md`** —
+> **flexible partial withdrawals** (take out any amount; sell only if it exceeds free cash)
+> plus a **tax rehearsal** (estimate the after-tax number on paper, to build the habit for
+> real money). The notes below are the original all-or-nothing sketch, kept for history; the
+> design doc supersedes them.
 
 **What it is:** a dashboard button that cleanly banks an account's profit and resets its
 working baseline to $100k — the "realize everything, then withdraw the gain, then keep
