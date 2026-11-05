@@ -264,8 +264,23 @@ def build_chart() -> dict:
     # Labels/tooltips in US MARKET TIME (ET), same for every viewer regardless of location.
     labels = [f"{(d := datetime.fromtimestamp(t, et)):%b} {d.day}" for t in stamps]  # x-axis
     tips = [f"{datetime.fromtimestamp(t, et):%b %d, %I%p}".replace(' 0', ' ') for t in stamps]
+
+    # Carry-forward fill of internal holes. A glitch on a WEEKEND (Alpaca's daily feed has no
+    # Sat/Sun points, so the truth-anchor can't replace it there) leaves a hole after the
+    # sanity band drops the inflated value. An options/stock account doesn't trade weekends,
+    # so its equity is genuinely flat across them — hold the last real value. Leading nulls
+    # (before an account existed, e.g. B) stay null so its line still starts later.
+    def _ffill(acct):
+        out, last = [], None
+        for t in stamps:
+            v = acct.get(t)
+            if v is not None:
+                last = v
+            out.append(last)
+        return out
+
     out = {'start': C.ACCOUNT_START, 'labels': labels, 'tips': tips,
-           'A': [A.get(t) for t in stamps], 'B': [B.get(t) for t in stamps], **errs}
+           'A': _ffill(A), 'B': _ffill(B), **errs}
     _chart.update(t=now, data=out)
     return out
 

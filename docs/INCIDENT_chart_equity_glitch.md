@@ -47,6 +47,31 @@ glitches of *any* size, not just >$150k — and (b) fill the resulting gap with 
 daily value. This makes the chart self-heal around any future deposit, exercise, or cash
 event. See `dashboard.py` `build_chart`.
 
+## Follow-up: weekend GAP in Account A (Oct 10–11, found Nov 4, 2026)
+
+**The issue (observed):** Account A's chart line had a broken gap — blank from **Sat Oct 10,
+7PM through Sun Oct 11, 11PM** (29 hours), then it resumed Monday. (Found 2026-11-04.)
+
+**The cause:** the *same* Oct-9 SPY-exercise glitch, but on a weekend where Layer 2 can't
+reach. Alpaca's `continuous` feed returned the inflated **~$179,999** (real A ≈ $102.7k) for
+that whole weekend. Layer 2 (the daily truth-anchor) *replaces* a glitched hour with that
+day's correct daily value — **but Alpaca's daily (1D) feed has no Saturday/Sunday points**
+(markets closed); it jumps Fri Oct 9 → Mon Oct 12. So on the weekend hours:
+1. no daily anchor existed to replace the glitch, and
+2. the inflated $179,999 failed the sanity band (>$150k) and was dropped,
+3. leaving a hole. (Those weekend hours are on the axis only because Account B's crypto
+   trades 24/7, so the shared time-axis includes Sat/Sun.)
+In short: Layer 2 self-heals glitches on **trading days**; a glitch on a **weekend** slipped
+through as a gap.
+
+**The fix (Layer 3 — carry-forward fill):** `build_chart` now forward-fills internal holes
+per account — a missing hour takes the last real value before it. An options/stock account
+does not trade on weekends, so its equity is genuinely *flat* across them; holding the last
+real value is both correct and gap-free. Leading nulls (before an account existed, e.g. B)
+are preserved, so B's line still starts later. Verified: A's 29-hour gap → 0, the weekend
+holds flat at ~$103.5k and resumes Monday at the correct $102,711; A/B ranges stay realistic
+and B is untouched. See `dashboard.py` `build_chart` (`_ffill`).
+
 ## Key takeaways
 
 - Your money was never wrong — this is purely the chart's data source.
@@ -54,3 +79,6 @@ event. See `dashboard.py` `build_chart`.
   rule now stops future exercises, so this particular trigger shouldn't recur on A.
 - The daily feed is the reliable source of truth; the hourly feed is for intraday/weekend
   detail only and must always be validated against it.
+- Three defense layers now stack: **sanity band** (reject absurd values) → **daily
+  truth-anchor** (replace glitches on trading days) → **carry-forward fill** (hold the last
+  real value across weekend/other internal holes so the line never breaks).
