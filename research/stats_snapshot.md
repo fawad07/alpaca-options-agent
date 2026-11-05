@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-11-04 01:33
+# Stats snapshot — 2026-11-05 01:36
 
-- **Equity:** $92,070.72  ·  **Total P&L:** -7,929.28 (-7.93%)
-- **Realized:** $-4,490.00  ·  **Unrealized:** $-3,439.28  ·  **Cash:** $10,614.72
+- **Equity:** $98,940.22  ·  **Total P&L:** -1,059.78 (-1.06%)
+- **Realized:** $+312.00  ·  **Unrealized:** $-1,371.78  ·  **Cash:** $14,556.22
 - **Open positions:** 5
-- **Closed round-trips:** 29  (W 10 / L 19, win rate 34%, profit factor 0.71)
-- **Journal:** 128 rows · 68 market-hours cycles · 36 entries · 29 exits · 235 signal-level gate blocks
-- **Equity path:** first $100,000 · peak $102,745 · trough $93,193 · last $93,193
-- **Window:** 2026-09-01 10:20 → 2026-11-03 15:04 ET
+- **Closed round-trips:** 33  (W 13 / L 20, win rate 39%, profit factor 1.02)
+- **Journal:** 130 rows · 69 market-hours cycles · 40 entries · 33 exits · 235 signal-level gate blocks
+- **Equity path:** first $100,000 · peak $102,745 · trough $93,193 · last $99,492
+- **Window:** 2026-09-01 10:20 → 2026-11-04 15:24 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -40,6 +40,10 @@
 | NVDA261120C00212500 | $10.95 | $5.20 | -52.5% | $-575 |
 | AAPL261127C00350000 | $11.10 | $1.78 | -84.0% | $-932 |
 | AAPL261127C00345000 | $11.25 | $2.80 | -75.1% | $-845 |
+| MSFT261127C00520000 | $16.80 | $41.00 | +144.0% | $+2,420 |
+| AAPL261204C00330000 | $10.00 | $24.45 | +144.5% | $+1,445 |
+| MSFT261204C00525000 | $17.00 | $38.35 | +125.6% | $+2,135 |
+| AMZN261204P00250000 | $8.80 | $2.81 | -68.1% | $-1,198 |
 
 ## Full fill ledger
 ```
@@ -108,4 +112,12 @@
 2026-11-03 20:04  BUY  1.0x MSFT261204C00525000 @ $17.00
 2026-11-03 20:04  BUY  1.0x NVDA261204P00205000 @ $10.30
 2026-11-03 20:04  BUY  2.0x AMZN261204P00250000 @ $8.80
+2026-11-04 20:24  SELL 1.0x MSFT261127C00520000 @ $41.00
+2026-11-04 20:24  SELL 1.0x AAPL261204C00330000 @ $24.45
+2026-11-04 20:24  SELL 2.0x AMZN261204P00250000 @ $2.81
+2026-11-04 20:24  SELL 1.0x MSFT261204C00525000 @ $38.35
+2026-11-04 20:24  BUY  1.0x QQQ261204P00695000 @ $17.35
+2026-11-04 20:24  BUY  1.0x MSFT261204C00560000 @ $16.65
+2026-11-04 20:24  BUY  2.0x AAPL261204C00355000 @ $8.70
+2026-11-04 20:24  BUY  2.0x NVDA261204P00200000 @ $9.30
 ```
