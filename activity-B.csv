@@ -321,3 +321,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-11-06 03:29,B,option+crypto,closed,102455.29,6,0,0,no signal — nothing actionable across options + crypto
 2026-11-06 11:16,B,option+crypto,open,101724.48,6,2,2,BOUGHT 1x NVDA put; 1x AAPL call; closed 2 position(s)
 2026-11-06 15:30,B,option+crypto,open,101583.0,6,0,0,5 signal(s) ranked but none opened (cap full / risk gate / no contract)
+2026-11-06 16:37,B,option+crypto,closed,101597.57,6,0,0,no signal — nothing actionable across options + crypto
