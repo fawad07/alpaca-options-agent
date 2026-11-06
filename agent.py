@@ -128,10 +128,16 @@ async def run_live(account=None) -> dict:
     async with mcp_session(acct_cfg) as s:
         info = await acct_info(s)
         equity = float(info.get('equity', C.ACCOUNT_START))
+        # Size off WORKING equity (actual − anything withdrawn via the cash-out tool) so
+        # money you've taken out is never re-traded. Invisible until a withdrawal is
+        # recorded: with withdrawn = 0, working == equity, so A and un-withdrawn B are
+        # byte-identical to before. See capital.py / docs/DESIGN_cashout.md.
+        import capital
+        working = capital.working_equity(acct_cfg.name, equity)
         # starting open positions across all asset classes → one global count
         pos_by_h = [await h.get_positions(s) for h, _, _ in handlers]
         open0 = sum(len(p) for p in pos_by_h)
-        rm = RiskManager(equity=equity, day_start_equity=equity, open_positions=open0,
+        rm = RiskManager(equity=working, day_start_equity=working, open_positions=open0,
                          max_concurrent=acct_cfg.max_concurrent)
         print(f"  Equity ${equity:,.0f} | open {open0}/{acct_cfg.max_concurrent} | "
               f"assets {'+'.join(acct_cfg.asset_classes)} | risk/trade ${rm.max_spend():,.0f}")

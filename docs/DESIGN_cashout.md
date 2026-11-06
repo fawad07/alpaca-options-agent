@@ -1,8 +1,12 @@
 # Design: Cash-Out / Withdraw (flexible, with tax rehearsal)
 
-**Status: DESIGNED — build on hold.** A dashboard tool to practice withdrawing money from
-a paper account the way you would on a real one, so the discipline transfers to live money
-later. Supersedes the terser "Bank Profit & Reset" entry in `FUTURE_ENHANCEMENTS.md`.
+**Status: ✅ BUILT (paper, Account B) — 2026-11-05.** A dashboard + CLI tool to practice
+withdrawing money from a paper account the way you would on a real one, so the discipline
+transfers to live money later. Supersedes the terser "Bank Profit & Reset" entry in
+`FUTURE_ENHANCEMENTS.md`. Decisions locked at build time: **default assumed tax rate 24%**
+(realistic mid federal short-term/ordinary-income bracket — see §3), **built against Account B**.
+The feature is **OFF by default** and Account A is never touched, so the A-vs-B research is
+unaffected until you turn it on and record a withdrawal. See "What was built" at the bottom.
 
 ## Guiding principle (unchanged)
 > **It shows the facts and does the math. You decide. It never says an amount is "safe."**
@@ -114,9 +118,60 @@ gain/loss, est. tax, new `cumulative_withdrawn`) → agent resumes sized off `wo
 4. The amount picker + preview→confirm button (gated).
 5. Docs + security pass.
 
-## Open decisions
-1. **Default assumed tax rate** for the rehearsal (e.g., 25%?) — editable either way.
-2. Build on paper now against B, or still wait for a longer A-vs-B record / a 3rd account?
+## Decisions (resolved 2026-11-05)
+1. **Default assumed tax rate = 24%.** Account B trades crypto actively (positions held
+   days, not a year) → every gain is **short-term**, taxed as **ordinary income** federally,
+   not the lower long-term rate. 24% is a realistic mid federal bracket; your real number =
+   your federal bracket (10/12/22/24/32/35/37%) **plus** state income tax (0% in TX/FL/WA/NV
+   … up to ~13% in CA). Editable in the UI, via the CLI `--rate`, or `CASHOUT_TAX_RATE` env.
+   Clearly labelled an assumption; **not tax advice**.
+2. **Built against Account B**, on paper, now. Account A stays pure (never withdrawn from).
 
-**Build status: HELD** — design only (user, 2026-11-04). Direction locked: flexible partial
-withdrawals + tax rehearsal.
+---
+
+## What was built (2026-11-05)
+
+New, isolated pieces — the trading agent, the risk gates' *logic*, and Account A are all
+untouched. The one sizing change is invisible while nothing is withdrawn (`working == actual`).
+
+| File | What it does |
+|---|---|
+| `capital.py` | The accounting: `working_equity`, `withdrawn`, `true_return`, state + ledger I/O. Invisible at zero. |
+| `cashout.py` | The engine + CLI: `facts` / `preview` / `execute`. Paper-only guard; crypto-first sell plan; tax rehearsal. |
+| `cashout_state.json` | Per-account `withdrawn` + `contributed` (both start 0 / $100k). |
+| `withdrawals-B.csv` | Append-only audit ledger (created on first withdrawal). |
+| `dashboard.py` | Gated routes `/api/cashout/{facts,preview,confirm}` + working-equity cards for B. |
+| `templates/dashboard.html` | The 💸 panel: facts, amount + presets, tax-rate input, preview → confirm, ledger. |
+| `config.py` | `ENABLE_CASHOUT` (default off) + `CASHOUT_TAX_RATE_DEFAULT = 0.24`. |
+| `agent.py` | Sizes off `working_equity` (one line; identical to before while withdrawn = 0). |
+| `run.sh` | `./run.sh cashout <facts|preview|execute> b [amount]`. |
+
+### How to use it
+
+**CLI (always available, local):**
+```bash
+./run.sh cashout facts   b              # read-only snapshot
+./run.sh cashout preview b 2500         # read-only: what it would do (sell? tax? after-tax?)
+./run.sh cashout execute b 2500 --yes   # ACTS on paper: sells if needed, records the ledger
+```
+
+**Dashboard button (off by default):** launch with the flag, then use the 💸 panel:
+```bash
+ENABLE_CASHOUT=1 ./run.sh dashboard
+```
+Preview is read-only; **Confirm** pops a summary dialog, then records it. The confirm endpoint
+is POST-only, paper-only, and needs a single-use nonce a matching preview just issued — no
+stray click or prefetch can move money.
+
+### How it stays out of the research
+- **Account A** is never withdrawn from → `working == actual` forever → byte-identical to today.
+- **The cloud agent** reads `cashout_state.json` from its checkout. On this feature branch it
+  isn't on `main`, so the cloud bots keep sizing off full equity — a withdrawal here is a pure
+  **local rehearsal** until you merge. Merge to `main` only when you want a B withdrawal to
+  actually shrink what the live agent trades. (A's state stays zero either way.)
+
+### Not done on purpose
+- No real transfer (paper can't wire out — it's a ledger entry; the code swaps to a real
+  transfer on a live account).
+- `execute`/Confirm is left for **you** to run with an amount you choose — the first real
+  withdrawal changes B's working numbers, so it's your call, not something auto-run.

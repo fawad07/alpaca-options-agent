@@ -60,6 +60,22 @@ RSI_BULL_MAX  = 72     # don't chase overbought
 RSI_BEAR_MIN  = 28     # don't chase oversold
 MIN_CONFIDENCE = 0.55  # skip weak signals
 
+# ── CASH-OUT / WITHDRAW (rehearsal tool — see docs/DESIGN_cashout.md) ──────────
+# A dashboard/CLI tool to practice withdrawing money from a PAPER account the way you
+# would on a real one. OFF by default; the agent and the A-vs-B research are untouched
+# until you turn it on AND actually record a withdrawal. Shows facts + an estimated tax;
+# never a "safe/unsafe" verdict and never real tax advice.
+ENABLE_CASHOUT = os.getenv('ENABLE_CASHOUT', '') == '1'
+
+# Default ASSUMED tax rate for the rehearsal — editable in the UI and via CASHOUT_TAX_RATE.
+# Why 24%: Account B trades crypto actively (positions held days, not a year), so every
+# gain is SHORT-TERM and taxed as ORDINARY INCOME federally — not the lower long-term rate.
+# 24% is a realistic mid federal bracket for an individual; your real number = your federal
+# bracket (10/12/22/24/32/35/37%) PLUS your state income tax (0% in TX/FL/WA/NV … up to
+# ~13% in CA). This single default is a starting point, clearly labelled an assumption —
+# set it to match your own bracket + state. It is NOT tax advice.
+CASHOUT_TAX_RATE_DEFAULT = float(os.getenv('CASHOUT_TAX_RATE', '0.24'))
+
 # ── FILES ─────────────────────────────────────────────────────
 LOG_DIR   = Path(__file__).parent / 'logs'
 TRADE_LOG = LOG_DIR / 'trades.jsonl'

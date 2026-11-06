@@ -31,6 +31,13 @@ results(){   $PY results.py 2>/dev/null; }
 market(){    $PY market_open.py 2>/dev/null; }
 dashboard(){ echo "Dashboard → http://localhost:8095   (Ctrl-C to stop)"; $PY dashboard.py; }
 
+# cash-out rehearsal (paper). facts/preview are read-only; execute needs --yes and acts.
+#   ./run.sh cashout facts b
+#   ./run.sh cashout preview b 2500
+#   ./run.sh cashout execute b 2500 --yes
+# The dashboard button for the same thing is OFF unless you launch with ENABLE_CASHOUT=1.
+cashout(){ $PY cashout.py "$@"; }
+
 trade(){  # force a cloud pass: a | b | both (default both)
   case "${1:-both}" in
     a) _fire trade.yml;;
@@ -83,6 +90,7 @@ case "${1:-menu}" in
   autopilot)     autopilot "${2:-3600}";;
   results)       results;;
   market)        market;;
+  cashout)       shift; cashout "$@";;
   menu|"")       menu;;
-  *) echo "usage: ./run.sh [status|compare|dashboard|trade [a|b|both]|autopilot [secs]|results|market]";;
+  *) echo "usage: ./run.sh [status|compare|dashboard|trade [a|b|both]|autopilot [secs]|results|market|cashout <facts|preview|execute> [b] [amount]]";;
 esac

@@ -10,13 +10,14 @@ the live A-vs-B comparison while that track record is still accumulating.
 
 ---
 
-## 1. Cash-Out / Withdraw  —  *status: DESIGNED, DEFERRED — see `docs/DESIGN_cashout.md`*
+## 1. Cash-Out / Withdraw  —  *status: ✅ BUILT (paper, Account B), 2026-11-05 — see `docs/DESIGN_cashout.md`*
 
-> **Evolved (2026-11-04):** the full, current design now lives in **`docs/DESIGN_cashout.md`** —
-> **flexible partial withdrawals** (take out any amount; sell only if it exceeds free cash)
-> plus a **tax rehearsal** (estimate the after-tax number on paper, to build the habit for
-> real money). The notes below are the original all-or-nothing sketch, kept for history; the
-> design doc supersedes them.
+> **Built (2026-11-05):** flexible partial withdrawals + tax rehearsal, on a `feature/cashout`
+> branch, against Account B. OFF by default (`ENABLE_CASHOUT`); Account A untouched; the cloud
+> agent is unaffected until the branch is merged to `main`. Default assumed tax rate **24%**
+> (short-term/ordinary-income — editable). Full build notes + usage are in
+> **`docs/DESIGN_cashout.md`**. The notes below are the original all-or-nothing sketch, kept
+> for history; the design doc and the shipped code supersede them.
 
 **What it is:** a dashboard button that cleanly banks an account's profit and resets its
 working baseline to $100k — the "realize everything, then withdraw the gain, then keep
