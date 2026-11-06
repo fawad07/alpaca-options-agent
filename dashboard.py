@@ -8,13 +8,14 @@ Auto-refreshes. Read-only — it never places trades.
 Run:   .venv/bin/python dashboard.py    →   http://localhost:8095
 """
 from __future__ import annotations
-import os, csv, asyncio, json, time, re, hmac
+import os, csv, asyncio, json, time, re, hmac, secrets
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from flask import Flask, jsonify, render_template, request, abort, make_response, redirect
 import config as C
+import capital
 from mcp_client import mcp_session, account, option_positions, crypto_positions, call, _rows
-from accounts import ACCOUNT_A, ACCOUNT_B
+from accounts import ACCOUNT_A, ACCOUNT_B, ACCOUNTS
 
 app = Flask(__name__)
 _cache = {'t': 0.0, 'data': None}
@@ -119,8 +120,13 @@ async def _fetch_b():
         a = await account(s)
         pos = await option_positions(s) + await crypto_positions(s)
     eq, start = _f(a.get('equity')), C.ACCOUNT_START
+    w = capital.withdrawn('B')
+    working = eq - w
     nums = {'equity': eq, 'cash': _f(a.get('cash')),
-            'pl': eq - start, 'pl_pct': (eq - start) / start * 100 if start else 0}
+            'pl': eq - start, 'pl_pct': (eq - start) / start * 100 if start else 0,
+            'withdrawn': w, 'working': working,
+            'true_return_pct': capital.true_return('B', eq) * 100,
+            'cashout_on': C.ENABLE_CASHOUT}
     return nums, pos
 
 
@@ -296,6 +302,80 @@ def api_status():
 @app.route('/api/chart')
 def api_chart():
     return jsonify(build_chart())
+
+
+# ── cash-out (rehearsal) — OFF unless ENABLE_CASHOUT=1 ─────────────────────────
+# facts/preview are read-only; confirm is the only acting route: POST-only, paper-only
+# (guarded inside cashout.execute), and it must echo a single-use nonce that a matching
+# preview just issued — so no stray click, prefetch, or GET can ever move money.
+_nonces: dict[str, dict] = {}        # token → {acct, amount, rate, t}
+_NONCE_TTL = 180                     # seconds
+
+
+def _cashout_gate():
+    if not C.ENABLE_CASHOUT:
+        abort(404)                   # feature invisible unless explicitly enabled
+
+
+def _acct_or_404(name: str):
+    acct = ACCOUNTS.get(str(name).upper())
+    if not acct:
+        abort(404)
+    return acct
+
+
+@app.route('/api/cashout/facts')
+def api_cashout_facts():
+    _cashout_gate()
+    import cashout
+    acct = _acct_or_404(request.args.get('acct', 'B'))
+    try:
+        f = asyncio.run(cashout.facts(acct))
+        f['default_rate'] = C.CASHOUT_TAX_RATE_DEFAULT
+        f['ledger'] = capital.ledger(acct.name)
+        return jsonify(f)
+    except Exception as e:
+        return jsonify({'error': str(e)[:200]}), 502
+
+
+@app.route('/api/cashout/preview')
+def api_cashout_preview():
+    _cashout_gate()
+    import cashout
+    acct = _acct_or_404(request.args.get('acct', 'B'))
+    try:
+        amount = float(request.args.get('amount', 0))
+        rate = request.args.get('rate')
+        rate = float(rate) if rate not in (None, '') else None
+    except ValueError:
+        return jsonify({'error': 'amount/rate must be numbers'}), 400
+    try:
+        p = asyncio.run(cashout.preview(acct, amount, rate))
+    except Exception as e:
+        return jsonify({'error': str(e)[:200]}), 502
+    if not p.get('error'):
+        tok = secrets.token_urlsafe(16)
+        _nonces[tok] = {'acct': acct.name, 'amount': round(amount, 2),
+                        'rate': p['tax_rate'], 't': time.time()}
+        p['nonce'] = tok
+    return jsonify(p)
+
+
+@app.route('/api/cashout/confirm', methods=['POST'])
+def api_cashout_confirm():
+    _cashout_gate()
+    import cashout
+    body = request.get_json(silent=True) or {}
+    tok = str(body.get('nonce', ''))
+    rec = _nonces.pop(tok, None)     # single-use: consume immediately
+    if not rec or time.time() - rec['t'] > _NONCE_TTL:
+        return jsonify({'error': 'preview expired — review the numbers again'}), 409
+    acct = _acct_or_404(rec['acct'])
+    try:
+        p = asyncio.run(cashout.execute(acct, rec['amount'], rec['rate']))
+        return jsonify(p)
+    except Exception as e:
+        return jsonify({'error': str(e)[:200]}), 502
 
 
 if __name__ == '__main__':

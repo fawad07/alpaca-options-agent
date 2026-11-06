@@ -38,6 +38,26 @@
   .note{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.5}
   .banner{background:rgba(224,161,58,.10);border:1px solid #5a4620;color:#e8d3a6;
           border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:18px}
+  .panel.cashout{border-color:#2f4a6b}
+  .co-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+  .co-facts .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+  .co-facts .v{font-size:18px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums}
+  .co-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+  .co-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+  .co-field input{background:var(--bg);border:1px solid var(--line);color:var(--text);
+          border-radius:8px;padding:8px 10px;font-size:15px;width:150px;font-variant-numeric:tabular-nums}
+  .btn{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:8px;
+          padding:8px 14px;font-size:13px;cursor:pointer}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:rgba(95,168,255,.14);border-color:#2f4a6b;color:var(--accent);font-weight:600}
+  .btn.danger{background:rgba(248,81,73,.12);border-color:#5a2420;color:var(--red);font-weight:600}
+  .chip{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:999px;
+          padding:5px 11px;font-size:12px;cursor:pointer}
+  .chip:hover{border-color:var(--accent)}
+  .co-out{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;
+          margin-top:6px;font-size:13px;line-height:1.6;display:none}
+  .co-out .lead{font-size:14px;font-weight:600;margin-bottom:6px}
+  .co-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:10px}
 </style>
 </head>
 <body>
@@ -79,6 +99,34 @@
         <table><thead><tr><th>Symbol</th><th>Qty</th><th>Value</th><th>P/L</th></tr></thead>
           <tbody id="posB"></tbody></table>
       </div>
+    </div>
+  </div>
+
+  <div class="panel cashout" id="cashoutPanel" style="display:none">
+    <h2>💸 Cash-out rehearsal — Account B (paper)</h2>
+    <div class="co-note" style="margin-top:0;margin-bottom:12px">
+      Practice withdrawing the way you would with real money. It shows the facts and does the
+      math — <b>you decide</b>. No "safe/unsafe" verdict. The tax figure is a <b>rehearsal estimate</b>
+      at an assumption you set — <b>$0 is actually charged on paper</b>, and it is not tax advice.
+    </div>
+    <div class="co-facts" id="coFacts"></div>
+    <div class="co-row">
+      <div class="co-field">
+        <label>Withdraw amount ($)</label>
+        <input id="coAmount" type="number" min="0" step="100" placeholder="e.g. 2500">
+      </div>
+      <div class="co-field">
+        <label>Assumed tax rate (%)</label>
+        <input id="coRate" type="number" min="0" max="60" step="1">
+      </div>
+      <button class="btn primary" id="coPreviewBtn">Preview</button>
+    </div>
+    <div class="co-row" id="coPresets" style="margin-top:-4px"></div>
+    <div class="co-out" id="coOut"></div>
+    <div id="coLedgerWrap" style="margin-top:14px;display:none">
+      <div class="subh">Withdrawal history (ledger)</div>
+      <table><thead><tr><th>Time (ET)</th><th>Amount</th><th>Sold?</th><th>Realized</th><th>Est. tax</th><th>After-tax</th></tr></thead>
+        <tbody id="coLedger"></tbody></table>
     </div>
   </div>
 
@@ -159,11 +207,21 @@ async function refresh(){
       `<div class="acctlabel">${name}</div>`+
       card('Equity',money(a.equity))+
       card('P&L vs $100k',`${sg(a.pl)}${money(a.pl)} <span style="font-size:13px">(${sg(a.pl_pct)}${a.pl_pct.toFixed(2)}%)</span>`,cls(a.pl))+
-      card('Cash',money(a.cash))
+      card('Cash',money(a.cash))+
+      // Once money has been withdrawn (cash-out tool), show WORKING equity (what the agent
+      // trades off) and the running withdrawn total. Hidden while nothing's been taken out.
+      ((a.withdrawn>0) ? (
+        card('Working equity',money(a.working))+
+        card('Withdrawn',money(a.withdrawn),'muted')+
+        card('Lifetime return',`${sg(a.true_return_pct)}${a.true_return_pct.toFixed(2)}%`,cls(a.true_return_pct))
+      ) : '')
     ) : '';
     $('cards').innerHTML =
       (acctBlock('Account A · options', d.account) + acctBlock('Account B · options + crypto', d.accountB))
       || `<div class="card"><div class="k">Account</div><div class="v muted">—</div></div>`;
+
+    // Cash-out rehearsal panel — only when the server has ENABLE_CASHOUT=1.
+    if(d.accountB && d.accountB.cashout_on){ $('cashoutPanel').style.display='block'; if(!coLoaded) loadCashout(); }
 
     const posRows=arr=>(arr&&arr.length)?arr.map(p=>`
       <tr><td>${esc(p.symbol)}</td><td>${esc(p.qty)}</td><td>${money(p.value)}</td>
@@ -184,6 +242,92 @@ async function refresh(){
       : '<tr><td class="muted" colspan="3">No decisions yet — run ./run.sh status to pull the latest.</td></tr>';
   }catch(e){ $('clock').textContent='offline — retrying'; }
 }
+
+// ── cash-out rehearsal (only active when the panel is shown) ──────────────────
+let coLoaded=false, coFacts=null, coNonce=null;
+async function loadCashout(){
+  coLoaded=true;
+  try{
+    const f=await (await fetch('/api/cashout/facts?acct=B')).json();
+    if(f.error){ $('coFacts').innerHTML=`<div class="co-note">${esc(f.error)}</div>`; return; }
+    coFacts=f;
+    if($('coRate').value==='') $('coRate').value=(f.default_rate*100).toFixed(0);
+    const fact=(k,v,c='')=>`<div><div class="k">${k}</div><div class="v ${c}">${v}</div></div>`;
+    $('coFacts').innerHTML=
+      fact('Equity',money(f.equity))+
+      fact('Free cash (no sale)',money(f.free_cash))+
+      fact('Open positions',money(f.position_value)+` <span style="font-size:12px" class="${cls(f.unrealized)}">(${sg(f.unrealized)}${money(f.unrealized)})</span>`)+
+      fact('Working equity',money(f.working_equity))+
+      fact('Withdrawn so far',money(f.withdrawn),'muted')+
+      fact('Lifetime return',`${sg(f.true_return_pct)}${f.true_return_pct.toFixed(2)}%`,cls(f.true_return_pct));
+    // presets fill the amount box with concrete, honest numbers
+    const profit=Math.max(0,f.profit), chips=[];
+    if(profit>0) chips.push(['All profit (~'+money(profit)+')',profit]);
+    chips.push(['Free cash ('+money(f.free_cash)+')',f.free_cash]);
+    chips.push(['Half of free cash',Math.round(f.free_cash/2)]);
+    $('coPresets').innerHTML=chips.map((c,i)=>`<span class="chip" data-amt="${c[1]}">${esc(c[0])}</span>`).join('');
+    document.querySelectorAll('#coPresets .chip').forEach(el=>el.onclick=()=>{ $('coAmount').value=Math.round(el.dataset.amt); });
+    // ledger
+    if(f.ledger && f.ledger.length){
+      $('coLedgerWrap').style.display='block';
+      $('coLedger').innerHTML=f.ledger.map(r=>`<tr>
+        <td>${esc(r.timestamp_et)}</td><td>${money(r.amount)}</td><td>${esc(r.sold)}</td>
+        <td class="${Number(r.realized_gain)>=0?'green':'red'}">${sg(Number(r.realized_gain))}${money(r.realized_gain)}</td>
+        <td>${money(r.est_tax)}</td><td>${money(r.after_tax)}</td></tr>`).join('');
+    }
+  }catch(e){ $('coFacts').innerHTML='<div class="co-note">could not load — is the backend reachable?</div>'; }
+}
+
+async function doPreview(){
+  coNonce=null;
+  const amt=parseFloat($('coAmount').value||'0'), rate=parseFloat($('coRate').value||'0')/100;
+  const out=$('coOut'); out.style.display='block';
+  out.innerHTML='<div class="co-note">previewing…</div>';
+  try{
+    const p=await (await fetch(`/api/cashout/preview?acct=B&amount=${amt}&rate=${rate}`)).json();
+    if(p.error){ out.innerHTML=`<div class="lead red">✖ ${esc(p.error)}</div>`; return; }
+    coNonce=p.nonce;
+    let h=`<div class="lead">Withdraw ${money(p.amount)} · assumed tax ${(p.tax_rate*100).toFixed(0)}%</div>`;
+    if(!p.sold){
+      h+=`• Covered by free cash — <b>nothing is sold</b> (a ledger entry only).<br>`+
+         `• No new realized gain from this action → <b>estimated tax ${money(0)}</b>.`;
+    }else{
+      h+=`• Free cash ${money(p.free_cash)} isn't enough — would <b>sell ${money(p.shortfall)}</b> of positions:<br>`;
+      h+=p.sell_plan.map(l=>`&nbsp;&nbsp;– sell ${l.pct_of_pos.toFixed(1)}% of ${esc(l.symbol)} (~${money(l.sell_value)}) → realizes <span class="${Number(l.realized)>=0?'green':'red'}">${sg(l.realized)}${money(l.realized)}</span>`).join('<br>')+'<br>';
+      h+=`• Realized gain/loss this action: <span class="${p.realized_gain>=0?'green':'red'}">${sg(p.realized_gain)}${money(p.realized_gain)}</span><br>`;
+      h+=`• Taxable gain ${money(p.taxable_gain)} × ${(p.tax_rate*100).toFixed(0)}% → <b>est. tax ${money(p.est_tax)}</b> <span class="co-note">(rehearsal estimate, not tax advice)</span>`;
+    }
+    h+=`<br>• <b>After-tax proceeds: ${money(p.after_tax)}</b>`;
+    h+=`<br>• Working equity after: ${money(p.working_after)} · free cash after ~${money(p.free_cash_after)}`;
+    h+=`<div class="co-row" style="margin-top:14px;margin-bottom:0">
+          <button class="btn danger" id="coConfirmBtn">Confirm withdrawal (paper)</button>
+          <span class="co-note" style="margin-top:0">Records it in the ledger and ${p.sold?'sells the positions above':'logs the amount'}. Reversible only by editing the ledger.</span>
+        </div>`;
+    out.innerHTML=h;
+    $('coConfirmBtn').onclick=()=>doConfirm(p);
+  }catch(e){ out.innerHTML='<div class="lead red">✖ preview failed</div>'; }
+}
+
+async function doConfirm(p){
+  if(!coNonce){ return; }
+  const msg=`Confirm (PAPER): withdraw ${money(p.amount)} from Account B`+
+            (p.sold?`, selling ${money(p.shortfall)} of positions (realizes ${sg(p.realized_gain)}${money(p.realized_gain)})`:'')+
+            `.\nEstimated tax ${money(p.est_tax)} (rehearsal — $0 actually charged).\n\nProceed?`;
+  if(!confirm(msg)) return;
+  const btn=$('coConfirmBtn'); if(btn){ btn.disabled=true; btn.textContent='working…'; }
+  try{
+    const r=await (await fetch('/api/cashout/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nonce:coNonce})})).json();
+    coNonce=null;
+    if(r.error){ $('coOut').innerHTML=`<div class="lead red">✖ ${esc(r.error)}</div>`; return; }
+    $('coOut').innerHTML=`<div class="lead green">✔ Recorded.</div>`+
+      `Withdrew ${money(r.amount)} · cumulative withdrawn now ${money(r.cumulative_withdrawn)}.<br>`+
+      `Equity after ${money(r.equity_after)} · working equity ${money(r.working_after)}.`;
+    $('coAmount').value='';
+    loadCashout();   // refresh facts + ledger
+  }catch(e){ $('coOut').innerHTML='<div class="lead red">✖ confirm failed</div>'; }
+}
+document.addEventListener('click',e=>{ if(e.target&&e.target.id==='coPreviewBtn') doPreview(); });
+
 refresh(); setInterval(refresh,20000);
 </script>
 </body>
