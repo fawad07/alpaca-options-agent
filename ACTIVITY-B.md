@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 323  (61 during market hours)
+- **Runs logged:** 324  (61 during market hours)
 - **Trades placed:** 19   ·   **Positions closed:** 17
 
 | Time (ET) | Assets | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|---|
-| 2026-10-24 19:44 | option+crypto | closed | $105,964 | 6 | 0 | 0 | 3 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-25 00:03 | option+crypto | closed | $106,038 | 6 | 0 | 0 | 3 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-25 05:14 | option+crypto | closed | $105,382 | 6 | 0 | 0 | 2 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-25 09:46 | option+crypto | closed | $105,434 | 6 | 0 | 0 | 2 signal(s) ranked but none opened (cap full / risk gate / no contract) |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-11-06 11:16 | option+crypto | open | $101,724 | 6 | 2 | 2 | BOUGHT 1x NVDA put; 1x AAPL call; closed 2 position(s) |
 | 2026-11-06 15:30 | option+crypto | open | $101,583 | 6 | 0 | 0 | 5 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-11-06 16:37 | option+crypto | closed | $101,598 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
+| 2026-11-06 20:11 | option+crypto | closed | $101,680 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 
