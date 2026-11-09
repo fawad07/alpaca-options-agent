@@ -1,10 +1,10 @@
-# Stats snapshot — 2026-11-08 00:54
+# Stats snapshot — 2026-11-09 01:12
 
-- **Equity:** $101,526.38  ·  **Total P&L:** +1,526.38 (+1.53%)
-- **Realized:** $+2,161.05  ·  **Unrealized:** $-634.67  ·  **Cash:** $63,038.26
-- **Open positions:** 6
+- **Equity:** $100,571.29  ·  **Total P&L:** +571.29 (+0.57%)
+- **Realized:** $+2,161.05  ·  **Unrealized:** $-1,589.76  ·  **Cash:** $85,480.10
+- **Open positions:** 4
 - **Closed round-trips:** 20  (W 10 / L 10, win rate 50%, profit factor 1.32)
-- **Journal:** 328 rows · 61 market-hours cycles · 19 entries · 17 exits · 1158 signal-level gate blocks
+- **Journal:** 333 rows · 61 market-hours cycles · 19 entries · 19 exits · 1158 signal-level gate blocks
 - **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $101,583
 - **Window:** 2026-09-14 14:06 → 2026-11-06 15:30 ET
 
@@ -83,4 +83,8 @@
 2026-11-06 16:16  SELL 1.0x QQQ261204P00685000 @ $34.12
 2026-11-06 16:16  BUY  1.0x NVDA261204P00190000 @ $13.10
 2026-11-06 16:16  BUY  1.0x AAPL261204C00345000 @ $10.30
+2026-11-08 15:52  SELL 4.53e-07x LTC/USD @ $51.73
+2026-11-08 21:55  SELL 130.251551x SOL/USD @ $86.32
+2026-11-08 21:55  SELL 5.248403x ETH/USD @ $2144.52
+2026-11-08 23:48  SELL 1.07e-07x ETH/USD @ $2128.61
 ```
