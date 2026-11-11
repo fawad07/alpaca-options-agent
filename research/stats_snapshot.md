@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-11-10 03:41
+# Stats snapshot — 2026-11-11 01:22
 
-- **Equity:** $104,681.02  ·  **Total P&L:** +4,681.02 (+4.68%)
-- **Realized:** $+6,593.00  ·  **Unrealized:** $-1,911.98  ·  **Cash:** $20,161.02
-- **Open positions:** 4
+- **Equity:** $102,401.99  ·  **Total P&L:** +2,401.99 (+2.40%)
+- **Realized:** $+6,593.00  ·  **Unrealized:** $-4,191.01  ·  **Cash:** $18,286.99
+- **Open positions:** 5
 - **Closed round-trips:** 37  (W 16 / L 21, win rate 43%, profit factor 1.37)
-- **Journal:** 135 rows · 71 market-hours cycles · 44 entries · 37 exits · 235 signal-level gate blocks
-- **Equity path:** first $100,000 · peak $102,745 · trough $93,193 · last $101,149
-- **Window:** 2026-09-01 10:20 → 2026-11-06 14:56 ET
+- **Journal:** 137 rows · 72 market-hours cycles · 45 entries · 37 exits · 235 signal-level gate blocks
+- **Equity path:** first $100,000 · peak $102,745 · trough $93,193 · last $102,366
+- **Window:** 2026-09-01 10:20 → 2026-11-10 15:26 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -132,4 +132,5 @@
 2026-11-05 20:37  BUY  1.0x MSFT261204C00535000 @ $19.55
 2026-11-06 19:56  BUY  2.0x AAPL261204C00345000 @ $9.30
 2026-11-06 19:56  BUY  1.0x MSFT261204C00530000 @ $19.90
+2026-11-10 20:26  BUY  1.0x QQQ261211P00674000 @ $18.74
 ```
