@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 140  (74 during market hours)
+- **Runs logged:** 141  (74 during market hours)
 - **Trades placed:** 47   ·   **Positions closed:** 39
 
 | Time (ET) | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|
-| 2026-10-01 14:50 | open | $97,587 | 5 | 1 | 1 | BOUGHT 1x QQQ call; closed 1 position(s) |
 | 2026-10-01 18:57 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-10-02 14:22 | open | $98,232 | 5 | 0 | 0 | 3 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-02 18:25 | closed | — | — | 0 | 0 | market closed — no action |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-11-11 15:09 | open | $102,866 | 5 | 2 | 2 | BOUGHT 1x QQQ put; 2x AAPL call; closed 2 position(s) |
 | 2026-11-11 20:57 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-11-12 15:46 | open | $102,928 | 5 | 0 | 0 | 5 signal(s) ranked but none opened (cap full / risk gate / no contract) |
+| 2026-11-12 20:31 | closed | — | — | 0 | 0 | market closed — no action |
 
