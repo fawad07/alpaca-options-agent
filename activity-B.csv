@@ -350,3 +350,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-11-13 10:30,B,option+crypto,open,101448.62,6,2,2,BOUGHT 1x GOOGL put; 1x QQQ put; closed 2 position(s)
 2026-11-13 16:37,B,option+crypto,closed,100898.14,6,0,0,no signal — nothing actionable across options + crypto
 2026-11-13 20:46,B,option+crypto,closed,100920.66,6,0,0,no signal — nothing actionable across options + crypto
+2026-11-14 03:48,B,option+crypto,closed,100698.47,6,0,0,no signal — nothing actionable across options + crypto
