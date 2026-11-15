@@ -1,10 +1,10 @@
-# Stats snapshot — 2026-11-14 01:46
+# Stats snapshot — 2026-11-15 01:18
 
-- **Equity:** $100,920.66  ·  **Total P&L:** +920.66 (+0.92%)
-- **Realized:** $+4,906.05  ·  **Unrealized:** $-3,985.39  ·  **Cash:** $83,906.67
-- **Open positions:** 6
+- **Equity:** $100,430.13  ·  **Total P&L:** +430.13 (+0.43%)
+- **Realized:** $+4,906.05  ·  **Unrealized:** $-4,475.92  ·  **Cash:** $95,131.13
+- **Open positions:** 5
 - **Closed round-trips:** 23  (W 13 / L 10, win rate 57%, profit factor 1.72)
-- **Journal:** 351 rows · 65 market-hours cycles · 24 entries · 22 exits · 1170 signal-level gate blocks
+- **Journal:** 355 rows · 65 market-hours cycles · 24 entries · 23 exits · 1170 signal-level gate blocks
 - **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $101,449
 - **Window:** 2026-09-14 14:06 → 2026-11-13 10:30 ET
 
@@ -98,4 +98,6 @@
 2026-11-13 15:30  SELL 2.0x AAPL261211C00350000 @ $14.25
 2026-11-13 15:30  BUY  1.0x GOOGL261211P00295000 @ $10.85
 2026-11-13 15:30  BUY  1.0x QQQ261211P00675000 @ $18.76
+2026-11-14 15:08  SELL 0.171472x BTC/USD @ $65624.75
+2026-11-14 15:40  SELL 2.45e-07x BTC/USD @ $65162.40
 ```
