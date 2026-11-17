@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 144  (75 during market hours)
+- **Runs logged:** 145  (75 during market hours)
 - **Trades placed:** 48   ·   **Positions closed:** 40
 
 | Time (ET) | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|
-| 2026-10-05 17:10 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-10-06 14:53 | open | $102,468 | 3 | 2 | 4 | BOUGHT 2x AAPL call; 1x TSLA call; closed 4 position(s) |
 | 2026-10-06 18:59 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-10-07 15:18 | open | $102,472 | 5 | 2 | 0 | BOUGHT 1x SPY call; 1x AAPL call |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-11-13 15:27 | open | $103,909 | 5 | 1 | 1 | BOUGHT 1x QQQ put; closed 1 position(s) |
 | 2026-11-13 20:00 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-11-16 17:51 | closed | — | — | 0 | 0 | market closed — no action |
+| 2026-11-17 16:43 | closed | — | — | 0 | 0 | market closed — no action |
 
