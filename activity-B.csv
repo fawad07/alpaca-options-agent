@@ -367,3 +367,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-11-17 22:29,B,option+crypto,closed,103136.13,5,0,0,no signal — nothing actionable across options + crypto
 2026-11-18 07:14,B,option+crypto,closed,103136.13,5,0,0,no signal — nothing actionable across options + crypto
 2026-11-18 15:43,B,option+crypto,open,102514.13,6,2,1,BOUGHT 1x GOOGL put; 1x AAPL call; closed 1 position(s)
+2026-11-18 21:01,B,option+crypto,closed,102377.05,6,0,0,no signal — nothing actionable across options + crypto
