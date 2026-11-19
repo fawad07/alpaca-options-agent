@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-11-18 03:08
+# Stats snapshot — 2026-11-19 02:49
 
-- **Equity:** $103,136.13  ·  **Total P&L:** +3,136.13 (+3.14%)
-- **Realized:** $+4,906.05  ·  **Unrealized:** $-1,769.92  ·  **Cash:** $95,131.13
-- **Open positions:** 5
-- **Closed round-trips:** 23  (W 13 / L 10, win rate 57%, profit factor 1.72)
-- **Journal:** 365 rows · 65 market-hours cycles · 24 entries · 23 exits · 1170 signal-level gate blocks
-- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $101,449
-- **Window:** 2026-09-14 14:06 → 2026-11-13 10:30 ET
+- **Equity:** $102,377.05  ·  **Total P&L:** +2,377.05 (+2.38%)
+- **Realized:** $+3,591.05  ·  **Unrealized:** $-1,214.00  ·  **Cash:** $93,201.05
+- **Open positions:** 6
+- **Closed round-trips:** 24  (W 13 / L 11, win rate 54%, profit factor 1.44)
+- **Journal:** 369 rows · 66 market-hours cycles · 26 entries · 24 exits · 1170 signal-level gate blocks
+- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $102,514
+- **Window:** 2026-09-14 14:06 → 2026-11-18 15:43 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -34,6 +34,7 @@
 | NVDA261204P00190000 | $13.10 | $24.85 | +89.7% | $+1,175 |
 | AAPL261204C00345000 | $10.30 | $16.10 | +56.3% | $+580 |
 | AAPL261211C00350000 | $9.30 | $14.25 | +53.2% | $+990 |
+| MSFT261211C00535000 | $18.05 | $4.90 | -72.9% | $-1,315 |
 
 ## Full fill ledger
 ```
@@ -100,4 +101,7 @@
 2026-11-13 15:30  BUY  1.0x QQQ261211P00675000 @ $18.76
 2026-11-14 15:08  SELL 0.171472x BTC/USD @ $65624.75
 2026-11-14 15:40  SELL 2.45e-07x BTC/USD @ $65162.40
+2026-11-18 20:43  SELL 1.0x MSFT261211C00535000 @ $4.90
+2026-11-18 20:43  BUY  1.0x GOOGL261218P00285000 @ $12.20
+2026-11-18 20:43  BUY  1.0x AAPL261218C00350000 @ $12.00
 ```
