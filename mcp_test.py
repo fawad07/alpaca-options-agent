@@ -27,11 +27,17 @@ SERVER_CMD = _resolve_server_cmd()
 def server_params(account=None) -> StdioServerParameters:
     """Launch the MCP server keyed to `account` (defaults to the single ALPACA_* account)."""
     from accounts import default_account
+    import config as C
     acct = account or default_account()
+    # ── THE one line that can route to REAL MONEY ──────────────────────────────
+    # Paper for EVERY account unless this is an explicitly-enabled live account:
+    # acct.live must be True AND the master switch ENABLE_LIVE_C on AND kill switch off.
+    # Any gate missing → paper. Default state ships paper; the assistant never flips this.
+    go_live = bool(getattr(acct, 'live', False)) and C.ENABLE_LIVE_C and not C.KILL_LIVE_C
     env = {**os.environ,
            'ALPACA_API_KEY': acct.api_key,
            'ALPACA_SECRET_KEY': acct.secret_key,
-           'ALPACA_PAPER_TRADE': 'true'}          # paper only
+           'ALPACA_PAPER_TRADE': 'false' if go_live else 'true'}
     return StdioServerParameters(command=SERVER_CMD, args=[], env=env)
 
 WANT = ['get_account_info', 'get_option_contracts', 'get_option_chain',

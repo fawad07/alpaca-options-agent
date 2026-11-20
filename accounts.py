@@ -27,6 +27,7 @@ class Account:
     option_universe: tuple = ()
     crypto_universe: tuple = ()
     ordering: str = 'confidence'      # 'universe' = V1 list-order fill; 'confidence' = strongest-first
+    live: bool = False                # True ONLY for a real-money account (Account C). Paper otherwise.
 
 
 # Account A — pinned to V1 behavior (do not change): options only, cap 5, 7 symbols.
@@ -57,7 +58,25 @@ ACCOUNT_B = Account(
     ordering='confidence',           # B: options + crypto compete by signal strength
 )
 
-ACCOUNTS = {'A': ACCOUNT_A, 'B': ACCOUNT_B}
+# ── Account C — LIVE MONEY (crypto-only, cap 6) — PREP, OFF BY DEFAULT ─────────
+# Real money. Built as INERT scaffolding: C is not deployed by anything automatically
+# (no cloud workflow, not the default DEPLOY_ACCOUNT) and it only ever touches live funds
+# when ALL gates in config.ENABLE_LIVE_C's note are met. Keys come ONLY from ALPACA_LIVE_*
+# — NO fallback to the paper keys, so missing keys fail safe (empty → auth error, no trade).
+# Crypto-only (no options), 6 concurrent slots. See docs/DESIGN_account_c_live.md.
+ACCOUNT_C = Account(
+    name='C',
+    api_key=os.getenv('ALPACA_LIVE_API_KEY', ''),
+    secret_key=os.getenv('ALPACA_LIVE_SECRET_KEY', ''),
+    asset_classes=('crypto',),
+    max_concurrent=6,
+    option_universe=(),
+    crypto_universe=('BTC/USD', 'ETH/USD', 'SOL/USD', 'LTC/USD'),
+    ordering='confidence',
+    live=True,
+)
+
+ACCOUNTS = {'A': ACCOUNT_A, 'B': ACCOUNT_B, 'C': ACCOUNT_C}
 
 
 def current_account() -> Account:

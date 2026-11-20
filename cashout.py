@@ -132,9 +132,13 @@ async def preview(acct, amount: float, rate: float | None = None) -> dict:
 
 
 # ── EXECUTE (the only acting step — confirmed, paper-only) ──────────────────────
-def _assert_paper() -> None:
-    """Hard guard: this project is wired paper-only (mcp_test.server_params forces
-    ALPACA_PAPER_TRADE=true against the paper URL). Refuse the instant that isn't true."""
+def _assert_paper(acct=None) -> None:
+    """Hard guard: the cash-out tool is a PAPER rehearsal only. Refuse if the endpoint
+    isn't paper OR if the target account is a real-money (live) account — this tool sells
+    positions and must never do that with real funds."""
+    if acct is not None and getattr(acct, 'live', False):
+        raise RuntimeError(f'cash-out refused: account {getattr(acct, "name", "?")} is a '
+                           f'LIVE real-money account — this rehearsal tool is paper-only.')
     url = str(getattr(C, 'ALPACA_PAPER_URL', ''))
     if 'paper' not in url.lower():
         raise RuntimeError(f'cash-out refused: not a paper endpoint ({url!r}).')
@@ -143,7 +147,7 @@ def _assert_paper() -> None:
 async def execute(acct, amount: float, rate: float | None = None) -> dict:
     """Perform the withdrawal on PAPER: sell what's needed, then record it in the ledger.
     Caller must have confirmed. Recomputes a fresh plan at the moment of execution."""
-    _assert_paper()
+    _assert_paper(acct)
     rate = C.CASHOUT_TAX_RATE_DEFAULT if rate is None else float(rate)
     p = await preview(acct, amount, rate)
     if p.get('error'):

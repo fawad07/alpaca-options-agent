@@ -76,6 +76,24 @@ ENABLE_CASHOUT = os.getenv('ENABLE_CASHOUT', '') == '1'
 # set it to match your own bracket + state. It is NOT tax advice.
 CASHOUT_TAX_RATE_DEFAULT = float(os.getenv('CASHOUT_TAX_RATE', '0.24'))
 
+# ── ACCOUNT C — LIVE MONEY (crypto-only, 6 slots) — PREP; OFF BY DEFAULT ───────
+# Real money. This is scaffolding only: the agent trades Account C with LIVE funds ONLY
+# when EVERY gate below is satisfied at once. Miss any one and C stays on paper or idle.
+#   1. DEPLOY_ACCOUNT=C          (you choose to run C)
+#   2. ENABLE_LIVE_C=1          (master live switch — default OFF)
+#   3. ALPACA_LIVE_* keys set   (no fallback to paper keys; empty = safe auth-fail)
+#   4. KILL_LIVE_C not set      (emergency stop)
+# The assistant does not set these. Flipping C live is your deliberate, by-hand step.
+# See docs/DESIGN_account_c_live.md for the full go-live checklist.
+ENABLE_LIVE_C = os.getenv('ENABLE_LIVE_C', '') == '1'   # master live switch (default OFF)
+KILL_LIVE_C   = os.getenv('KILL_LIVE_C', '') == '1'     # emergency stop → forces C back to paper/idle
+
+# Hard spend caps for the live account. DEFINED now as the agreed safety values; their
+# ENFORCEMENT in the agent is a required go-live task (see the design doc checklist) —
+# they do nothing until wired, so do NOT treat them as active yet. Conservative defaults.
+LIVE_C_MAX_NOTIONAL_PER_TRADE = float(os.getenv('LIVE_C_MAX_NOTIONAL_PER_TRADE', '100'))  # $ per crypto buy
+LIVE_C_MAX_DAILY_SPEND        = float(os.getenv('LIVE_C_MAX_DAILY_SPEND', '300'))         # $ opened per day
+
 # ── FILES ─────────────────────────────────────────────────────
 LOG_DIR   = Path(__file__).parent / 'logs'
 TRADE_LOG = LOG_DIR / 'trades.jsonl'
