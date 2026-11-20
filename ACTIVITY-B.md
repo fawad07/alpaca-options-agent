@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 373  (67 during market hours)
-- **Trades placed:** 29   ·   **Positions closed:** 27
+- **Runs logged:** 374  (68 during market hours)
+- **Trades placed:** 31   ·   **Positions closed:** 28
 
 | Time (ET) | Assets | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|---|
-| 2026-11-04 13:31 | option+crypto | open | $103,466 | 6 | 1 | 1 | BOUGHT 1x TSLA call; closed 1 position(s) |
 | 2026-11-04 18:55 | option+crypto | closed | $103,262 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-05 00:58 | option+crypto | closed | $103,185 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-05 09:24 | option+crypto | closed | $102,531 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-11-19 14:03 | option+crypto | open | $104,031 | 6 | 3 | 3 | BOUGHT 1x GOOGL put; 1x AAPL call; 1x SPY put; closed 3 position(s) |
 | 2026-11-19 20:12 | option+crypto | closed | $104,822 | 5 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-20 03:40 | option+crypto | closed | $104,822 | 5 | 0 | 0 | no signal — nothing actionable across options + crypto |
+| 2026-11-20 12:17 | option+crypto | open | $105,558 | 6 | 2 | 1 | BOUGHT 1x GOOGL put; 1x SPY put; closed 1 position(s) |
 
