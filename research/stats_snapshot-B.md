@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-11-19 02:49
+# Stats snapshot — 2026-11-20 02:36
 
-- **Equity:** $102,377.05  ·  **Total P&L:** +2,377.05 (+2.38%)
-- **Realized:** $+3,591.05  ·  **Unrealized:** $-1,214.00  ·  **Cash:** $93,201.05
-- **Open positions:** 6
-- **Closed round-trips:** 24  (W 13 / L 11, win rate 54%, profit factor 1.44)
-- **Journal:** 369 rows · 66 market-hours cycles · 26 entries · 24 exits · 1170 signal-level gate blocks
-- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $102,514
-- **Window:** 2026-09-14 14:06 → 2026-11-18 15:43 ET
+- **Equity:** $104,821.80  ·  **Total P&L:** +4,821.80 (+4.82%)
+- **Realized:** $+7,168.05  ·  **Unrealized:** $-2,346.25  ·  **Cash:** $97,621.80
+- **Open positions:** 5
+- **Closed round-trips:** 27  (W 16 / L 11, win rate 59%, profit factor 1.89)
+- **Journal:** 372 rows · 67 market-hours cycles · 29 entries · 27 exits · 1170 signal-level gate blocks
+- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $104,031
+- **Window:** 2026-09-14 14:06 → 2026-11-19 14:03 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -33,8 +33,11 @@
 | TSLA261204C00390000 | $19.35 | $7.75 | -59.9% | $-1,160 |
 | NVDA261204P00190000 | $13.10 | $24.85 | +89.7% | $+1,175 |
 | AAPL261204C00345000 | $10.30 | $16.10 | +56.3% | $+580 |
+| QQQ261211P00674000 | $18.92 | $32.29 | +70.7% | $+1,337 |
 | AAPL261211C00350000 | $9.30 | $14.25 | +53.2% | $+990 |
 | MSFT261211C00535000 | $18.05 | $4.90 | -72.9% | $-1,315 |
+| GOOGL261211P00295000 | $10.85 | $19.00 | +75.1% | $+815 |
+| QQQ261211P00675000 | $18.76 | $33.01 | +76.0% | $+1,425 |
 
 ## Full fill ledger
 ```
@@ -104,4 +107,10 @@
 2026-11-18 20:43  SELL 1.0x MSFT261211C00535000 @ $4.90
 2026-11-18 20:43  BUY  1.0x GOOGL261218P00285000 @ $12.20
 2026-11-18 20:43  BUY  1.0x AAPL261218C00350000 @ $12.00
+2026-11-19 19:03  SELL 1.0x GOOGL261211P00295000 @ $19.00
+2026-11-19 19:03  SELL 1.0x QQQ261211P00674000 @ $32.29
+2026-11-19 19:03  SELL 1.0x QQQ261211P00675000 @ $33.01
+2026-11-19 19:03  BUY  1.0x GOOGL261218P00280000 @ $11.90
+2026-11-19 19:03  BUY  1.0x AAPL261218C00350000 @ $10.40
+2026-11-19 19:03  BUY  1.0x SPY261218P00720000 @ $17.79
 ```
