@@ -1,0 +1,87 @@
+name: risk-gate-agent-C-LIVE
+
+# ⚠️  ACCOUNT C = REAL MONEY (crypto-only, 6 slots). This workflow CAN place LIVE trades.
+# It is built INERT + SAFE by default. Four things keep it from firing a real trade on its own:
+#   1. NO active schedule — manual trigger only (workflow_dispatch). The `schedule:` block
+#      below is commented out. Uncommenting it AND merging this file to `main` is what makes
+#      C fully auto on real money (scheduled workflows only fire from the default branch).
+#      That is YOUR deliberate go-live step, not the assistant's.
+#   2. A typed confirmation ("LIVE-C") is required on every manual run, or the job aborts.
+#   3. It trades real money only if you have set the repo SECRETS below. Missing keys =
+#      safe auth failure, no trade.
+#   4. Set repo VARIABLE  KILL_LIVE_C=1  to force C back to paper/idle without editing anything.
+#
+# ⚠️  The hard spend caps (LIVE_C_MAX_*) are passed here but are NOT YET ENFORCED in code
+#     (see docs/DESIGN_account_c_live.md, go-live step 2). Wire + paper-test them BEFORE you
+#     trust this with real money.
+#
+# Secrets you must set yourself (never commit keys):
+#   gh secret set ALPACA_LIVE_API_KEY
+#   gh secret set ALPACA_LIVE_SECRET_KEY
+# Optional repo variables (gh variable set NAME --body VALUE):
+#   KILL_LIVE_C, LIVE_C_MAX_NOTIONAL_PER_TRADE, LIVE_C_MAX_DAILY_SPEND
+
+on:
+  # ── SCHEDULE DISABLED ON PURPOSE. Uncomment to go FULLY AUTO on real money (unattended).
+  #    Takes effect only once this file is on the `main` branch. This is the real live switch.
+  # schedule:
+  #   - cron: "13,43 * * * *"   # every ~30 min, 24/7 (crypto never closes)
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type LIVE-C to confirm you are trading REAL money on Account C'
+        required: true
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: risk-gate-agent-C-LIVE
+  cancel-in-progress: false
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Safety interlock (manual runs must type LIVE-C)
+        # Applies to manual dispatch only; a future scheduled run skips it (that is the
+        # deliberate auto mode you opt into by uncommenting `schedule:` above).
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.confirm != 'LIVE-C' }}
+        run: |
+          echo "::error::Confirmation not given. Type exactly  LIVE-C  to run Account C live. Aborting."
+          exit 1
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+
+      - name: Run the LIVE agent (account C, crypto-only)
+        env:
+          AGENT_MODE: LIVE_PAPER        # "place real orders via MCP"; paper-vs-live is decided
+                                        # by the code gate (ENABLE_LIVE_C + live keys + kill off)
+          DEPLOY_ACCOUNT: C
+          ENABLE_LIVE_C: '1'            # this workflow IS the live switch — but keys are still required
+          KILL_LIVE_C: ${{ vars.KILL_LIVE_C }}        # set repo var KILL_LIVE_C=1 to halt
+          ALPACA_LIVE_API_KEY: ${{ secrets.ALPACA_LIVE_API_KEY }}
+          ALPACA_LIVE_SECRET_KEY: ${{ secrets.ALPACA_LIVE_SECRET_KEY }}
+          LIVE_C_MAX_NOTIONAL_PER_TRADE: ${{ vars.LIVE_C_MAX_NOTIONAL_PER_TRADE }}
+          LIVE_C_MAX_DAILY_SPEND: ${{ vars.LIVE_C_MAX_DAILY_SPEND }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python cron_once.py
+
+      - name: Commit account C's decision journal
+        if: always()
+        run: |
+          git config user.name  "risk-gate-bot"
+          git config user.email "actions@github.com"
+          git add activity-C.csv ACTIVITY-C.md 2>/dev/null || true
+          git diff --cached --quiet && { echo "no journal change"; exit 0; }
+          git commit -m "journal C: run at $(TZ=America/New_York date '+%Y-%m-%d %H:%M ET')"
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main && git push && exit 0
+            sleep 4
+          done
+          echo "journal C push failed after retries" >&2; exit 1

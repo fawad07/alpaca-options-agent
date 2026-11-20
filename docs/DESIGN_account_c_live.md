@@ -30,7 +30,7 @@ on paper or idle:
 | 2. `ENABLE_LIVE_C=1` (master switch) | `config.py` | **OFF** |
 | 3. `ALPACA_LIVE_API_KEY` + `ALPACA_LIVE_SECRET_KEY` present | `accounts.py` (no paper fallback) | empty → safe auth-fail |
 | 4. `KILL_LIVE_C` not set (emergency stop) | `config.py` | not set |
-| 5. No live cloud workflow exists yet | `.github/workflows/` | **not created on purpose** |
+| 5. Live cloud workflow armed | `.github/workflows/trade-c.yml` | exists but **inert**: manual-only, schedule commented out, typed confirmation required |
 
 **The one fork line:** `mcp_test.server_params` sends `ALPACA_PAPER_TRADE='false'` *only* when
 `acct.live AND ENABLE_LIVE_C AND not KILL_LIVE_C`. Every other path ships `'true'` (paper).
@@ -52,12 +52,16 @@ This is the single line that can route to real money; it defaults to paper.
 | `cashout.py` | `_assert_paper(acct)` refuses live accounts. |
 | `.env.example` | Documented, commented-out live vars (nothing active). |
 
-**Deliberately NOT built** (these are the dangerous, go-live-only pieces, left for you):
-- No live cloud workflow (`trade-c.yml`) — a scheduled bot trading real money unattended is
-  the scariest artifact; it is not created here.
-- **Hard spend caps are DEFINED but NOT YET ENFORCED.** `LIVE_C_MAX_*` are just numbers until
-  wired into sizing — see checklist step 2. Do not treat them as active.
-- No real keys, no live switch flipped.
+| `.github/workflows/trade-c.yml` | Live cloud workflow, built **inert**: manual-trigger only (no active schedule), typed `LIVE-C` confirmation, keys from repo secrets, `KILL_LIVE_C` repo-var halt. |
+
+**Deliberately NOT done** (these are the dangerous, go-live-only acts, left for you):
+- The workflow's **`schedule:` cron is commented out** — uncommenting it *and* merging the
+  file to `main` is what makes C fully auto on real money unattended. Left for your deliberate
+  choice; scheduled workflows only fire from the default branch, so on a feature branch it
+  can't auto-run regardless.
+- **Hard spend caps are DEFINED but NOT YET ENFORCED.** `LIVE_C_MAX_*` are passed into the
+  workflow but are just numbers until wired into sizing — see checklist step 2. Not active yet.
+- No real keys set, no live switch flipped, no first order placed.
 
 ---
 
@@ -80,9 +84,12 @@ This is the single line that can route to real money; it defaults to paper.
 5. **Add real keys + flip the switch (you, by hand).** Put `ALPACA_LIVE_*` in `.env`, set
    `ENABLE_LIVE_C=1`. Do the first few runs **manually** (`DEPLOY_ACCOUNT=C ./run.sh ...`),
    watching each one. Verify fills on the real Alpaca site.
-6. **Only then consider a cloud workflow.** If you want C unattended, create `trade-c.yml`
-   with its own `ALPACA_LIVE_*` GitHub secrets. Keep the schedule sparse at first. This is
-   the real "fully auto on real money" step — make it a conscious decision.
+6. **Go unattended (the real "fully auto" step).** `trade-c.yml` already exists but is inert.
+   To automate it: set the GitHub secrets (`gh secret set ALPACA_LIVE_API_KEY` /
+   `ALPACA_LIVE_SECRET_KEY`), **uncomment the `schedule:` block**, and **merge the file to
+   `main`** (scheduled workflows only fire from the default branch). Keep the cron sparse at
+   first. Until you do all three, the workflow only runs when you click "Run workflow" and type
+   `LIVE-C`. This is a conscious decision — make it one.
 7. **Know your stop.** `KILL_LIVE_C=1` (or pull the live keys) halts C. Decide in advance the
    loss at which you stop, and who/what enforces it.
 
