@@ -1,12 +1,12 @@
-# Stats snapshot — 2026-11-20 02:36
+# Stats snapshot — 2026-11-21 02:50
 
-- **Equity:** $104,821.80  ·  **Total P&L:** +4,821.80 (+4.82%)
-- **Realized:** $+7,168.05  ·  **Unrealized:** $-2,346.25  ·  **Cash:** $97,621.80
-- **Open positions:** 5
-- **Closed round-trips:** 27  (W 16 / L 11, win rate 59%, profit factor 1.89)
-- **Journal:** 372 rows · 67 market-hours cycles · 29 entries · 27 exits · 1170 signal-level gate blocks
-- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $104,031
-- **Window:** 2026-09-14 14:06 → 2026-11-19 14:03 ET
+- **Equity:** $107,427.40  ·  **Total P&L:** +7,427.40 (+7.43%)
+- **Realized:** $+8,281.05  ·  **Unrealized:** $-853.65  ·  **Cash:** $97,164.40
+- **Open positions:** 6
+- **Closed round-trips:** 28  (W 17 / L 11, win rate 61%, profit factor 2.02)
+- **Journal:** 375 rows · 68 market-hours cycles · 31 entries · 28 exits · 1170 signal-level gate blocks
+- **Equity path:** first $99,904 · peak $111,112 · trough $96,276 · last $105,558
+- **Window:** 2026-09-14 14:06 → 2026-11-20 12:17 ET
 
 ## Closed round-trips
 | Contract | Buy | Sell | Return | P&L |
@@ -38,6 +38,7 @@
 | MSFT261211C00535000 | $18.05 | $4.90 | -72.9% | $-1,315 |
 | GOOGL261211P00295000 | $10.85 | $19.00 | +75.1% | $+815 |
 | QQQ261211P00675000 | $18.76 | $33.01 | +76.0% | $+1,425 |
+| SPY261218P00720000 | $17.79 | $28.92 | +62.6% | $+1,113 |
 
 ## Full fill ledger
 ```
@@ -113,4 +114,7 @@
 2026-11-19 19:03  BUY  1.0x GOOGL261218P00280000 @ $11.90
 2026-11-19 19:03  BUY  1.0x AAPL261218C00350000 @ $10.40
 2026-11-19 19:03  BUY  1.0x SPY261218P00720000 @ $17.79
+2026-11-20 17:17  SELL 1.0x SPY261218P00720000 @ $28.92
+2026-11-20 17:17  BUY  1.0x GOOGL261218P00275000 @ $13.10
+2026-11-20 17:17  BUY  1.0x SPY261218P00701000 @ $20.39
 ```
