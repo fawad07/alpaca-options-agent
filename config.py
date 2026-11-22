@@ -88,9 +88,10 @@ CASHOUT_TAX_RATE_DEFAULT = float(os.getenv('CASHOUT_TAX_RATE', '0.24'))
 ENABLE_LIVE_C = os.getenv('ENABLE_LIVE_C', '') == '1'   # master live switch (default OFF)
 KILL_LIVE_C   = os.getenv('KILL_LIVE_C', '') == '1'     # emergency stop → forces C back to paper/idle
 
-# Hard spend caps for the live account. DEFINED now as the agreed safety values; their
-# ENFORCEMENT in the agent is a required go-live task (see the design doc checklist) —
-# they do nothing until wired, so do NOT treat them as active yet. Conservative defaults.
+# Hard spend caps for the live account. ENFORCED (2026-11-22) in risk.py for Account C only:
+# the per-trade cap clamps one buy inside size_crypto; the daily cap halts new buys via
+# rm.spend_ok(), seeded from today's real filled buys. Unit-tested in test_live_c_caps.py.
+# A and B are unaffected (no caps). Conservative defaults; override via env.
 LIVE_C_MAX_NOTIONAL_PER_TRADE = float(os.getenv('LIVE_C_MAX_NOTIONAL_PER_TRADE', '100'))  # $ per crypto buy
 LIVE_C_MAX_DAILY_SPEND        = float(os.getenv('LIVE_C_MAX_DAILY_SPEND', '300'))         # $ opened per day
 

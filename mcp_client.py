@@ -149,3 +149,31 @@ async def open_crypto_orders(session, symbol: str | None = None) -> list:
 
 async def cancel_order(session, order_id: str) -> dict:
     return await call(session, 'cancel_order_by_id', {'order_id': order_id})
+
+
+async def crypto_spend_today(session) -> float:
+    """Dollars already spent BUYING crypto today (ET), from real filled orders —
+    used to seed the live Account C daily-spend cap. Sums filled_qty × filled_avg_price
+    for today's filled BUY orders. Best-effort: any unparseable row is skipped."""
+    from zoneinfo import ZoneInfo
+    et = ZoneInfo('America/New_York')
+    today = _dt.datetime.now(et).date()
+    rows = _rows(await call(session, 'get_orders', {'status': 'all', 'limit': 500}))
+    total = 0.0
+    for o in rows:
+        if str(o.get('side')) != 'buy':
+            continue
+        sym = str(o.get('symbol', ''))
+        if 'crypto' not in str(o.get('asset_class', '')).lower() and '/' not in sym:
+            continue
+        fq, fp = o.get('filled_qty'), o.get('filled_avg_price')
+        ts = o.get('filled_at') or o.get('submitted_at') or o.get('created_at')
+        if not (fq and fp and ts):
+            continue
+        try:
+            when = _dt.datetime.fromisoformat(str(ts).replace('Z', '+00:00')).astimezone(et).date()
+        except Exception:
+            continue
+        if when == today:
+            total += float(fq) * float(fp)
+    return round(total, 2)

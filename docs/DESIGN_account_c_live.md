@@ -59,9 +59,14 @@ This is the single line that can route to real money; it defaults to paper.
   file to `main` is what makes C fully auto on real money unattended. Left for your deliberate
   choice; scheduled workflows only fire from the default branch, so on a feature branch it
   can't auto-run regardless.
-- **Hard spend caps are DEFINED but NOT YET ENFORCED.** `LIVE_C_MAX_*` are passed into the
-  workflow but are just numbers until wired into sizing — see checklist step 2. Not active yet.
 - No real keys set, no live switch flipped, no first order placed.
+
+**✅ Hard spend caps — now ENFORCED (2026-11-22).** `LIVE_C_MAX_NOTIONAL_PER_TRADE` clamps one
+buy inside `risk.size_crypto`; `LIVE_C_MAX_DAILY_SPEND` halts new buys via `RiskManager.spend_ok()`,
+seeded from today's real filled buys (`mcp_client.crypto_spend_today`). Active for Account C in
+paper OR live; A and B get no caps. Proven by `test_live_c_caps.py` (per-trade clamp, daily halt,
+A/B unaffected). This closes go-live step 2. **The caps being real does NOT make C safe to run —
+the end-to-end paper dress rehearsal (step 3) is still required.**
 
 ---
 
@@ -73,9 +78,9 @@ This is the single line that can route to real money; it defaults to paper.
 
 1. **Let A/B run longer first.** Get a track record long enough to mean something, including
    a losing stretch. Right now it's too short — this is the honest gate, not a technical one.
-2. **Enforce the hard caps (and test on paper).** Wire `LIVE_C_MAX_NOTIONAL_PER_TRADE` and
-   `LIVE_C_MAX_DAILY_SPEND` into the crypto sizing / risk gate, then prove on a PAPER run that
-   a buy is capped and the daily limit halts new buys. Until this passes, do not go live.
+2. ✅ **DONE (2026-11-22) — Enforce the hard caps.** Wired into `risk.py` (per-trade clamp in
+   `size_crypto`; daily halt in `spend_ok`, seeded from real filled buys). Unit-tested in
+   `test_live_c_caps.py` (all pass). Still verify them in the step-3 end-to-end rehearsal.
 3. **Paper dress rehearsal of C itself.** Point `ALPACA_LIVE_*` at a *fresh paper* crypto
    account, keep `ENABLE_LIVE_C` OFF, run `DEPLOY_ACCOUNT=C` by hand, and confirm C opens/caps
    crypto correctly with 6 slots. Fix anything odd. (Keep A and B untouched.)

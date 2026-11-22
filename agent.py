@@ -142,6 +142,16 @@ async def run_live(account=None) -> dict:
         print(f"  Equity ${equity:,.0f} | open {open0}/{acct_cfg.max_concurrent} | "
               f"assets {'+'.join(acct_cfg.asset_classes)} | risk/trade ${rm.max_spend():,.0f}")
 
+        # LIVE Account C ONLY: enforce the hard dollar caps (per-trade + daily). Active for C
+        # in paper OR live, so a paper dress rehearsal genuinely tests them. A and B: no caps.
+        if getattr(acct_cfg, 'live', False):
+            from mcp_client import crypto_spend_today
+            rm.hard_notional_cap = C.LIVE_C_MAX_NOTIONAL_PER_TRADE
+            rm.daily_spend_cap = C.LIVE_C_MAX_DAILY_SPEND
+            rm.spent_today = await crypto_spend_today(s)
+            print(f"  [LIVE-C CAPS ENFORCED] per-trade ≤ ${rm.hard_notional_cap:,.0f} · "
+                  f"daily ≤ ${rm.daily_spend_cap:,.0f} (already spent today ${rm.spent_today:,.0f})")
+
         mkt = market_open()
         held_syms = {_norm(p.get('symbol')) for pos in pos_by_h for p in pos}
         # 1) manage exits — options only during market hours; crypto anytime
@@ -162,10 +172,22 @@ async def run_live(account=None) -> dict:
                 break
             if _norm(sym) in held_syms:
                 continue
+            # Live Account C daily-spend gate: peek the planned notional (per-trade cap
+            # already applied inside size_crypto) and skip if it would blow the daily cap.
+            peek = None
+            if ac == 'crypto' and rm.daily_spend_cap is not None:
+                peek = h.plan_entry(sym, sig, price, rm)
+                if peek:
+                    ok_s, why_s = rm.spend_ok(peek['notional'])
+                    if not ok_s:
+                        print(f"  {sym}: skipped — {why_s}")
+                        continue
             label = await h.scan_and_enter(s, sym, sig, price, rm)
             if label:
                 placed.append(label)
                 held_syms.add(_norm(sym))
+                if peek:
+                    rm.spent_today += peek['notional']
 
     # build the one-line journal summary of this pass
     parts = []

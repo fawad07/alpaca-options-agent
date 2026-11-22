@@ -11,9 +11,9 @@ name: risk-gate-agent-C-LIVE
 #      safe auth failure, no trade.
 #   4. Set repo VARIABLE  KILL_LIVE_C=1  to force C back to paper/idle without editing anything.
 #
-# ⚠️  The hard spend caps (LIVE_C_MAX_*) are passed here but are NOT YET ENFORCED in code
-#     (see docs/DESIGN_account_c_live.md, go-live step 2). Wire + paper-test them BEFORE you
-#     trust this with real money.
+# ✅  The hard spend caps (LIVE_C_MAX_*) are now ENFORCED in risk.py for Account C and
+#     unit-tested (test_live_c_caps.py). STILL REQUIRED before trusting this with real money:
+#     an end-to-end PAPER dress rehearsal of Account C (docs/DESIGN_account_c_live.md step 3).
 #
 # Secrets you must set yourself (never commit keys):
 #   gh secret set ALPACA_LIVE_API_KEY
