@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 150  (75 during market hours)
+- **Runs logged:** 151  (75 during market hours)
 - **Trades placed:** 48   ·   **Positions closed:** 40
 
 | Time (ET) | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|
-| 2026-10-08 19:47 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-10-09 14:46 | open | $102,745 | 5 | 0 | 0 | 5 signal(s) ranked but none opened (cap full / risk gate / no contract) |
 | 2026-10-09 18:56 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-10-12 17:42 | closed | — | — | 0 | 0 | market closed — no action |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-11-20 16:01 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-11-23 19:45 | closed | — | — | 0 | 0 | market closed — no action |
 | 2026-11-24 17:59 | closed | — | — | 0 | 0 | market closed — no action |
+| 2026-11-25 17:27 | closed | — | — | 0 | 0 | market closed — no action |
 
