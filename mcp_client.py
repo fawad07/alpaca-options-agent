@@ -151,16 +151,17 @@ async def cancel_order(session, order_id: str) -> dict:
     return await call(session, 'cancel_order_by_id', {'order_id': order_id})
 
 
-async def crypto_spend_today(session) -> float:
-    """Dollars already spent BUYING crypto today (ET), from real filled orders —
-    used to seed the live Account C daily-spend cap. Sums filled_qty × filled_avg_price
-    for today's filled BUY orders. Best-effort: any unparseable row is skipped."""
-    from zoneinfo import ZoneInfo
-    et = ZoneInfo('America/New_York')
-    today = _dt.datetime.now(et).date()
-    rows = _rows(await call(session, 'get_orders', {'status': 'all', 'limit': 500}))
+from zoneinfo import ZoneInfo as _ZoneInfo
+_ET = _ZoneInfo('America/New_York')
+
+
+def sum_crypto_buys_on(orders: list, day, et=_ET) -> float:
+    """PURE + testable: sum filled crypto-BUY notional (filled_qty × filled_avg_price) for
+    orders whose fill fell on ET-calendar date `day`. This is what makes the daily cap RESET —
+    only buys dated `day` count, so at ET midnight the running total drops to yesterday's = 0
+    for the new day. Unparseable rows are skipped."""
     total = 0.0
-    for o in rows:
+    for o in orders:
         if str(o.get('side')) != 'buy':
             continue
         sym = str(o.get('symbol', ''))
@@ -174,6 +175,14 @@ async def crypto_spend_today(session) -> float:
             when = _dt.datetime.fromisoformat(str(ts).replace('Z', '+00:00')).astimezone(et).date()
         except Exception:
             continue
-        if when == today:
+        if when == day:
             total += float(fq) * float(fp)
     return round(total, 2)
+
+
+async def crypto_spend_today(session) -> float:
+    """Dollars already spent BUYING crypto TODAY (ET), from real filled orders — seeds the
+    live Account C daily-spend cap. Resets automatically each ET day (see sum_crypto_buys_on)."""
+    today = _dt.datetime.now(_ET).date()
+    rows = _rows(await call(session, 'get_orders', {'status': 'all', 'limit': 500}))
+    return sum_crypto_buys_on(rows, today)

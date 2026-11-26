@@ -41,7 +41,13 @@ This is the single line that can route to real money; it defaults to paper.
   with `live=True`, so the withdrawal/rehearsal tool can never sell real positions.
 - **No paper-key fallback for C.** Unlike B (which falls back to the A keys), C's keys come
   *only* from `ALPACA_LIVE_*`. Forget them → empty keys → the broker rejects auth → no trade.
-- **Kill switch** (`KILL_LIVE_C=1`) forces C back to paper on its very next run.
+- **Kill switch — two forms.** `KILL_LIVE_C=1` (env) OR committing a file named `KILL_LIVE_C`
+  to the repo (`config.live_c_killed()`). The file form halts the cloud bot on its next run with
+  no secret/env edit — `touch KILL_LIVE_C` + commit to stop, delete to resume. When engaged, the
+  agent **idles without even connecting** (it doesn't just fall back to paper).
+- **Daily cap resets each ET day.** The daily-spend total is seeded from today's real filled
+  buys only (`mcp_client.sum_crypto_buys_on`), so at ET midnight it drops to 0 for the new day —
+  no stale state. Unit-tested in `test_live_c_caps.py`.
 
 ## What was built in this prep pass (inert)
 | File | Change |
@@ -95,8 +101,15 @@ the end-to-end paper dress rehearsal (step 3) is still required.**
    `main`** (scheduled workflows only fire from the default branch). Keep the cron sparse at
    first. Until you do all three, the workflow only runs when you click "Run workflow" and type
    `LIVE-C`. This is a conscious decision — make it one.
-7. **Know your stop.** `KILL_LIVE_C=1` (or pull the live keys) halts C. Decide in advance the
-   loss at which you stop, and who/what enforces it.
+7. **Know your stop.** Halt C any of three ways: set `KILL_LIVE_C=1`, **commit a `KILL_LIVE_C`
+   file** (halts the cloud bot next run, no env edit), or pull the live keys. Decide in advance
+   the loss at which you stop, and who/what enforces it.
+
+### Related tooling
+- `research/probe_crypto_signals.py` — read-only probe of how often the crypto strategy would
+  actually have a BUY (Flag-2 H1). First read: each coin ~26–32% of days; ≥1 coin on ~43% of
+  days; currently all neutral/bear (nothing to buy). Run it anytime to gauge C's activity.
+- `test_live_c_caps.py` — proves per-trade cap, daily cap + daily reset, and the kill switch.
 
 ## How this keeps A and B safe
 - A and B are untouched — same keys, same paper fork, same behavior. Adding C changed only

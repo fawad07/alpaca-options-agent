@@ -33,7 +33,7 @@ def server_params(account=None) -> StdioServerParameters:
     # Paper for EVERY account unless this is an explicitly-enabled live account:
     # acct.live must be True AND the master switch ENABLE_LIVE_C on AND kill switch off.
     # Any gate missing → paper. Default state ships paper; the assistant never flips this.
-    go_live = bool(getattr(acct, 'live', False)) and C.ENABLE_LIVE_C and not C.KILL_LIVE_C
+    go_live = bool(getattr(acct, 'live', False)) and C.ENABLE_LIVE_C and not C.live_c_killed()
     env = {**os.environ,
            'ALPACA_API_KEY': acct.api_key,
            'ALPACA_SECRET_KEY': acct.secret_key,

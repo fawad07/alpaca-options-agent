@@ -86,7 +86,17 @@ CASHOUT_TAX_RATE_DEFAULT = float(os.getenv('CASHOUT_TAX_RATE', '0.24'))
 # The assistant does not set these. Flipping C live is your deliberate, by-hand step.
 # See docs/DESIGN_account_c_live.md for the full go-live checklist.
 ENABLE_LIVE_C = os.getenv('ENABLE_LIVE_C', '') == '1'   # master live switch (default OFF)
-KILL_LIVE_C   = os.getenv('KILL_LIVE_C', '') == '1'     # emergency stop → forces C back to paper/idle
+KILL_LIVE_C   = os.getenv('KILL_LIVE_C', '') == '1'     # emergency stop (env) → forces C back to paper/idle
+# Kill-switch FILE: committing a file named KILL_LIVE_C to the repo halts the live account on
+# the cloud agent's next run — no secret/env edit needed. `touch KILL_LIVE_C` + commit to stop;
+# delete it to resume. Checked at call time, so it also halts a locally running agent next run.
+KILL_LIVE_C_FILE = Path(__file__).parent / 'KILL_LIVE_C'
+
+
+def live_c_killed() -> bool:
+    """True if the live Account C emergency stop is engaged — either the env flag or the
+    presence of a KILL_LIVE_C file. Any trading path for C must honor this."""
+    return KILL_LIVE_C or KILL_LIVE_C_FILE.exists()
 
 # Hard spend caps for the live account. ENFORCED (2026-11-22) in risk.py for Account C only:
 # the per-trade cap clamps one buy inside size_crypto; the daily cap halts new buys via

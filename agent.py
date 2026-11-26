@@ -122,6 +122,13 @@ async def run_live(account=None) -> dict:
     from mcp_client import mcp_session, account as acct_info, _norm
     from accounts import current_account
     acct_cfg = account or current_account()
+    # Emergency stop for the live account: if the KILL switch (env or KILL_LIVE_C file) is
+    # engaged, do not even connect — sit idle this run. Strongest form of the kill switch.
+    if getattr(acct_cfg, 'live', False) and C.live_c_killed():
+        print(f"\n🛑 KILL switch engaged for LIVE account {acct_cfg.name} — idle, no trades this run.")
+        return {'account': acct_cfg.name, 'assets': "+".join(acct_cfg.asset_classes),
+                'equity': '', 'open_positions': '', 'new_trades': 0, 'exits': 0,
+                'summary': 'KILL switch engaged — live account idle (no connection, no trades)'}
     handlers = _handlers(acct_cfg)
     print(f"\n=== Agent run @ {datetime.now():%Y-%m-%d %H:%M}  [LIVE_PAPER · account {acct_cfg.name}] ===")
     placed, exits_n = [], 0

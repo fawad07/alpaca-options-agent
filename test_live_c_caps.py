@@ -65,6 +65,40 @@ check("spend_ok always True when no daily cap", rm_ab.spend_ok(1_000_000)[0])
 _, n_ab, _ = rm_ab.size_crypto(90_000.0, C.CRYPTO_STOP_PCT, C.CRYPTO_MAX_NOTIONAL_PCT)
 check("size_crypto ignores cap when none set", n_ab > 100)
 
+print("\n=== 4) DAILY cap RESETS each ET day (yesterday's buys don't count) ===")
+import datetime as _dt
+from zoneinfo import ZoneInfo
+from mcp_client import sum_crypto_buys_on
+et = ZoneInfo('America/New_York')
+today = _dt.datetime(2026, 11, 26, 10, 0, tzinfo=et)
+yest = today - _dt.timedelta(days=1)
+orders = [
+    {'side': 'buy', 'symbol': 'BTC/USD', 'asset_class': 'crypto',
+     'filled_qty': '0.001', 'filled_avg_price': '90000', 'filled_at': today.isoformat()},   # $90 today
+    {'side': 'buy', 'symbol': 'ETH/USD', 'asset_class': 'crypto',
+     'filled_qty': '0.02', 'filled_avg_price': '3000', 'filled_at': yest.isoformat()},       # $60 YESTERDAY
+    {'side': 'sell', 'symbol': 'BTC/USD', 'asset_class': 'crypto',
+     'filled_qty': '0.001', 'filled_avg_price': '90000', 'filled_at': today.isoformat()},     # a SELL, ignore
+]
+spent_today = sum_crypto_buys_on(orders, today.date(), et)
+print(f"    today's crypto BUY spend = ${spent_today:.2f} (expected $90 — yesterday's $60 excluded)")
+check("only today's buys count (daily reset works)", abs(spent_today - 90.0) < 1e-6)
+check("a SELL is not counted as spend", spent_today < 90.0 + 1e-6)
+
+print("\n=== 5) KILL switch (file) halts the live account ===")
+import importlib, config as _cfg
+importlib.reload(_cfg)
+kill_file = _cfg.KILL_LIVE_C_FILE
+try:
+    was = kill_file.exists()
+    check("not killed when no file / env", (not was) and (not _cfg.live_c_killed()))
+    kill_file.write_text("halt C\n")
+    check("live_c_killed() True once the KILL_LIVE_C file exists", _cfg.live_c_killed())
+finally:
+    if kill_file.exists() and not was:
+        kill_file.unlink()   # clean up the test file
+check("kill file cleaned up", not kill_file.exists() or was)
+
 print()
 if fails:
     print(f"{FAIL} {fails} check(s) FAILED — caps are NOT trustworthy yet. Do not run C live.")

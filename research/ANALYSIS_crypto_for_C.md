@@ -58,6 +58,11 @@ A hypothesis is a claim we can check, not a prediction we trust. For C's paper d
 **H1 — Activity.** With options gone, C's crypto signal (long-only; EMA20>EMA50 + RSI in band,
 on BTC/ETH/SOL/LTC) will fire and fill slots *much* more often than B's ≈1 trade — likely
 several open positions at a time. *Measure:* avg slots used, trades/week.
+> **First data point (`research/probe_crypto_signals.py`, 2y):** each coin would fire a BUY on
+> ~26–32% of days; on **~43% of days at least one coin has a BUY** (avg 1.1 of 4). So C would
+> trade *meaningfully more than B* (whose slots were full of options) — but it's not a constant
+> stream, and right now all four are neutral/bear (nothing to buy). Partly supports H1, and the
+> idle current state previews H2.
 
 **H2 — Regime-dependence.** Because the strategy is long-only trend-following, C will tend to
 **make money when the coins trend up and bleed in chop/downtrends** (buying strength, stopped
