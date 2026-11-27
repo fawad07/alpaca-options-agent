@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 394  (70 during market hours)
+- **Runs logged:** 395  (70 during market hours)
 - **Trades placed:** 31   ·   **Positions closed:** 28
 
 | Time (ET) | Assets | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|---|
-| 2026-11-09 09:20 | option+crypto | closed | $101,005 | 4 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-09 18:29 | option+crypto | closed | $101,269 | 4 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-09 23:47 | option+crypto | closed | $101,176 | 4 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-10 08:20 | option+crypto | closed | $100,967 | 4 | 0 | 0 | no signal — nothing actionable across options + crypto |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-11-26 07:52 | option+crypto | closed | $105,102 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-26 17:11 | option+crypto | closed | $105,102 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-26 23:19 | option+crypto | closed | $105,102 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
+| 2026-11-27 09:01 | option+crypto | closed | $103,330 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 
