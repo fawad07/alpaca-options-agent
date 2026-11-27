@@ -41,20 +41,21 @@ ACCOUNT_A = Account(
     ordering='universe',              # keep A byte-identical to V1 (list-order fill)
 )
 
-# Account B — experimental combined agent: options + crypto, cap 6, GOOGL + coins.
-# Keys fall back to the MAIN account if ALPACA_B_* isn't set — so you can run the
-# combined agent on your EXISTING paper account (no 2nd account needed). If you do
-# this, run ONLY the combined deployment (DEPLOY_ACCOUNT=B), not the A one too, or
-# they'd double-trade the same account.
+# Account B — CRYPTO-ONLY (since 2026-11-27), cap 6, the 4 coins. Repurposed as the live-running
+# PAPER MIRROR of the future live crypto Account C: same crypto-only strategy and 6 slots, so by
+# the time C is funded there's a real track record of exactly what it does. Was options+crypto
+# until 2026-11-27 (that ended the original A-vs-B options comparison — a deliberate choice).
+# Legacy options held at the switch are auto-liquidated by the agent at the next market open.
+# Keys fall back to the MAIN account if ALPACA_B_* isn't set.
 ACCOUNT_B = Account(
     name='B',
     api_key=os.getenv('ALPACA_B_API_KEY', C.ALPACA_API_KEY),
     secret_key=os.getenv('ALPACA_B_SECRET_KEY', C.ALPACA_SECRET_KEY),
-    asset_classes=('option', 'crypto'),
+    asset_classes=('crypto',),
     max_concurrent=6,
-    option_universe=('SPY', 'QQQ', 'AAPL', 'MSFT', 'NVDA', 'AMZN', 'TSLA', 'GOOGL'),
+    option_universe=(),
     crypto_universe=('BTC/USD', 'ETH/USD', 'SOL/USD', 'LTC/USD'),
-    ordering='confidence',           # B: options + crypto compete by signal strength
+    ordering='confidence',
 )
 
 ACCOUNTS = {'A': ACCOUNT_A, 'B': ACCOUNT_B}

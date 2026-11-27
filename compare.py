@@ -41,7 +41,7 @@ async def main():
     print("\n" + "═" * 64)
     print(f"  RISK GATE — ACCOUNT A vs ACCOUNT B   (both started $100,000)")
     print("═" * 64)
-    print(f"  {'':22}{'A (options V1)':>19}{'B (options+crypto)':>21}")
+    print(f"  {'':22}{'A (options V1)':>19}{'B (crypto-only)':>21}")
     def row(label, a, b):
         print(f"  {label:22}{a:>19}{b:>21}")
     row("equity",        f"${A['eq']:,.0f}",        f"${B['eq']:,.0f}")

@@ -143,6 +143,32 @@ async def run_live(account=None) -> dict:
               f"assets {'+'.join(acct_cfg.asset_classes)} | risk/trade ${rm.max_spend():,.0f}")
 
         mkt = market_open()
+
+        # 0) Liquidate any holdings OUTSIDE this account's current mandate — e.g. legacy
+        # options still held after B switched to crypto-only. Self-healing: options only close
+        # in market hours, so while the market is shut this is a no-op that retries next run
+        # until flat. The agent trades only its mandate but never leaves a holding unmanaged.
+        if 'option' not in set(acct_cfg.asset_classes) and mkt:
+            from mcp_client import option_positions as _optpos, close_option as _closeopt
+            legacy = await _optpos(s)
+            if legacy:
+                print(f"  liquidating {len(legacy)} legacy option position(s) (outside "
+                      f"{'+'.join(acct_cfg.asset_classes)} mandate)")
+                for p in legacy:                      # best-effort; off-hours closes are rejected
+                    try:
+                        await _closeopt(s, p.get('symbol'))
+                    except Exception:
+                        pass
+                await asyncio.sleep(2)
+                remaining = {_norm(p.get('symbol')) for p in await _optpos(s)}
+                closed = [p for p in legacy if _norm(p.get('symbol')) not in remaining]
+                exits_n += len(closed)               # count ONLY positions that actually closed
+                for p in closed:
+                    print(f"    closed {p.get('symbol')}")
+                still = len(legacy) - len(closed)
+                if still:
+                    print(f"    {still} option(s) not closed now (market closed?) — retry next run")
+
         held_syms = {_norm(p.get('symbol')) for pos in pos_by_h for p in pos}
         # 1) manage exits — options only during market hours; crypto anytime
         for (h, _, ac), pos in zip(handlers, pos_by_h):

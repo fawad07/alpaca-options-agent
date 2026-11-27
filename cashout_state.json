@@ -4,7 +4,8 @@
     "withdrawn": 0.0
   },
   "B": {
-    "contributed": 100000.0,
-    "withdrawn": 2000.0
+    "contributed": 104312.26,
+    "withdrawn": 0.0,
+    "note": "crypto-only epoch base set 2026-11-27 (B's equity at the switch). Measures crypto-only performance from here; prior options era excluded from this scorecard."
   }
 }
