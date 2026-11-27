@@ -394,3 +394,4 @@ timestamp_et,account,assets,market,equity,open_positions,new_trades,exits,summar
 2026-11-26 17:11,B,option+crypto,closed,105102.26,6,0,0,no signal — nothing actionable across options + crypto
 2026-11-26 23:19,B,option+crypto,closed,105102.26,6,0,0,no signal — nothing actionable across options + crypto
 2026-11-27 09:01,B,option+crypto,closed,103330.26,6,0,0,no signal — nothing actionable across options + crypto
+2026-11-27 17:38,B,crypto,closed,104312.26,1,0,0,no signal — nothing actionable across options + crypto
