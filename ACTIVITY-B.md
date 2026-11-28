@@ -3,12 +3,11 @@
 Auto-written by the agent on **every** cloud run. Proof it ran, and an
 honest record of what it decided — including days with no trades.
 
-- **Runs logged:** 397  (70 during market hours)
+- **Runs logged:** 398  (70 during market hours)
 - **Trades placed:** 31   ·   **Positions closed:** 28
 
 | Time (ET) | Assets | Market | Equity | Open | New | Exits | What happened |
 |---|---|---|---|---|---|---|---|
-| 2026-11-10 08:20 | option+crypto | closed | $100,967 | 4 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-10 15:30 | option+crypto | open | $101,635 | 6 | 3 | 1 | BOUGHT 1x QQQ put; 2x AAPL call; 1x MSFT call; closed 1 position(s) |
 | 2026-11-10 19:54 | option+crypto | closed | $101,163 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-11 02:37 | option+crypto | closed | $101,236 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
@@ -68,4 +67,5 @@ honest record of what it decided — including days with no trades.
 | 2026-11-27 09:01 | option+crypto | closed | $103,330 | 6 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-27 17:38 | crypto | closed | $104,312 | 1 | 0 | 0 | no signal — nothing actionable across options + crypto |
 | 2026-11-27 23:13 | crypto | closed | $104,312 | 1 | 0 | 0 | no signal — nothing actionable across options + crypto |
+| 2026-11-28 08:16 | crypto | closed | $104,312 | 1 | 0 | 0 | no signal — nothing actionable across options + crypto |
 
